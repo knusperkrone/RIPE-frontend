@@ -1,0 +1,117 @@
+import 'package:flutter/material.dart';
+import 'package:iftem/service/backend_service.de.dart';
+import 'package:iftem/service/mixins/mqtt_client_service.dart';
+import 'package:iftem/service/models/dto.dart';
+import 'package:iftem/service/sensor_listener_service.dart';
+import 'package:iftem/service/sensor_settings.dart';
+import 'package:iftem/ui/component/branded.dart';
+import 'package:iftem/ui/page/detail/sensor_data_card.dart';
+import 'package:iftem/ui/page/sensor_overview_page.dart';
+
+import 'agent_decorator.dart';
+
+class SensorDetailPage extends StatefulWidget {
+  final RegisteredSensor sensor;
+  final SensorDto data;
+
+  const SensorDetailPage(this.sensor, this.data)
+      : assert(sensor != null && data != null);
+
+  @override
+  State<StatefulWidget> createState() => _SensorDetailPageState();
+}
+
+class _SensorDetailPageState extends State<SensorDetailPage> {
+  final _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final _backendService = new BackendService();
+  SensorListenerService _service;
+  SensorDto data;
+  RegisteredSensor info;
+
+  /*
+   * Constructor/Destructor
+   */
+
+  @override
+  void initState() {
+    super.initState();
+    data = widget.data;
+    info = widget.sensor;
+    _service = new SensorListenerService();
+    MqttClientService.init().then((value) {
+      _service.listenSensor(info.id, info.key, _refreshData);
+    });
+  }
+
+  @override
+  void dispose() {
+    _service.dispose();
+    super.dispose();
+  }
+
+  /*
+   * Callbacks
+   */
+
+  void _onBack(BuildContext context) {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    } else {
+      Navigator.pushReplacement<void, void>(
+        context,
+        MaterialPageRoute(builder: (_) => SensorOverviewPage()),
+      );
+    }
+  }
+
+  Future<void> _refreshData() async {
+    final resp = await _backendService.getSensorData(info.id, info.key);
+    if (resp.isNotEmpty) {
+      setState(() => data = resp.value);
+    } else {
+      final snackbar = IftemSnackbar(
+        context,
+        label: 'Sensor konnte nicht aktualisiert werden',
+        action: SnackBarAction(
+          label: 'Erneut versuchen',
+          onPressed: _refreshData,
+        ),
+      );
+      _scaffoldKey.currentState.hideCurrentSnackBar();
+      _scaffoldKey.currentState.showSnackBar(snackbar);
+    }
+  }
+
+  /*
+   * Build
+   */
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        _onBack(context);
+        return true;
+      },
+      child: Scaffold(
+        key: _scaffoldKey,
+        appBar: IftemAppBar(
+          title: Text(data.name),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => _onBack(context),
+          ),
+        ),
+        body: ListView.builder(
+          itemCount: 1 + data.agents.length,
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return SensorDataCard(data.sensorData);
+            }
+            return new AgentDecorator(info, data.agents[index - 1]);
+          },
+        ),
+      ),
+    );
+  }
+}
