@@ -51,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
       final isMqttConnected = await _mqttConnectFut;
       if (isMqttConnected) {
         // Only fetch sensor failed - show overview, with context options
-        if (sensorsList.value.length == 0 || !isDirty) {
+        if (sensorsList.value.isEmpty || !isDirty) {
           final first = sensorsList.value.first;
           final data =
               await BackendService().getSensorData(first.id, first.key);
