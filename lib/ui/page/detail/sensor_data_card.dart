@@ -15,24 +15,24 @@ class SensorDataCard extends StatelessWidget {
     BuildContext context,
     IconData icon,
     String text,
-    dynamic value,
+    num? value,
     String appendix,
   ) {
     if (value == null) {
       return [];
     }
 
-    final subhead = Theme.of(context).textTheme.subtitle1.copyWith();
-    final valTheme = Theme.of(context).textTheme.subtitle1.copyWith(
-        //color: Theme.of(context).buttonColor,
-        fontWeight: FontWeight.bold,
-        color: Colors.black87);
+    final subhead = Theme.of(context).textTheme.subtitle1!.copyWith();
+    final valTheme = Theme.of(context)
+        .textTheme
+        .subtitle1!
+        .copyWith(fontWeight: FontWeight.bold, color: Colors.black87);
     return [
       ListTile(
         leading: Icon(icon),
         title: RichText(
           text: TextSpan(text: text, style: subhead, children: [
-            TextSpan(text: ' $value', style: valTheme),
+            TextSpan(text: ' ${value.toStringAsFixed(1)}', style: valTheme),
             TextSpan(text: appendix, style: valTheme),
           ]),
         ),
@@ -58,7 +58,7 @@ class SensorDataCard extends StatelessWidget {
                 context, Icons.brightness_4, 'Helligkeit:', data.light, ' lux'),
             ListTile(
               dense: true,
-              title: Text('Zeitstempel: ${TimeUtils.toHR(data.timestamp)}'),
+              title: Text('Zeitstempel: ${toHR(data.timestamp)} UTC'),
               subtitle: Text('Battery: ${data.battery}%'),
             )
           ],

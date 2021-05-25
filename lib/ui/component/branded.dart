@@ -3,25 +3,25 @@ import 'package:iftem/ui/component/colors.dart';
 
 class IftemAppBar extends AppBar {
   IftemAppBar({
-    Widget leading,
+    Widget? leading,
     bool automaticallyImplyLeading = true,
-    Widget title,
-    List<Widget> actions,
-    PreferredSizeWidget bottom,
-    Color shadowColor,
-    ShapeBorder shape,
-    Color backgroundColor,
-    Brightness brightness,
-    IconThemeData iconTheme,
-    IconThemeData actionsIconTheme,
-    TextTheme textTheme,
+    Widget? title,
+    List<Widget>? actions,
+    PreferredSizeWidget? bottom,
+    Color? shadowColor,
+    ShapeBorder? shape,
+    Color? backgroundColor,
+    Brightness? brightness,
+    IconThemeData? iconTheme,
+    IconThemeData? actionsIconTheme,
+    TextTheme? textTheme,
     bool primary = true,
-    bool centerTitle,
+    bool? centerTitle,
     bool excludeHeaderSemantics = false,
     double titleSpacing = NavigationToolbar.kMiddleSpacing,
     double toolbarOpacity = 1.0,
     double bottomOpacity = 1.0,
-    double toolbarHeight,
+    double? toolbarHeight,
   }) : super(
           elevation: 2,
           flexibleSpace: Container(
@@ -58,23 +58,55 @@ class IftemAppBar extends AppBar {
 
 class IftemSnackbar extends SnackBar {
   static Text style(BuildContext context, String label) {
-    final textTheme = Theme.of(context).textTheme.subtitle1;
+    final textTheme = Theme.of(context).textTheme.subtitle1!;
     return Text(label, style: textTheme.copyWith(color: Colors.black45));
   }
 
   IftemSnackbar(
     BuildContext context, {
-    String label,
-    SnackBarAction action,
+    String label = '',
+    SnackBarAction? action,
     Duration duration = const Duration(milliseconds: 4000),
+    SnackBarBehavior behavior = SnackBarBehavior.floating,
   }) : super(
           content: IftemSnackbar.style(context, label),
           backgroundColor: BACKGROUND_COLOR,
-          behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
           ),
           action: action,
           duration: duration,
+          behavior: behavior,
         );
+}
+
+class IftemIcon extends StatelessWidget {
+  final IconData icon;
+
+  const IftemIcon(this.icon);
+
+  @override
+  Widget build(BuildContext context) {
+    final size = Theme.of(context).iconTheme.size ?? 24.0;
+    return ShaderMask(
+      child: SizedBox(
+        width: size * 1.2,
+        height: size * 1.2,
+        child: Icon(
+          icon,
+          size: size,
+          color: Colors.white,
+        ),
+      ),
+      shaderCallback: (Rect bounds) {
+        final rect = Rect.fromLTRB(0, 0, size, size);
+        return const LinearGradient(
+          begin: Alignment.bottomLeft,
+          end: Alignment.topRight,
+          stops: [0.0, 0.66],
+          colors: [ACCENT_COLOR, PRIMARY_COLOR],
+        ).createShader(rect);
+      },
+    );
+  }
 }

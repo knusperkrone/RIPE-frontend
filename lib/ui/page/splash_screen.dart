@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:iftem/service/backend_service.de.dart';
-import 'package:iftem/service/mixins/mqtt_client_service.dart';
 import 'package:iftem/service/sensor_settings.dart';
 import 'package:iftem/ui/component/branded.dart';
 import 'package:iftem/ui/page/detail/sensor_detail_page.dart';
@@ -19,9 +18,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   final _sensorService = new SensorSettingService();
-  final _scaffoldKey = new GlobalKey<ScaffoldState>();
-  Future<void> _delayFut;
-  Future<bool> _mqttConnectFut;
+  late Future<void> _delayFut;
   bool isDirty = false;
 
   /*
@@ -31,8 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _mqttConnectFut = MqttClientService.init();
-    _delayFut = Future.delayed(const Duration(milliseconds: 1500), () {});
+    _delayFut = new Future.delayed(const Duration(seconds: 1), () {});
     _sensorService.init().then((_) => _onConnect());
   }
 
@@ -42,50 +38,44 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _onConnect() async {
     final sensorsList = _sensorService.getSensors();
-    if (sensorsList.isEmpty) {
+    if (sensorsList == null) {
       // No sensor - register!
+      await _delayFut;
       Navigator.pushReplacement<void, void>(
           context, MaterialPageRoute(builder: (_) => SensorRegisterPage()));
-    } else {
-      // Has sensors - show overview
-      final isMqttConnected = await _mqttConnectFut;
-      if (isMqttConnected) {
-        // Only fetch sensor failed - show overview, with context options
-        if (sensorsList.value.isEmpty || !isDirty) {
-          final first = sensorsList.value.first;
-          final data =
-              await BackendService().getSensorData(first.id, first.key);
-          if (data.isPresent) {
-            await _delayFut;
-            return Navigator.pushReplacement<void, void>(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => SensorDetailPage(first, data.value)));
-          }
-        } else {
-          await _delayFut;
-          return Navigator.pushReplacement<void, void>(
-              context, MaterialPageRoute(builder: (_) => SensorOverviewPage()));
-        }
+    } else if (!isDirty && sensorsList.length == 1) {
+      final first = sensorsList.first;
+      final data = await BackendService().getSensorData(first.id, first.key);
+      if (data != null) {
+        await _delayFut;
+        return Navigator.pushReplacement<void, void>(context,
+            MaterialPageRoute(builder: (_) => SensorDetailPage(first, data)));
+      } else {
+        isDirty = true;
+        return _notifyFetchError();
       }
-
-      // Cannot connect - notify user
-      isDirty = true;
-      final snackbar = IftemSnackbar(
-        context,
-        label: 'Sensor-Daten konnten nicht abgerufen werden',
-        duration: const Duration(days: 1),
-        action: SnackBarAction(
-          label: 'Erneut versuchen',
-          onPressed: () {
-            _mqttConnectFut = MqttClientService.init();
-            _onConnect();
-          },
-        ),
-      );
-      _scaffoldKey.currentState.hideCurrentSnackBar();
-      _scaffoldKey.currentState.showSnackBar(snackbar);
+    } else {
+      await _delayFut;
+      return Navigator.pushReplacement<void, void>(
+          context, MaterialPageRoute(builder: (_) => SensorOverviewPage()));
     }
+  }
+
+  void _notifyFetchError() {
+    isDirty = true;
+    final snackbar = IftemSnackbar(
+      context,
+      label: 'Sensor-Daten konnten nicht abgerufen werden',
+      duration: const Duration(days: 1),
+      action: SnackBarAction(
+        label: 'Erneut versuchen',
+        onPressed: () {
+          _onConnect();
+        },
+      ),
+    );
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
   /*
@@ -94,30 +84,28 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
-      key: _scaffoldKey,
       body: Container(
         decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-              Theme.of(context).canvasColor,
-              Theme.of(context).accentColor
-            ])),
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+            colors: [theme.canvasColor, theme.accentColor],
+          ),
+        ),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image(
                 image: widget.logo,
-                height: 200,
+                height: 200.0,
+                width: 200.0,
               ),
               Text(
                 'Iftem',
-                style: Theme.of(context)
-                    .textTheme
-                    .headline2
+                style: theme.textTheme.headline2!
                     .copyWith(fontWeight: FontWeight.w200),
               ),
             ],

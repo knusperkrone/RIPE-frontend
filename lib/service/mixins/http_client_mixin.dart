@@ -18,7 +18,7 @@ abstract class DartHttpClientMixin {
       String base, String path, Map<String, String> headers) async {
     assert(path.codeUnitAt(0) == '/'.codeUnitAt(0));
     final req = await _client.getUrl(Uri.parse('$base$path'));
-    headers?.forEach((key, value) => req.headers.set(key, value));
+    headers.forEach((key, value) => req.headers.set(key, value));
 
     return await req.close();
   }
@@ -34,7 +34,7 @@ abstract class DartHttpClientMixin {
       Map<String, String> headers, String body) async {
     assert(path.codeUnitAt(0) == '/'.codeUnitAt(0));
     final req = await _client.postUrl(Uri.parse('$base$path'));
-    headers?.forEach((key, value) => req.headers.set(key, value));
+    headers.forEach((key, value) => req.headers.set(key, value));
     req.add(utf8.encode(body));
 
     return await req.close();
@@ -51,7 +51,7 @@ abstract class DartHttpClientMixin {
       String body) async {
     assert(path.codeUnitAt(0) == '/'.codeUnitAt(0));
     final req = await _client.putUrl(Uri.parse('$base$path'));
-    headers?.forEach((key, value) => req.headers.set(key, value));
+    headers.forEach((key, value) => req.headers.set(key, value));
     req.add(utf8.encode(body));
 
     final response = await req.close();

@@ -20,9 +20,9 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
   final _backendService = new BackendService();
   final _formKey = new GlobalKey<FormState>();
 
-  TextEditingController _idController;
-  TextEditingController _pwdController;
-  TextEditingController _nameController;
+  late TextEditingController _idController;
+  late TextEditingController _pwdController;
+  late TextEditingController _nameController;
   bool canPop = false;
 
   /*
@@ -57,8 +57,8 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
 
   Future<void> _onRegister(BuildContext context) async {
     // Validate input
-    _formKey.currentState.save();
-    if (!_formKey.currentState.validate()) {
+    _formKey.currentState!.save();
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
@@ -66,28 +66,32 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
     final id = int.parse(_idController.value.text);
     final key = _pwdController.value.text;
     String name = _nameController.value.text;
-    final sensorOpt = await _backendService.getSensorData(id, key);
+    final sensor = await _backendService.getSensorData(id, key);
 
     // Notify user
-    SnackBar snackBar;
-    bool isSuccess = sensorOpt.isNotEmpty;
+    SnackBar? snackBar;
+    bool isSuccess = sensor != null;
     if (isSuccess) {
-      if (name?.trim()?.isEmpty ?? true) {
-        name = sensorOpt.value.name;
+      if (name.trim().isEmpty) {
+        name = sensor.name;
       }
 
       // Ask for photo
       final file = await showDialog<File>(
         context: context,
         barrierDismissible: false,
-        builder: (_) => AddPhotoDialog(_settingService.placeholder),
+        builder: (_) => AddPhotoDialog(
+          _settingService.placeholder,
+          _settingService.placeholderColor,
+        ),
       );
 
-      final settingOpt = _settingService.addSensor(id, key, name, file?.path);
-      if (sensorOpt.isNotEmpty) {
+      final settings =
+          await _settingService.addSensor(id, key, name, file?.path);
+      if (settings != null) {
         if (!canPop) {
           // Show sensor
-          _onBack(settingOpt.value, sensorOpt.value);
+          _onBack(settings, sensor);
           return;
         }
 
@@ -95,7 +99,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
           context,
           label: 'Registrierung erfolgreich',
           action: SnackBarAction(
-            onPressed: () => _onBack(settingOpt.value, sensorOpt.value),
+            onPressed: () => _onBack(settings, sensor),
             label: 'Abschliessen',
           ),
         );
@@ -112,8 +116,8 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
             label: canPop ? 'Abbrechen' : 'Erneut versuchen',
           ));
     }
-    Scaffold.of(context).hideCurrentSnackBar();
-    Scaffold.of(context).showSnackBar(snackBar);
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackBar!);
   }
 
   /*
@@ -130,12 +134,14 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
           width: double.infinity,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Theme.of(context).canvasColor,
-                  Theme.of(context).accentColor
-                ]),
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: const [0.0, 0.33],
+              colors: [
+                Theme.of(context).accentColor,
+                Theme.of(context).canvasColor,
+              ],
+            ),
           ),
           alignment: Alignment.center,
           child: ListView(
@@ -147,15 +153,14 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
                   child: IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: canPop ? () => Navigator.pop(context) : null,
-                    color: Theme.of(context).primaryColor,
                   ),
                 ),
               ),
               Container(
                 height: (constraints.maxHeight / 6) - 40,
               ),
-              Image.asset(
-                'assets/icon.png',
+              const Image(
+                image: AssetImage('assets/icon.png'),
                 width: 80,
                 height: 80,
               ),
@@ -165,7 +170,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
                 textAlign: TextAlign.center,
                 style: Theme.of(context)
                     .textTheme
-                    .headline6
+                    .headline6!
                     .copyWith(fontWeight: FontWeight.w200),
               ),
               Container(height: 30),
@@ -185,7 +190,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
                           hintText: 'Id',
-                          icon: Icon(Icons.mobile_screen_share),
+                          icon: IftemIcon(Icons.mobile_screen_share),
                         ),
                       ),
                       TextFormField(
@@ -195,7 +200,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
                         keyboardType: TextInputType.visiblePassword,
                         decoration: const InputDecoration(
                           hintText: 'Passwort',
-                          icon: Icon(Icons.security),
+                          icon: IftemIcon(Icons.security),
                         ),
                       ),
                       TextFormField(
@@ -203,7 +208,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
                         controller: _nameController,
                         decoration: const InputDecoration(
                           hintText: 'Name',
-                          icon: Icon(Icons.local_florist),
+                          icon: IftemIcon(Icons.local_florist),
                         ),
                       ),
                     ],
@@ -215,8 +220,10 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
                 padding: EdgeInsets.symmetric(
                   horizontal: constraints.maxWidth / 6,
                 ),
-                child: RaisedButton(
-                  color: PRIMARY_COLOR,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(PRIMARY_COLOR),
+                  ),
                   child: const Text('Bestätigen'),
                   onPressed: () => _onRegister(context),
                 ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:iftem/service/backend_service.de.dart';
-import 'package:iftem/service/mixins/mqtt_client_service.dart';
 import 'package:iftem/service/models/dto.dart';
 import 'package:iftem/service/sensor_listener_service.dart';
 import 'package:iftem/service/sensor_settings.dart';
@@ -14,19 +13,17 @@ class SensorDetailPage extends StatefulWidget {
   final RegisteredSensor sensor;
   final SensorDto data;
 
-  const SensorDetailPage(this.sensor, this.data)
-      : assert(sensor != null && data != null);
+  const SensorDetailPage(this.sensor, this.data);
 
   @override
   State<StatefulWidget> createState() => _SensorDetailPageState();
 }
 
 class _SensorDetailPageState extends State<SensorDetailPage> {
-  final _scaffoldKey = new GlobalKey<ScaffoldState>();
   final _backendService = new BackendService();
-  SensorListenerService _service;
-  SensorDto data;
-  RegisteredSensor info;
+  late SensorListenerService _service;
+  late SensorDto data;
+  late RegisteredSensor info;
 
   /*
    * Constructor/Destructor
@@ -37,8 +34,8 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
     super.initState();
     data = widget.data;
     info = widget.sensor;
-    _service = new SensorListenerService();
-    MqttClientService.init().then((value) {
+    _service = new SensorListenerService(data.broker);
+    _service.connect().then((_) {
       _service.listenSensor(info.id, info.key, _refreshData);
     });
   }
@@ -66,8 +63,8 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
 
   Future<void> _refreshData() async {
     final resp = await _backendService.getSensorData(info.id, info.key);
-    if (resp.isNotEmpty) {
-      setState(() => data = resp.value);
+    if (resp != null) {
+      setState(() => data = resp);
     } else {
       final snackbar = IftemSnackbar(
         context,
@@ -77,8 +74,7 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
           onPressed: _refreshData,
         ),
       );
-      _scaffoldKey.currentState.hideCurrentSnackBar();
-      _scaffoldKey.currentState.showSnackBar(snackbar);
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
     }
   }
 
@@ -94,7 +90,6 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
         return true;
       },
       child: Scaffold(
-        key: _scaffoldKey,
         appBar: IftemAppBar(
           title: Text(data.name),
           leading: IconButton(
@@ -108,7 +103,11 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
             if (index == 0) {
               return SensorDataCard(data.sensorData);
             }
-            return new AgentDecorator(info, data.agents[index - 1]);
+            return new AgentDecorator(
+              info: info,
+              agent: data.agents[index - 1],
+              refreshCallback: _refreshData,
+            );
           },
         ),
       ),

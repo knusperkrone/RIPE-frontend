@@ -8,7 +8,7 @@ class EditNameDialog extends StatefulWidget {
 
 class _EditNameDialogState extends State<EditNameDialog> {
   final _formKey = new GlobalKey<FormState>();
-  TextEditingController _textController;
+  late TextEditingController _textController;
 
   /*
    * Constructor/Destructor
@@ -31,8 +31,8 @@ class _EditNameDialogState extends State<EditNameDialog> {
    */
 
   void _onSubmit() {
-    _formKey.currentState.save();
-    if (!_formKey.currentState.validate()) {
+    _formKey.currentState!.save();
+    if (!_formKey.currentState!.validate()) {
       return;
     }
     Navigator.pop(context, _textController.value.text);

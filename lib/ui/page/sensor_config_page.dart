@@ -8,9 +8,8 @@ import 'package:tuple/tuple.dart';
 import 'dialog/config_sensor_dialog.dart';
 
 class SensorConfigPage extends StatelessWidget {
-  final _scaffoldKey = new GlobalKey<ScaffoldState>();
   final _senderService = new SensorServerService();
-  final List<String> wifiData = List.filled(2, null, growable: false);
+  final List<String?> wifiData = List.filled(2, null, growable: false);
 
   /*
    * UI-Callbacks
@@ -20,8 +19,8 @@ class SensorConfigPage extends StatelessWidget {
     final result = await showDialog<Tuple2<String, String>>(
       context: context,
       builder: (_) => ConfigSensorDialog(
-        ssid: wifiData[0],
-        pwd: wifiData[1],
+        ssid: wifiData[0]!,
+        pwd: wifiData[1]!,
       ),
     );
     if (result == null) {
@@ -42,8 +41,8 @@ class SensorConfigPage extends StatelessWidget {
         onPressed: () => _onAdd(context),
       ),
     );
-    _scaffoldKey.currentState.hideCurrentSnackBar();
-    _scaffoldKey.currentState.showSnackBar(snackbar);
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
   /*
@@ -55,19 +54,21 @@ class SensorConfigPage extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
-      key: _scaffoldKey,
       body: LayoutBuilder(builder: (context, constraints) {
         final linePadding = constraints.maxWidth / 9;
         return Container(
           width: double.infinity,
           decoration: BoxDecoration(
-              gradient: LinearGradient(
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                  colors: [
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: const [0.0, 0.33],
+              colors: [
+                Theme.of(context).accentColor,
                 Theme.of(context).canvasColor,
-                Theme.of(context).accentColor
-              ])),
+              ],
+            ),
+          ),
           alignment: Alignment.center,
           child: ListView(
             children: [
@@ -76,7 +77,7 @@ class SensorConfigPage extends StatelessWidget {
                 child: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.pop(context),
-                  color: Theme.of(context).primaryColor,
+                  color: Colors.white70,
                 ),
               ),
               Container(
@@ -93,7 +94,7 @@ class SensorConfigPage extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: Theme.of(context)
                     .textTheme
-                    .headline6
+                    .headline6!
                     .copyWith(fontWeight: FontWeight.w200),
               ),
               Container(height: 30),
@@ -105,8 +106,8 @@ class SensorConfigPage extends StatelessWidget {
                     children: [
                       TextSpan(
                         text: '• ',
-                        style: textTheme.subtitle2
-                            .copyWith(color: DARK_PRIMARY_COLOR),
+                        style:
+                            textTheme.subtitle2!.copyWith(color: BUTTON_COLOR),
                       ),
                       TextSpan(
                           text: 'Sensor ein und wieder ausschalten',
@@ -123,8 +124,8 @@ class SensorConfigPage extends StatelessWidget {
                     children: [
                       TextSpan(
                         text: '• ',
-                        style: textTheme.subtitle2
-                            .copyWith(color: DARK_PRIMARY_COLOR),
+                        style:
+                            textTheme.subtitle2!.copyWith(color: BUTTON_COLOR),
                       ),
                       TextSpan(text: 'WLAN mit ', style: textTheme.subtitle1),
                       TextSpan(
@@ -143,8 +144,8 @@ class SensorConfigPage extends StatelessWidget {
                     children: [
                       TextSpan(
                         text: '• ',
-                        style: textTheme.subtitle2
-                            .copyWith(color: DARK_PRIMARY_COLOR),
+                        style:
+                            textTheme.subtitle2!.copyWith(color: BUTTON_COLOR),
                       ),
                       TextSpan(
                           text: 'Heim WLAN Verbinungsdaten angeben',
@@ -158,8 +159,10 @@ class SensorConfigPage extends StatelessWidget {
                 padding: EdgeInsets.symmetric(
                   horizontal: constraints.maxWidth / 6,
                 ),
-                child: RaisedButton(
-                  color: PRIMARY_COLOR,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(PRIMARY_COLOR),
+                  ),
                   child: const Text('Sensor konfigurieren'),
                   onPressed: () => _onAdd(context),
                 ),

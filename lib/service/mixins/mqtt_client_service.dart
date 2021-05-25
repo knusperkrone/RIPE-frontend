@@ -8,51 +8,78 @@ import 'package:typed_data/typed_buffers.dart';
 
 typedef MqttReceiveFunc = void Function(String);
 
-abstract class MqttClientService {
-  static const _BASE_URL = 'retroapp.if-lab.de';
+class _MqttContext {
+  final MqttServerClient client;
+  final Map<String, List<MqttReceiveFunc>> callbacks = new HashMap();
 
-  static final _observers = new HashMap<String, List<MqttReceiveFunc>>();
-  static bool _isOfflineMode = false;
-  static MqttClient client;
+  _MqttContext(this.client);
 
-  static Future<bool> init() async {
-    if (client == null || !isConnected()) {
-      if (client == null) {
-        final MqttConnectMessage connMess = MqttConnectMessage()
-            .withClientIdentifier('_APP_')
-            .keepAliveFor(20)
-            .withWillQos(MqttQos.exactlyOnce);
-        client = MqttServerClient(_BASE_URL, '_APP_');
-        client.connectionMessage = connMess;
-        client.keepAlivePeriod = 20;
-        client.onConnected = _onConnect;
-        client.onDisconnected = _onDisconnect;
-      }
+  void addCallback(String topic, MqttReceiveFunc callback) {
+    if (callbacks[topic] == null) {
+      callbacks[topic] = [];
+    }
+    callbacks[topic]!.add(callback);
+    if (callbacks[topic]!.length == 1) {
+      client.subscribe(topic, MqttQos.atLeastOnce);
+    }
+  }
 
-      try {
-        await client.connect();
-      } catch (error) {
-        print(error);
-        return false;
-      }
+  void removeCallback(String topic) {
+    client.unsubscribe(topic);
+    callbacks[topic]?.clear();
+  }
 
-      client.updates.listen((List<MqttReceivedMessage<MqttMessage>> msgBuffer) {
-        for (final msg in msgBuffer) {
-          final topic = msg.topic;
-          final recMess = msg.payload as MqttPublishMessage;
-          final String payload =
-              MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-
-          final observers = _observers[topic];
-          if (observers == null) {
-            print('No observer for $topic - $payload');
-          } else {
-            for (final observer in observers) {
-              observer(payload);
-            }
-          }
-        }
+  void reconnect() {
+    for (final sub in callbacks.entries) {
+      sub.value.forEach((callback) {
+        addCallback(sub.key, callback);
       });
+    }
+  }
+
+  void publish(String topic, String msg) {
+    final bytes = utf8.encode(msg);
+    final data = new Uint8Buffer(bytes.length);
+    for (int i = 0; i < bytes.length; i++) {
+      data[i] = bytes[i];
+    }
+    client.publishMessage(topic, MqttQos.atLeastOnce, data);
+  }
+
+  bool get isConnected =>
+      client.connectionStatus?.state == MqttConnectionState.connected;
+}
+
+abstract class MqttClientService {
+  static final Map<String, _MqttContext> _contexts = {}; // < BrokerUrl, Ctx>
+  static bool _isOfflineMode = false;
+
+  static Future<bool> connect(String broker) async {
+    _MqttContext? ctx = _contexts[broker];
+
+    if (ctx == null || !ctx.isConnected) {
+      const id = '_APP_'; // TODO(knukro): generate
+      final client = new MqttServerClient(broker, id);
+      final MqttConnectMessage connMess = MqttConnectMessage()
+          .withClientIdentifier(id)
+          .withWillQos(MqttQos.exactlyOnce);
+      client.connectionMessage = connMess;
+      client.keepAlivePeriod = 20;
+      client.onConnected = () => _onConnect;
+      client.onDisconnected = () => _onDisconnect;
+
+      if (!_isOfflineMode) {
+        try {
+          await client.connect();
+        } catch (e) {
+          print('[ERROR] MqttClientService.init - $e');
+          return false;
+        }
+      }
+
+      ctx = new _MqttContext(client);
+      client.updates!.listen((msg) => _listen(ctx!, msg));
+      _contexts[broker] = ctx;
     }
     return true;
   }
@@ -61,32 +88,32 @@ abstract class MqttClientService {
    * Static init methods
    */
 
-  static void _onConnect() {
-    // Resubscribe
-    print('[INFO] MQTT connected');
-    for (final topic in _observers.keys) {
-      final status = client.getSubscriptionsStatus(topic);
-      if (status == MqttSubscriptionStatus.doesNotExist) {
-        client.subscribe(topic, MqttQos.atMostOnce);
+  static void _onConnect(String broker) {
+    print('[INFO] MqttClientService.connected for broker $broker');
+    _contexts[broker]?.reconnect();
+  }
+
+  static void _onDisconnect(String broker) {
+    print('[ERROR] MqttClientService.disconnected for broker $broker');
+  }
+
+  static void _listen(
+      _MqttContext ctx, List<MqttReceivedMessage<MqttMessage>> msgBuffer) {
+    for (final msg in msgBuffer) {
+      final topic = msg.topic;
+      final casted = (msg.payload as MqttPublishMessage).payload;
+      final payload = MqttPublishPayload.bytesToStringAsString(casted.message!);
+
+      final observers = ctx.callbacks[topic];
+      if (observers == null) {
+        print(
+            '[WARN] MqttClientService.listen No observer for $topic - $payload');
+      } else {
+        for (final observer in observers) {
+          observer(payload);
+        }
       }
     }
-  }
-
-  static void _onDisconnect() {
-    print('[ERROR] MQTT disconnected');
-  }
-
-  /*
-   * Static helper method
-   */
-
-  static Uint8Buffer _toPayload(String payload) {
-    final bytes = utf8.encode(payload);
-    final buffer = new Uint8Buffer(bytes.length);
-    for (int i = 0; i < bytes.length; i++) {
-      buffer[i] = bytes[i];
-    }
-    return buffer;
   }
 
   /*
@@ -99,43 +126,38 @@ abstract class MqttClientService {
 
   static void setOfflineMode([bool isOffline = true]) {
     _isOfflineMode = isOffline;
-  }
-
-  static bool isConnected() {
-    if (client != null) {
-      final state = client.connectionStatus.state;
-      return state == MqttConnectionState.connected;
-    }
-    return false;
-  }
-
-  @protected
-  void subscribe(String topic, MqttReceiveFunc recFunc) {
-    if (_isOfflineMode) {
-      return;
-    }
-
-    if (_observers[topic] == null) {
-      _observers[topic] = [];
-    }
-
-    _observers[topic].add(recFunc);
-    if (_observers[topic].length == 1) {
-      client.subscribe(topic, MqttQos.atMostOnce);
+    for (final ctx in _contexts.values) {
+      if (isOffline) {
+        ctx.client.disconnect();
+      } else {
+        ctx.client.connect();
+      }
     }
   }
 
   @protected
-  void unsubscribe(String topic) {
+  static bool isConnected(String broker) {
+    return _contexts[broker]?.isConnected ?? false;
+  }
+
+  @protected
+  void subscribe(String broker, String topic, MqttReceiveFunc recFunc) {
     if (!_isOfflineMode) {
-      client.unsubscribe(topic);
+      _contexts[broker]?.addCallback(topic, recFunc);
     }
   }
 
   @protected
-  void publish(String topic, String data) {
+  void unsubscribe(String broker, String topic) {
     if (!_isOfflineMode) {
-      client.publishMessage(topic, MqttQos.exactlyOnce, _toPayload(data));
+      _contexts[broker]?.removeCallback(topic);
+    }
+  }
+
+  @protected
+  void publish(String broker, String topic, String data) {
+    if (!_isOfflineMode) {
+      _contexts[broker]?.publish(topic, data);
     }
   }
 }

@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:iftem/ui/component/colors.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:palette_generator/palette_generator.dart';
 
 class AddPhotoDialog extends StatefulWidget {
-  final String path;
+  final String imagePath;
+  final Color imageGradient;
 
-  const AddPhotoDialog(this.path) : assert(path != null);
+  const AddPhotoDialog(this.imagePath, this.imageGradient);
 
   @override
   State createState() => _AddPhotoDialogState();
@@ -15,12 +17,14 @@ class AddPhotoDialog extends StatefulWidget {
 
 class _AddPhotoDialogState extends State<AddPhotoDialog> {
   final _imagePicker = new ImagePicker();
-  File file;
+  late File _imagePath;
+  late Color _imageShadow;
 
   @override
   void initState() {
     super.initState();
-    file = new File(widget.path);
+    _imagePath = new File(widget.imagePath);
+    _imageShadow = widget.imageGradient;
   }
 
   /*
@@ -30,9 +34,16 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
   Future<void> _onPhoto(BuildContext context, ImageSource source) async {
     final picked = await _imagePicker.getImage(source: source);
     if (picked != null) {
-      setState(() {
-        file = new File(picked.path);
-      });
+      // Select file and preview gradient
+      _imagePath = new File(picked.path);
+      final palette =
+          await PaletteGenerator.fromImageProvider(new FileImage(_imagePath));
+      _imageShadow = (palette.lightVibrantColor ??
+              palette.vibrantColor ??
+              palette.dominantColor)!
+          .color;
+
+      setState(() {});
     }
   }
 
@@ -47,20 +58,26 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
           borderRadius: BorderRadius.all(Radius.circular(12.0))),
       contentPadding: const EdgeInsets.only(top: 10.0),
       content: Container(
-        height: 250,
+        height: 270,
         child: Column(
           children: [
             const Text('Pflanzenprofilbild hinzufügen'),
             const Divider(),
             Container(
-              height: 80,
-              width: 80,
-              decoration: BoxDecoration(
-                color: BACKGROUND_COLOR,
+              width: 100,
+              height: 100,
+              foregroundDecoration: BoxDecoration(
                 shape: BoxShape.circle,
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color: _imageShadow,
+                    blurRadius: 7.0,
+                    offset: const Offset(0.0, 0.75),
+                  ),
+                ],
                 image: DecorationImage(
-                  fit: BoxFit.fill,
-                  image: FileImage(file),
+                  fit: BoxFit.cover,
+                  image: FileImage(_imagePath),
                 ),
               ),
             ),
@@ -102,7 +119,7 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
                 ),
                 child: const Text('Bestätigen', textAlign: TextAlign.center),
               ),
-              onTap: () => Navigator.pop(context, file),
+              onTap: () => Navigator.pop(context, _imagePath),
             ),
           ],
         ),

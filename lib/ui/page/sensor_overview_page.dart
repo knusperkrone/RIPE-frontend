@@ -6,12 +6,12 @@ import 'package:flutter/rendering.dart';
 import 'package:iftem/service/backend_service.de.dart';
 import 'package:iftem/service/sensor_settings.dart';
 import 'package:iftem/ui/component/branded.dart';
+import 'package:iftem/ui/component/colors.dart';
 import 'package:iftem/ui/page/detail/sensor_detail_page.dart';
 import 'package:iftem/ui/page/dialog/delete_sensor_dialog.dart';
 import 'package:iftem/ui/page/dialog/edit_name_dialog.dart';
 import 'package:iftem/ui/page/sensor_config_page.dart';
 import 'package:iftem/ui/page/sensor_register_page.dart';
-import 'package:palette_generator/palette_generator.dart';
 
 import 'dialog/add_photo_dialog.dart';
 
@@ -24,7 +24,7 @@ class SensorOverviewPage extends StatefulWidget {
 
 class _SensorOverviewPageState extends State<SensorOverviewPage> {
   final _fabKey = new GlobalKey<FabCircularMenuState>();
-  List<RegisteredSensor> sensors;
+  late List<RegisteredSensor> _sensors;
 
   /*
    * Constructor/Destructor
@@ -33,7 +33,7 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
   @override
   void initState() {
     super.initState();
-    sensors = SensorSettingService().getSensors().value;
+    _sensors = SensorSettingService().getSensors()!;
   }
 
   /*
@@ -50,13 +50,13 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
       final settings = SensorSettingService();
       settings.removeSensor(id);
 
-      final sensorsOpt = settings.getSensors();
-      if (sensorsOpt.isEmpty) {
+      final sensors = settings.getSensors();
+      if (sensors == null) {
         Navigator.pushReplacement<void, void>(
             context, MaterialPageRoute(builder: (_) => SensorRegisterPage()));
       } else {
         setState(() {
-          sensors = sensorsOpt.value;
+          _sensors = sensors;
         });
       }
     }
@@ -68,60 +68,66 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: IftemAppBar(
-        title: const Text('IFtem'),
-        centerTitle: true,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 4.0, right: 4.0),
-        child: ListView.builder(
-          itemCount: 1 + sensors.length,
-          itemBuilder: (_, index) {
-            if (index == 0) {
-              return Container(height: 15);
-            }
-            return _SensorCard(
-              sensor: sensors[index - 1],
-              onDelete: _onDelete,
-            );
-          },
+    return Scaffold(body: Builder(builder: (context) {
+      return Scaffold(
+        appBar: IftemAppBar(
+          title: const Text('Ripe'),
+          centerTitle: true,
         ),
-      ),
-      floatingActionButton: FabCircularMenu(
-        key: _fabKey,
-        ringDiameter: MediaQuery.of(context).size.width * 0.66,
-        animationDuration: const Duration(milliseconds: 450),
-        children: <Widget>[
-          IconButton(
-              tooltip: 'Information',
-              icon: const Icon(Icons.info_outline),
-              onPressed: () {
-                _fabKey.currentState.close();
-                // TODO(knukro): About page
-              }),
-          IconButton(
-              tooltip: 'Sensor konfigurieren',
-              icon: const Icon(Icons.device_hub),
-              onPressed: () async {
-                await Navigator.push<void>(context,
-                        MaterialPageRoute(builder: (_) => SensorConfigPage()))
-                    .then((value) => _fabKey.currentState.close());
-                _fabKey.currentState.close();
-              }),
-          IconButton(
-              tooltip: 'Sensor hinzufügen',
-              icon: const Icon(Icons.person_add),
-              onPressed: () async {
-                await Navigator.push<void>(
-                    context,
-                    MaterialPageRoute<void>(
-                        builder: (_) => SensorRegisterPage()));
-                _fabKey.currentState.close();
-              }),
-        ],
-      ),
-    );
+        body: Padding(
+          padding: const EdgeInsets.only(left: 4.0, right: 4.0),
+          child: ListView.builder(
+            itemCount: 1 + _sensors.length,
+            itemBuilder: (_, index) {
+              if (index == 0) {
+                return Container(height: 15);
+              }
+              return _SensorCard(
+                sensor: _sensors[index - 1],
+                onDelete: _onDelete,
+              );
+            },
+          ),
+        ),
+        floatingActionButton: FabCircularMenu(
+          key: _fabKey,
+          ringDiameter: MediaQuery.of(context).size.width * 0.66,
+          animationDuration: const Duration(milliseconds: 450),
+          fabOpenIcon: const Icon(Icons.menu, color: Colors.white),
+          fabCloseIcon: const Icon(Icons.menu, color: Colors.white),
+          fabColor: BUTTON_COLOR,
+          ringColor: BUTTON_COLOR_LIGHT,
+          children: <Widget>[
+            IconButton(
+                tooltip: 'Information',
+                icon: const Icon(Icons.info_outline, color: Colors.white),
+                onPressed: () {
+                  _fabKey.currentState!.close();
+                  // TODO(knukro): About page
+                }),
+            IconButton(
+                tooltip: 'Sensor konfigurieren',
+                icon: const Icon(Icons.device_hub, color: Colors.white),
+                onPressed: () async {
+                  await Navigator.push<void>(context,
+                          MaterialPageRoute(builder: (_) => SensorConfigPage()))
+                      .then((value) => _fabKey.currentState!.close());
+                  _fabKey.currentState!.close();
+                }),
+            IconButton(
+                tooltip: 'Sensor hinzufügen',
+                icon: const Icon(Icons.person_add, color: Colors.white),
+                onPressed: () async {
+                  await Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                          builder: (_) => SensorRegisterPage()));
+                  _fabKey.currentState!.close();
+                }),
+          ],
+        ),
+      );
+    }));
   }
 }
 
@@ -130,8 +136,8 @@ class _SensorCard extends StatefulWidget {
   final _IntCallback onDelete;
 
   const _SensorCard({
-    @required this.sensor,
-    @required this.onDelete,
+    required this.sensor,
+    required this.onDelete,
   });
 
   @override
@@ -139,22 +145,16 @@ class _SensorCard extends StatefulWidget {
 }
 
 class _SensorCardState extends State<_SensorCard> {
-  String name;
-  ImageProvider image;
-  Color _gradientColor;
+  late String _name;
+  late ImageProvider _image;
+  Color? _gradientColor;
 
   @override
   void initState() {
     super.initState();
-    name = widget.sensor.name;
-
-    image = FileImage(File(widget.sensor.imagePath));
-    PaletteGenerator.fromImageProvider(image).then((palette) {
-      _gradientColor = (palette.vibrantColor ?? palette.dominantColor).color;
-      if (mounted) {
-        setState(() {});
-      }
-    });
+    _name = widget.sensor.name;
+    _image = FileImage(File(widget.sensor.imagePath));
+    _gradientColor = widget.sensor.imageColor;
   }
 
   /*
@@ -165,9 +165,9 @@ class _SensorCardState extends State<_SensorCard> {
     final id = widget.sensor.id;
     final key = widget.sensor.key;
     final data = await BackendService().getSensorData(id, key);
-    if (data.isPresent) {
+    if (data != null) {
       Navigator.push<void>(context, MaterialPageRoute(builder: (_) {
-        return new SensorDetailPage(widget.sensor, data.value);
+        return new SensorDetailPage(widget.sensor, data);
       }));
     } else {
       final snackbar = IftemSnackbar(
@@ -178,8 +178,8 @@ class _SensorCardState extends State<_SensorCard> {
           onPressed: _onTab,
         ),
       );
-      Scaffold.of(context).hideCurrentSnackBar();
-      Scaffold.of(context).showSnackBar(snackbar);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
     }
   }
 
@@ -187,17 +187,20 @@ class _SensorCardState extends State<_SensorCard> {
     final settings = SensorSettingService();
     final file = await showDialog<File>(
       context: context,
-      builder: (_) => AddPhotoDialog(widget.sensor.imagePath),
+      builder: (_) => AddPhotoDialog(
+        widget.sensor.imagePath,
+        widget.sensor.imageColor,
+      ),
     );
 
     if (file != null) {
-      final thumbnailPath = settings.changeImage(widget.sensor.id, file.path);
+      final changeTuple =
+          await settings.changeImage(widget.sensor.id, file.path);
 
       // Update image
-      image = FileImage(File(thumbnailPath));
-      final palette = await PaletteGenerator.fromImageProvider(image);
       setState(() {
-        _gradientColor = (palette.vibrantColor ?? palette.dominantColor).color;
+        _image = FileImage(new File(changeTuple.item1));
+        _gradientColor = changeTuple.item2;
       });
     }
   }
@@ -211,12 +214,12 @@ class _SensorCardState extends State<_SensorCard> {
     if (name != null) {
       final settings = SensorSettingService();
       setState(() {
-        this.name = settings.changeName(widget.sensor.id, name);
+        _name = settings.changeName(widget.sensor.id, name);
       });
     }
   }
 
-  /*
+/*
    * Build
    */
 
@@ -229,7 +232,7 @@ class _SensorCardState extends State<_SensorCard> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              _gradientColor,
+              _gradientColor!,
               Theme.of(context).cardColor,
             ],
             stops: const [0.0, 0.3],
@@ -248,11 +251,11 @@ class _SensorCardState extends State<_SensorCard> {
               shape: BoxShape.circle,
               image: DecorationImage(
                 fit: BoxFit.fill,
-                image: image,
+                image: _image,
               ),
             ),
           ),
-          title: Text(name),
+          title: Text(_name),
           trailing: PopupMenuButton(
             onSelected: (int i) {
               switch (i) {
