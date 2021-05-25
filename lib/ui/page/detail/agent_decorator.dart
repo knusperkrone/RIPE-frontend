@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:iftem/service/backend_service.de.dart';
-import 'package:iftem/service/models/dto.dart';
-import 'package:iftem/service/sensor_settings.dart';
-import 'package:iftem/ui/component/branded.dart';
-import 'package:iftem/ui/component/colors.dart';
-import 'package:iftem/ui/page/config/agent_config_page.dart';
-import 'package:iftem/ui/page/detail/slider_decorator.dart';
-import 'package:iftem/ui/page/detail/time_pane_decorator.dart';
+import 'package:ripe/service/backend_service.de.dart';
+import 'package:ripe/service/models/dto.dart';
+import 'package:ripe/service/sensor_settings.dart';
+import 'package:ripe/ui/component/branded.dart';
+import 'package:ripe/ui/component/colors.dart';
+import 'package:ripe/ui/page/config/agent_config_page.dart';
+import 'package:ripe/ui/page/detail/slider_decorator.dart';
+import 'package:ripe/ui/page/detail/time_pane_decorator.dart';
 
 typedef RefreshFn = Future<void> Function();
 
@@ -69,7 +69,7 @@ abstract class BaseDecorator extends StatefulWidget {
       domain: domain,
       payload: payload,
     )) {
-      final snackbar = IftemSnackbar(
+      final snackbar = RipeSnackbar(
         context,
         label: 'Befehl konnte nicht gesendet werden',
       );
@@ -99,7 +99,7 @@ abstract class BaseDecorator extends StatefulWidget {
       if (success) {
         _refreshCallback();
       } else {
-        final snackbar = IftemSnackbar(
+        final snackbar = RipeSnackbar(
           context,
           label: 'Konfiguration konnte nicht gesendet werden',
         );

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:iftem/ui/component/validator.dart';
+import 'package:ripe/ui/component/validator.dart';
 import 'package:tuple/tuple.dart';
 
 class ConfigSensorDialog extends StatefulWidget {

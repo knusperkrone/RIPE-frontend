@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:iftem/service/backend_service.de.dart';
-import 'package:iftem/service/models/dto.dart';
-import 'package:iftem/service/sensor_listener_service.dart';
-import 'package:iftem/service/sensor_settings.dart';
-import 'package:iftem/ui/component/branded.dart';
-import 'package:iftem/ui/page/detail/sensor_data_card.dart';
-import 'package:iftem/ui/page/sensor_overview_page.dart';
+import 'package:ripe/service/backend_service.de.dart';
+import 'package:ripe/service/models/dto.dart';
+import 'package:ripe/service/sensor_listener_service.dart';
+import 'package:ripe/service/sensor_settings.dart';
+import 'package:ripe/ui/component/branded.dart';
+import 'package:ripe/ui/page/detail/sensor_data_card.dart';
+import 'package:ripe/ui/page/sensor_overview_page.dart';
 
 import 'agent_decorator.dart';
 
@@ -66,7 +66,7 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
     if (resp != null) {
       setState(() => data = resp);
     } else {
-      final snackbar = IftemSnackbar(
+      final snackbar = RipeSnackbar(
         context,
         label: 'Sensor konnte nicht aktualisiert werden',
         action: SnackBarAction(
@@ -90,7 +90,7 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
         return true;
       },
       child: Scaffold(
-        appBar: IftemAppBar(
+        appBar: RipeAppBar(
           title: Text(data.name),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:iftem/service/models/dto.dart';
-import 'package:iftem/service/sensor_settings.dart';
-import 'package:iftem/ui/component/colors.dart';
-import 'package:iftem/ui/component/time_utils.dart';
+import 'package:ripe/service/models/dto.dart';
+import 'package:ripe/service/sensor_settings.dart';
+import 'package:ripe/ui/component/colors.dart';
+import 'package:ripe/ui/component/time_utils.dart';
 
 import 'agent_decorator.dart';
 

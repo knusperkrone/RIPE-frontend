@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:iftem/service/models/dto.dart';
-import 'package:iftem/ui/component/time_utils.dart';
+import 'package:ripe/service/models/dto.dart';
+import 'package:ripe/ui/component/time_utils.dart';
 
 class SensorDataCard extends StatelessWidget {
   final SensorDataDto data;

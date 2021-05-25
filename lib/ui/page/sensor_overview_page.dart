@@ -3,15 +3,15 @@ import 'dart:io';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:iftem/service/backend_service.de.dart';
-import 'package:iftem/service/sensor_settings.dart';
-import 'package:iftem/ui/component/branded.dart';
-import 'package:iftem/ui/component/colors.dart';
-import 'package:iftem/ui/page/detail/sensor_detail_page.dart';
-import 'package:iftem/ui/page/dialog/delete_sensor_dialog.dart';
-import 'package:iftem/ui/page/dialog/edit_name_dialog.dart';
-import 'package:iftem/ui/page/sensor_config_page.dart';
-import 'package:iftem/ui/page/sensor_register_page.dart';
+import 'package:ripe/service/backend_service.de.dart';
+import 'package:ripe/service/sensor_settings.dart';
+import 'package:ripe/ui/component/branded.dart';
+import 'package:ripe/ui/component/colors.dart';
+import 'package:ripe/ui/page/detail/sensor_detail_page.dart';
+import 'package:ripe/ui/page/dialog/delete_sensor_dialog.dart';
+import 'package:ripe/ui/page/dialog/edit_name_dialog.dart';
+import 'package:ripe/ui/page/sensor_config_page.dart';
+import 'package:ripe/ui/page/sensor_register_page.dart';
 
 import 'dialog/add_photo_dialog.dart';
 
@@ -70,7 +70,7 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
   Widget build(BuildContext context) {
     return Scaffold(body: Builder(builder: (context) {
       return Scaffold(
-        appBar: IftemAppBar(
+        appBar: RipeAppBar(
           title: const Text('Ripe'),
           centerTitle: true,
         ),
@@ -170,7 +170,7 @@ class _SensorCardState extends State<_SensorCard> {
         return new SensorDetailPage(widget.sensor, data);
       }));
     } else {
-      final snackbar = IftemSnackbar(
+      final snackbar = RipeSnackbar(
         context,
         label: 'Sensor konnte nicht geladen werden',
         action: SnackBarAction(

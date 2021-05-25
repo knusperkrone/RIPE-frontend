@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:iftem/service/mixins/mqtt_client_service.dart';
+import 'package:ripe/service/mixins/mqtt_client_service.dart';
 
 class SensorListenerService extends MqttClientService {
   static final Map<String, SensorListenerService> _services = {};

@@ -1,8 +1,8 @@
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:iftem/env.dart';
-import 'package:iftem/service/mixins/http_client_mixin.dart';
+import 'package:ripe/env.dart';
+import 'package:ripe/service/mixins/http_client_mixin.dart';
 import 'package:tuple/tuple.dart';
 
 import 'models/dto.dart';

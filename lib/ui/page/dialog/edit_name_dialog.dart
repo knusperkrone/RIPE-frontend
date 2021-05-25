@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:iftem/ui/component/validator.dart';
+import 'package:ripe/ui/component/validator.dart';
 
 class EditNameDialog extends StatefulWidget {
   @override

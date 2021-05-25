@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:iftem/ui/component/branded.dart';
+import 'package:ripe/ui/component/branded.dart';
 import 'package:tuple/tuple.dart';
 
 import 'agent_config_decorator.dart';
@@ -26,7 +26,7 @@ class AgentConfigPageState extends State<AgentConfigPage> {
     super.initState();
     widget.configRequest.then((value) {
       if (value == null) {
-        final snackbar = IftemSnackbar(
+        final snackbar = RipeSnackbar(
           context,
           label: 'Einstellungen konnten nicht geladen werden',
         );
@@ -64,7 +64,7 @@ class AgentConfigPageState extends State<AgentConfigPage> {
 
     return Scaffold(body: Builder(builder: (context) {
       return Scaffold(
-        appBar: IftemAppBar(
+        appBar: RipeAppBar(
           title: Text('$title Einstellungen'),
         ),
         body: _buildBody(),

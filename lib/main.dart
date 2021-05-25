@@ -3,24 +3,24 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:iftem/ui/component/colors.dart';
+import 'package:ripe/ui/component/colors.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
+import 'env.dart';
 import 'ui/page/splash_screen.dart';
 
 Future<void> main() async {
   if (kReleaseMode) {
-    const dsn = 'https://2518fe9ebaaa43d8b2aa9c52e0a59974@sentry.if-lab.de/14';
     await SentryFlutter.init(
-      (options) => options.dsn = dsn,
-      appRunner: () => runApp(IftemApp()),
+      (options) => options.dsn = SENTRY_DSN,
+      appRunner: () => runApp(RipeApp()),
     );
   } else {
-    runApp(IftemApp());
+    runApp(RipeApp());
   }
 }
 
-class IftemApp extends StatelessWidget {
+class RipeApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const cachedLogo = AssetImage('assets/icon.png');

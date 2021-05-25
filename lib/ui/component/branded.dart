@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:iftem/ui/component/colors.dart';
+import 'package:ripe/ui/component/colors.dart';
 
-class IftemAppBar extends AppBar {
-  IftemAppBar({
+class RipeAppBar extends AppBar {
+  RipeAppBar({
     Widget? leading,
     bool automaticallyImplyLeading = true,
     Widget? title,
@@ -56,20 +56,20 @@ class IftemAppBar extends AppBar {
         );
 }
 
-class IftemSnackbar extends SnackBar {
+class RipeSnackbar extends SnackBar {
   static Text style(BuildContext context, String label) {
     final textTheme = Theme.of(context).textTheme.subtitle1!;
     return Text(label, style: textTheme.copyWith(color: Colors.black45));
   }
 
-  IftemSnackbar(
+  RipeSnackbar(
     BuildContext context, {
     String label = '',
     SnackBarAction? action,
     Duration duration = const Duration(milliseconds: 4000),
     SnackBarBehavior behavior = SnackBarBehavior.floating,
   }) : super(
-          content: IftemSnackbar.style(context, label),
+          content: RipeSnackbar.style(context, label),
           backgroundColor: BACKGROUND_COLOR,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),
@@ -80,10 +80,10 @@ class IftemSnackbar extends SnackBar {
         );
 }
 
-class IftemIcon extends StatelessWidget {
+class RipeIcon extends StatelessWidget {
   final IconData icon;
 
-  const IftemIcon(this.icon);
+  const RipeIcon(this.icon);
 
   @override
   Widget build(BuildContext context) {

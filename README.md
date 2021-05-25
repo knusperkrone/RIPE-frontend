@@ -1,4 +1,4 @@
-# iftem
+# ripe
 
 Control your plants the IoT way
 

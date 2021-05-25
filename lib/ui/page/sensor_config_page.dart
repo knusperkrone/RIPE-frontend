@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:iftem/service/sensor_server_service.dart';
-import 'package:iftem/ui/component/branded.dart';
-import 'package:iftem/ui/component/colors.dart';
+import 'package:ripe/service/sensor_server_service.dart';
+import 'package:ripe/ui/component/branded.dart';
+import 'package:ripe/ui/component/colors.dart';
 import 'package:tuple/tuple.dart';
 
 import 'dialog/config_sensor_dialog.dart';
@@ -33,7 +33,7 @@ class SensorConfigPage extends StatelessWidget {
       Navigator.pop(context);
       return;
     }
-    final snackbar = IftemSnackbar(
+    final snackbar = RipeSnackbar(
       context,
       label: 'Konnte nicht verbinden..\nMit dem Sensor WLAN verbunden?',
       action: SnackBarAction(

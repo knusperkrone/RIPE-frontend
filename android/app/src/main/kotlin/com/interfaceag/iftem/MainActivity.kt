@@ -1,4 +1,4 @@
-package com.interfaceag.iftem
+package com.interfaceag.ripe
 
 import io.flutter.embedding.android.FlutterActivity
 

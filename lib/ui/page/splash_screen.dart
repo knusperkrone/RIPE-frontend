@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:iftem/service/backend_service.de.dart';
-import 'package:iftem/service/sensor_settings.dart';
-import 'package:iftem/ui/component/branded.dart';
-import 'package:iftem/ui/page/detail/sensor_detail_page.dart';
-import 'package:iftem/ui/page/sensor_overview_page.dart';
-import 'package:iftem/ui/page/sensor_register_page.dart';
+import 'package:ripe/service/backend_service.de.dart';
+import 'package:ripe/service/sensor_settings.dart';
+import 'package:ripe/ui/component/branded.dart';
+import 'package:ripe/ui/page/detail/sensor_detail_page.dart';
+import 'package:ripe/ui/page/sensor_overview_page.dart';
+import 'package:ripe/ui/page/sensor_register_page.dart';
 
 class SplashScreen extends StatefulWidget {
   final ImageProvider logo;
@@ -63,7 +63,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _notifyFetchError() {
     isDirty = true;
-    final snackbar = IftemSnackbar(
+    final snackbar = RipeSnackbar(
       context,
       label: 'Sensor-Daten konnten nicht abgerufen werden',
       duration: const Duration(days: 1),
@@ -95,20 +95,10 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         ),
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image(
-                image: widget.logo,
-                height: 200.0,
-                width: 200.0,
-              ),
-              Text(
-                'Iftem',
-                style: theme.textTheme.headline2!
-                    .copyWith(fontWeight: FontWeight.w200),
-              ),
-            ],
+          child: Image(
+            image: widget.logo,
+            height: 200.0,
+            width: 200.0,
           ),
         ),
       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:iftem/ui/component/colors.dart';
-import 'package:iftem/ui/component/time_utils.dart';
+import 'package:ripe/ui/component/colors.dart';
+import 'package:ripe/ui/component/time_utils.dart';
 
 /*
 pub enum AgentConfigType {

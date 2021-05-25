@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:iftem/service/mixins/http_client_mixin.dart';
+import 'package:ripe/service/mixins/http_client_mixin.dart';
 
 class SensorServerService with DartHttpClientMixin {
   SensorServerService() : super() {

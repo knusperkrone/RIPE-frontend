@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:iftem/service/backend_service.de.dart';
-import 'package:iftem/service/models/dto.dart';
-import 'package:iftem/service/sensor_settings.dart';
-import 'package:iftem/ui/component/branded.dart';
-import 'package:iftem/ui/component/colors.dart';
-import 'package:iftem/ui/component/validator.dart';
-import 'package:iftem/ui/page/dialog/add_photo_dialog.dart';
-import 'package:iftem/ui/page/sensor_overview_page.dart';
+import 'package:ripe/service/backend_service.de.dart';
+import 'package:ripe/service/models/dto.dart';
+import 'package:ripe/service/sensor_settings.dart';
+import 'package:ripe/ui/component/branded.dart';
+import 'package:ripe/ui/component/colors.dart';
+import 'package:ripe/ui/component/validator.dart';
+import 'package:ripe/ui/page/dialog/add_photo_dialog.dart';
+import 'package:ripe/ui/page/sensor_overview_page.dart';
 
 class SensorRegisterPage extends StatefulWidget {
   @override
@@ -95,7 +95,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
           return;
         }
 
-        snackBar = IftemSnackbar(
+        snackBar = RipeSnackbar(
           context,
           label: 'Registrierung erfolgreich',
           action: SnackBarAction(
@@ -109,7 +109,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
     }
 
     if (!isSuccess) {
-      snackBar = IftemSnackbar(context,
+      snackBar = RipeSnackbar(context,
           label: 'Registerung fehlgeschlagen',
           action: SnackBarAction(
             onPressed: canPop ? () => Navigator.pop(context) : () {},
@@ -190,7 +190,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
                           hintText: 'Id',
-                          icon: IftemIcon(Icons.mobile_screen_share),
+                          icon: RipeIcon(Icons.mobile_screen_share),
                         ),
                       ),
                       TextFormField(
@@ -200,7 +200,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
                         keyboardType: TextInputType.visiblePassword,
                         decoration: const InputDecoration(
                           hintText: 'Passwort',
-                          icon: IftemIcon(Icons.security),
+                          icon: RipeIcon(Icons.security),
                         ),
                       ),
                       TextFormField(
@@ -208,7 +208,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
                         controller: _nameController,
                         decoration: const InputDecoration(
                           hintText: 'Name',
-                          icon: IftemIcon(Icons.local_florist),
+                          icon: RipeIcon(Icons.local_florist),
                         ),
                       ),
                     ],
