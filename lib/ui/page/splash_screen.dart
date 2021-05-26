@@ -17,6 +17,7 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final _backendService = new BackendService();
   final _sensorService = new SensorSettingService();
   late Future<void> _delayFut;
   bool isDirty = false;
@@ -28,8 +29,12 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _delayFut = new Future.delayed(const Duration(seconds: 1), () {});
-    _sensorService.init().then((_) => _onConnect());
+    _delayFut = new Future.delayed(const Duration(milliseconds: 1250), () {});
+    Future(() async {
+      await _sensorService.init();
+      await _backendService.init();
+      _onConnect();
+    });
   }
 
   /*

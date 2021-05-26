@@ -7,6 +7,7 @@ import 'package:ripe/service/backend_service.de.dart';
 import 'package:ripe/service/sensor_settings.dart';
 import 'package:ripe/ui/component/branded.dart';
 import 'package:ripe/ui/component/colors.dart';
+import 'package:ripe/ui/page/about_page.dart';
 import 'package:ripe/ui/page/detail/sensor_detail_page.dart';
 import 'package:ripe/ui/page/dialog/delete_sensor_dialog.dart';
 import 'package:ripe/ui/page/dialog/edit_name_dialog.dart';
@@ -101,28 +102,28 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
             IconButton(
                 tooltip: 'Information',
                 icon: const Icon(Icons.info_outline, color: Colors.white),
-                onPressed: () {
+                onPressed: () async {
                   _fabKey.currentState!.close();
-                  // TODO(knukro): About page
+                  await Navigator.push<void>(context,
+                      MaterialPageRoute(builder: (_) => AboutPage()));
                 }),
             IconButton(
                 tooltip: 'Sensor konfigurieren',
                 icon: const Icon(Icons.device_hub, color: Colors.white),
                 onPressed: () async {
-                  await Navigator.push<void>(context,
-                          MaterialPageRoute(builder: (_) => SensorConfigPage()))
-                      .then((value) => _fabKey.currentState!.close());
                   _fabKey.currentState!.close();
+                  await Navigator.push<void>(context,
+                      MaterialPageRoute(builder: (_) => SensorConfigPage()));
                 }),
             IconButton(
                 tooltip: 'Sensor hinzufügen',
                 icon: const Icon(Icons.person_add, color: Colors.white),
                 onPressed: () async {
+                  _fabKey.currentState!.close();
                   await Navigator.push<void>(
                       context,
                       MaterialPageRoute<void>(
                           builder: (_) => SensorRegisterPage()));
-                  _fabKey.currentState!.close();
                 }),
           ],
         ),

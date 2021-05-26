@@ -2,21 +2,23 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:ripe/env.dart';
+import 'package:ripe/service/base_pref_service.dart';
 import 'package:ripe/service/mixins/http_client_mixin.dart';
+import 'package:ripe/util/log.dart';
 import 'package:tuple/tuple.dart';
 
 import 'models/dto.dart';
 
-class BackendService with DartHttpClientMixin {
+class BackendService extends BasePrefService with DartHttpClientMixin {
   Future<SensorDto?> getSensorData(int id, String key) async {
     try {
-      final resp = await doGet(BACKEND_URL, '/api/sensor/$id/$key', {});
-
+      final resp = await doGet(baseUrl, '/api/sensor/$id/$key', {});
       final json = jsonDecode(resp) as Map<String, dynamic>;
+
+      Log.debug('Fetched sensor data for $id');
       return SensorDto.fromJson(json);
     } catch (e) {
-      print('[ERROR] BackendService.getSensorData - $e');
-      return null;
+      Log.error('GetSensorData - $e');
     }
   }
 
@@ -28,15 +30,16 @@ class BackendService with DartHttpClientMixin {
   }) async {
     try {
       await doPost(
-        BACKEND_URL,
+        baseUrl,
         '/api/agent/$id/$key/$domain',
         {'Content-Type': 'application/json'},
         jsonEncode({'payload': payload}),
       );
 
+      Log.debug('Send command to sensor $id, $payload');
       return true;
     } catch (e) {
-      print('[ERROR] BackendService.forceAgent - $e');
+      Log.error('forceAgent - $e');
       return false;
     }
   }
@@ -48,7 +51,7 @@ class BackendService with DartHttpClientMixin {
   }) async {
     try {
       final resp =
-          await doGet(BACKEND_URL, '/api/agent/$id/$key/$domain/config', {});
+          await doGet(baseUrl, '/api/agent/$id/$key/$domain/config', {});
 
       final json = jsonDecode(resp) as Map<String, dynamic>;
       final Map<String, List<dynamic>> casted = json.cast();
@@ -58,9 +61,10 @@ class BackendService with DartHttpClientMixin {
       final Map<String, Tuple2<String, Map<String, dynamic>>> sorted =
           SplayTreeMap.from(transformed, (a, b) => a.compareTo(b));
 
+      Log.debug('Fetched agent config $id $domain');
       return sorted;
     } catch (e) {
-      print('[ERROR] BackendService.getAgentConfig - $e');
+      Log.error('getAgentConfig - $e');
       return null;
     }
   }
@@ -73,15 +77,29 @@ class BackendService with DartHttpClientMixin {
   }) async {
     try {
       await doPost(
-        BACKEND_URL,
+        baseUrl,
         '/api/agent/$id/$key/$domain/config',
         {'Content-Type': 'application/json'},
         jsonEncode(settings),
       );
+
+      Log.debug('Set agent config $id $domain');
+      return true;
     } catch (e) {
-      print('[ERROR] BackendService.setAgentConfig - $e');
+      Log.error('setAgentConfig - $e');
       return false;
     }
-    return true;
+  }
+
+  /*
+   * setter/getter
+   */
+
+  set baseUrl(String url) {
+    prefs.setString('BASE_URL_V1', url);
+  }
+
+  String get baseUrl {
+    return prefs.getString('BASE_URL_V1') ?? BACKEND_URL;
   }
 }

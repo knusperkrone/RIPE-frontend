@@ -8,7 +8,8 @@ import 'package:image/image.dart' as image;
 import 'package:palette_generator/palette_generator.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ripe/service/base_pref_service.dart';
+import 'package:ripe/util/log.dart';
 import 'package:tuple/tuple.dart';
 
 class RegisteredSensor {
@@ -22,7 +23,7 @@ class RegisteredSensor {
       this.id, this.key, this.name, this.imagePath, this.imageColor);
 }
 
-class SensorSettingService {
+class SensorSettingService extends BasePrefService {
   /*
    * Singleton logic
    */
@@ -41,7 +42,6 @@ class SensorSettingService {
   static const _DELIMITER = '\n\r';
   static const _PLACEHOLDER_NAME = '__DEFAULT_PLACEHOLDER.png';
 
-  late SharedPreferences _prefs;
   late Directory _applicationDir;
 
   late Map<int, RegisteredSensor> _registered;
@@ -50,8 +50,9 @@ class SensorSettingService {
    * Constructor
    */
 
+  @override
   Future<void> init() async {
-    _prefs = await SharedPreferences.getInstance();
+    super.init();
     _applicationDir = await getApplicationDocumentsDirectory();
     _registered = await _fetch();
     _initPlaceHolderImage();
@@ -81,23 +82,25 @@ class SensorSettingService {
     _registered[id] = registered;
     _persist();
 
-    print('[INFO] SensorSettingService.Added new sensor: [$id] $name');
+    Log.info('Added new sensor $id, $name');
     return registered;
   }
 
   void removeSensor(int id) {
-    final sensor = _registered[id];
-    if (sensor?.imagePath != placeholder) {
-      new File(sensor!.imagePath).deleteSync();
+    final sensor = _registered[id]!;
+    if (sensor.imagePath != placeholder) {
+      new File(sensor.imagePath).deleteSync();
     }
     _registered.remove(id);
     _persist();
+    Log.info('Removed sensor $id, ${sensor.name}');
   }
 
   List<RegisteredSensor>? getSensors() {
     if (_registered.isEmpty) {
       return null;
     }
+    Log.debug('Loaded ${_registered.length} sensors');
     return List.of(_registered.values); // clone list
   }
 
@@ -109,9 +112,11 @@ class SensorSettingService {
     final oldName = path.basename(oldPath);
     final oldIndex = oldName.substring(0, oldName.indexOf('_'));
     final newIndex = (int.tryParse(oldIndex) ?? 1) + 1;
+    final newPath = '${newIndex}_thumbnail_$id.png';
+    Log.debug('Changing sensor $id image from $oldPath to $newPath');
 
     // Resize image
-    final thumbnailPath = _getThumbnailPath('${newIndex}_thumbnail_$id.png');
+    final thumbnailPath = _getThumbnailPath(newPath);
     _resizeImage(imagePath, thumbnailPath);
     if (!oldPath.endsWith(_PLACEHOLDER_NAME)) {
       File(oldPath).delete();
@@ -131,6 +136,7 @@ class SensorSettingService {
     _registered[id] = RegisteredSensor(
         id, sensor.key, name, sensor.imagePath, sensor.imageColor);
     _persist();
+
     return name;
   }
 
@@ -143,7 +149,7 @@ class SensorSettingService {
    */
 
   Future<Map<int, RegisteredSensor>> _fetch() async {
-    final result = _prefs.getStringList(_SENSORS_KEY);
+    final result = prefs.getStringList(_SENSORS_KEY);
     if (result == null || result.isEmpty) {
       return {};
     }
@@ -176,7 +182,7 @@ class SensorSettingService {
       return '$id$_DELIMITER$key$_DELIMITER$name$_DELIMITER$imagePath$_DELIMITER$imageColor';
     }).toList(growable: false);
 
-    await _prefs.setStringList(_SENSORS_KEY, persisted);
+    await prefs.setStringList(_SENSORS_KEY, persisted);
   }
 
   void _resizeImage(String imagePath, String thumbPath) {
@@ -188,7 +194,7 @@ class SensorSettingService {
     final thumbnailBytes = image.encodePng(image.copyResize(img, width: 120));
     thumbFile.writeAsBytesSync(thumbnailBytes);
 
-    print('[INFO] SensorSettingService Generated thumbnail: $thumbPath');
+    Log.info('Generated thumbnail for $imagePath at $thumbPath');
   }
 
   Future<Color> _generateImageColor(String imagePath) async {
@@ -208,7 +214,8 @@ class SensorSettingService {
       final thumbnailBytes = image.encodePng(image.copyResize(img, width: 120));
       placeholderFile.createSync(recursive: true);
       placeholderFile.writeAsBytesSync(thumbnailBytes);
-      print('[INFO] SensorSettingService Generating default thumbnail');
+
+      Log.info('Generated default thumbnail');
     }
   }
 

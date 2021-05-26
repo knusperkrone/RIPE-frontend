@@ -4,6 +4,7 @@ import 'dart:convert' show utf8;
 import 'package:meta/meta.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
+import 'package:ripe/util/log.dart';
 import 'package:typed_data/typed_buffers.dart';
 
 typedef MqttReceiveFunc = void Function(String);
@@ -72,7 +73,7 @@ abstract class MqttClientService {
         try {
           await client.connect();
         } catch (e) {
-          print('[ERROR] MqttClientService.init - $e');
+          Log.error('Failed connecting MQTT - $e');
           return false;
         }
       }
@@ -89,12 +90,12 @@ abstract class MqttClientService {
    */
 
   static void _onConnect(String broker) {
-    print('[INFO] MqttClientService.connected for broker $broker');
+    Log.debug('Connected to broker $broker');
     _contexts[broker]?.reconnect();
   }
 
   static void _onDisconnect(String broker) {
-    print('[ERROR] MqttClientService.disconnected for broker $broker');
+    Log.debug('Disconnected from broker $broker');
   }
 
   static void _listen(
@@ -106,8 +107,7 @@ abstract class MqttClientService {
 
       final observers = ctx.callbacks[topic];
       if (observers == null) {
-        print(
-            '[WARN] MqttClientService.listen No observer for $topic - $payload');
+        Log.error('No observers for $topic with $payload');
       } else {
         for (final observer in observers) {
           observer(payload);
