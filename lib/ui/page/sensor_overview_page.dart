@@ -104,8 +104,10 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
                 icon: const Icon(Icons.info_outline, color: Colors.white),
                 onPressed: () async {
                   _fabKey.currentState!.close();
-                  await Navigator.push<void>(context,
-                      MaterialPageRoute(builder: (_) => AboutPage()));
+                  await Navigator.push<void>(
+                    context,
+                    MaterialPageRoute(builder: (_) => AboutPage()),
+                  );
                 }),
             IconButton(
                 tooltip: 'Sensor konfigurieren',

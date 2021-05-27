@@ -1,6 +1,9 @@
+import 'package:collection/collection.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'dto.g.dart';
+
+const _LIST_EQ = ListEquality<dynamic>();
 
 enum AgentState {
   DISABLED,
@@ -33,6 +36,25 @@ class SensorDataDto {
 
   factory SensorDataDto.fromJson(Map<String, dynamic> json) =>
       _$SensorDataDtoFromJson(json);
+
+  @override
+  int get hashCode {
+    return timestamp.hashCode *
+        battery.hashCode *
+        moisture.hashCode *
+        temperature.hashCode *
+        carbon.hashCode *
+        conductivity.hashCode *
+        light.hashCode;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is SensorDataDto) {
+      return hashCode == other.hashCode;
+    }
+    return false;
+  }
 }
 
 @JsonSerializable(createToJson: false, createFactory: false)
@@ -43,6 +65,25 @@ class AgentDecoratorDto {
 
   factory AgentDecoratorDto.fromJson(Map<String, dynamic> json) =>
       new AgentDecoratorDto(json);
+
+  @override
+  int get hashCode {
+    return payload.entries.map((entry) {
+      int valueHash = entry.value.hashCode;
+      if (entry.value is List) {
+        valueHash = _LIST_EQ.hash(entry.value as List).hashCode;
+      }
+      return entry.key.hashCode * valueHash;
+    }).sum;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is AgentDecoratorDto) {
+      return hashCode == other.hashCode;
+    }
+    return false;
+  }
 }
 
 class AgentStateDto {
@@ -92,6 +133,19 @@ class AgentStateDto {
   AgentState get state => _state;
 
   DateTime? get time => _time;
+
+  @override
+  int get hashCode {
+    return _state.hashCode * _time.hashCode;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is AgentStateDto) {
+      return hashCode == other.hashCode;
+    }
+    return false;
+  }
 }
 
 @JsonSerializable(createToJson: false)
@@ -104,6 +158,19 @@ class AgentRenderDto {
 
   factory AgentRenderDto.fromJson(Map<String, dynamic> json) =>
       _$AgentRenderDtoFromJson(json);
+
+  @override
+  int get hashCode {
+    return decorator.hashCode * state.hashCode * rendered.hashCode;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is AgentRenderDto) {
+      return hashCode == other.hashCode;
+    }
+    return false;
+  }
 }
 
 @JsonSerializable(createToJson: false)
@@ -118,12 +185,26 @@ class AgentDto {
   factory AgentDto.fromJson(Map<String, dynamic> json) {
     return _$AgentDtoFromJson(json);
   }
+
+  @override
+  int get hashCode {
+    return domain.hashCode * agentName.hashCode * ui.hashCode;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is AgentDto) {
+      return hashCode == other.hashCode;
+    }
+    return false;
+  }
 }
 
 @JsonSerializable(createToJson: false)
 class SensorDto {
   final String name;
-  final String broker;
+  @JsonKey(required: false)
+  final String? broker;
   @JsonKey(name: 'data')
   final SensorDataDto sensorData;
   final List<AgentDto> agents;
@@ -132,4 +213,20 @@ class SensorDto {
 
   factory SensorDto.fromJson(Map<String, dynamic> json) =>
       _$SensorDtoFromJson(json);
+
+  @override
+  int get hashCode {
+    return name.hashCode *
+        broker.hashCode *
+        sensorData.hashCode *
+        _LIST_EQ.hash(agents);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (other == SensorDto) {
+      return hashCode == other.hashCode;
+    }
+    return false;
+  }
 }

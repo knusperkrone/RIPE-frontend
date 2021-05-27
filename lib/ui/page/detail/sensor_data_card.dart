@@ -1,11 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:ripe/service/models/dto.dart';
+import 'package:ripe/ui/component/colors.dart';
 import 'package:ripe/ui/component/time_utils.dart';
 
-class SensorDataCard extends StatelessWidget {
+class SensorDataCard extends StatefulWidget {
   final SensorDataDto data;
 
   const SensorDataCard(this.data);
+
+  @override
+  State createState() => _SensorDataCardState();
+}
+
+class _SensorDataCardState extends State<SensorDataCard> {
+  bool isUpdating = false;
+
+  @override
+  void didUpdateWidget(SensorDataCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.data != widget.data) {
+      setState(() => isUpdating = true);
+      Future.delayed(const Duration(milliseconds: 750), () {
+        setState(() => isUpdating = false);
+      });
+    }
+  }
 
   /*
    * Build
@@ -43,6 +62,7 @@ class SensorDataCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final data = widget.data;
     return Container(
       width: double.infinity,
       child: Card(
@@ -58,8 +78,22 @@ class SensorDataCard extends StatelessWidget {
                 context, Icons.brightness_4, 'Helligkeit:', data.light, ' lux'),
             ListTile(
               dense: true,
-              title: Text('Zeitstempel: ${toHR(data.timestamp)} UTC'),
+              title: Text(
+                'Zeitstempel: ${toHR(data.timestamp, withTimezone: true)}',
+              ),
               subtitle: Text('Battery: ${data.battery}%'),
+              trailing: AnimatedOpacity(
+                opacity: isUpdating ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 750 ~/ 2),
+                child: const Padding(
+                  padding: EdgeInsets.only(right: 15.0),
+                  child: Icon(
+                    Icons.sync,
+                    size: 20.0,
+                    color: BUTTON_COLOR_LIGHT,
+                  ),
+                ),
+              ),
             )
           ],
         ),

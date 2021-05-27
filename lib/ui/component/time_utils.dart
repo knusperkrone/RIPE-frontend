@@ -18,11 +18,12 @@ String toHourHR(DateTime? time) {
   return '${pad(time.hour)}:${pad(time.minute)}:${pad(time.second)}';
 }
 
-String toHR(DateTime? time) {
+String toHR(DateTime? time, {bool withTimezone = false}) {
   if (time == null) {
     return '∞';
   }
-  return '${time.year}-${pad(time.month)}-${pad(time.day)} ${pad(time.hour)}:${pad(time.minute)}:${pad(time.second)}';
+  time = time.toLocal();
+  return '${time.year}-${pad(time.month)}-${pad(time.day)} ${pad(time.hour)}:${pad(time.minute)}:${pad(time.second)} ${withTimezone ? time.timeZoneName : ''}';
 }
 
 String getMonthHR(int month) {

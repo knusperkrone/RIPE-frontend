@@ -37,7 +37,7 @@ AgentDto _$AgentDtoFromJson(Map<String, dynamic> json) {
 SensorDto _$SensorDtoFromJson(Map<String, dynamic> json) {
   return SensorDto(
     json['name'] as String,
-    json['broker'] as String,
+    json['broker'] as String?,
     SensorDataDto.fromJson(json['data'] as Map<String, dynamic>),
     (json['agents'] as List<dynamic>)
         .map((dynamic e) => AgentDto.fromJson(e as Map<String, dynamic>))

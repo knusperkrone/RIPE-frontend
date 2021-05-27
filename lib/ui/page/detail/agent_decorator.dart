@@ -12,13 +12,9 @@ import 'package:ripe/ui/page/detail/time_pane_decorator.dart';
 typedef RefreshFn = Future<void> Function();
 
 class AgentDecorator extends StatelessWidget {
-  static const _TIME_PANE_KEY = 'TimePane';
-  static const _SLIDER_KEY = 'Slider';
-
-  final RefreshFn refreshCallback;
-
   final RegisteredSensor info;
   final AgentDto agent;
+  final RefreshFn refreshCallback;
 
   const AgentDecorator({
     required this.info,
@@ -31,19 +27,20 @@ class AgentDecorator extends StatelessWidget {
     final decoratorMap = agent.ui.decorator.payload;
     assert(decoratorMap.keys.length == 1);
 
+    final uiKey = decoratorMap.keys.first;
     switch (decoratorMap.keys.first) {
-      case _TIME_PANE_KEY:
-        final val = decoratorMap[_TIME_PANE_KEY] as int;
+      case TimePaneDecorator.KEY:
+        final val = decoratorMap[uiKey] as int;
         return TimePaneDecorator(info, agent, refreshCallback, val);
-      case _SLIDER_KEY:
-        final val = decoratorMap[_SLIDER_KEY] as List<dynamic>;
+      case SliderDecorator.KEY:
+        final val = decoratorMap[uiKey] as List<dynamic>;
         return SliderDecorator(info, agent, refreshCallback, val.cast());
     }
     // Not supported
     return Card(
       child: ListTile(
         title: Text(
-          'Noch nicht unterstützt - update die App!',
+          '$uiKey ist noch nicht unterstützt - update die App!',
           style: Theme.of(context)
               .textTheme
               .subtitle1!
@@ -51,6 +48,21 @@ class AgentDecorator extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+abstract class BaseDecoratorState<T extends BaseDecorator> extends State<T> {
+  bool isUpdating = false;
+
+  @override
+  void didUpdateWidget(T oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget._agent.ui != widget._agent.ui) {
+      setState(() => isUpdating = true);
+      Future.delayed(const Duration(milliseconds: 750), () {
+        setState(() => isUpdating = false);
+      });
+    }
   }
 }
 

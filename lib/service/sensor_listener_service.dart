@@ -4,7 +4,7 @@ import 'package:ripe/service/mixins/mqtt_client_service.dart';
 class SensorListenerService extends MqttClientService {
   static final Map<String, SensorListenerService> _services = {};
 
-  final _subscribed = <String>[];
+  final Set<String> _subscribed = {};
   final String _broker;
 
   /*
@@ -51,5 +51,22 @@ class SensorListenerService extends MqttClientService {
 
   List<String> _buildTopics(int id, String key) {
     return ['sensor/cmd/$id/$key', 'sensor/data/$id/$key'];
+  }
+
+  /*
+   * equality
+   */
+
+  @override
+  int get hashCode {
+    return _broker.hashCode;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is SensorListenerService) {
+      return hashCode == other.hashCode;
+    }
+    return false;
   }
 }

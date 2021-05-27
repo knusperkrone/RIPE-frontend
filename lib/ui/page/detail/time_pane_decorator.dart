@@ -8,6 +8,7 @@ import 'package:ripe/ui/component/time_utils.dart';
 import 'agent_decorator.dart';
 
 class TimePaneDecorator extends BaseDecorator {
+  static const KEY = 'TimePane';
   final int defaultTimeout;
 
   TimePaneDecorator(
@@ -21,7 +22,7 @@ class TimePaneDecorator extends BaseDecorator {
   State<StatefulWidget> createState() => new _TimePaneDecoratorState();
 }
 
-class _TimePaneDecoratorState extends State<TimePaneDecorator> {
+class _TimePaneDecoratorState extends BaseDecoratorState<TimePaneDecorator> {
   final _slideKey = new GlobalKey<SlidableState>();
   late int forceSeconds;
 
@@ -122,9 +123,27 @@ class _TimePaneDecoratorState extends State<TimePaneDecorator> {
                       ?.open(actionType: SlideActionType.primary),
                   value: widget.isActive),
               title: Text(widget.domainHR),
-              trailing: IconButton(
-                icon: const Icon(Icons.settings),
-                onPressed: () => widget.onSettings(context),
+              trailing: Container(
+                width: 68,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    AnimatedOpacity(
+                      opacity: isUpdating ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 750 ~/ 2),
+                      child: const Icon(
+                        Icons.sync,
+                        size: 20.0,
+                        color: BUTTON_COLOR_LIGHT,
+                      ),
+                    ),
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      icon: const Icon(Icons.settings),
+                      onPressed: () => widget.onSettings(context),
+                    ),
+                  ],
+                ),
               ),
             ),
             const Divider(),

@@ -19,9 +19,10 @@ class SensorDetailPage extends StatefulWidget {
   State<StatefulWidget> createState() => _SensorDetailPageState();
 }
 
-class _SensorDetailPageState extends State<SensorDetailPage> {
+class _SensorDetailPageState extends State<SensorDetailPage>
+    with WidgetsBindingObserver {
   final _backendService = new BackendService();
-  late SensorListenerService _service;
+  late SensorListenerService? _service;
   late SensorDto data;
   late RegisteredSensor info;
 
@@ -32,18 +33,51 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance?.addObserver(this);
     data = widget.data;
     info = widget.sensor;
-    _service = new SensorListenerService(data.broker);
-    _service.connect().then((_) {
-      _service.listenSensor(info.id, info.key, _refreshData);
-    });
+    _initMqtt();
   }
 
   @override
   void dispose() {
-    _service.dispose();
+    WidgetsBinding.instance?.removeObserver(this);
+    _service?.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _initMqtt();
+    }
+  }
+
+  void _initMqtt() {
+    if (data.broker != null) {
+      _service = new SensorListenerService(data.broker!);
+      _service!.connect().then((_) {
+        _service!.listenSensor(info.id, info.key, _refreshData);
+      });
+    } else {
+      final snackbar = RipeSnackbar(
+        context,
+        label: 'Sensor ist nicht erreichbar',
+        action: SnackBarAction(
+          label: 'Erneut verbinden',
+          onPressed: () {
+            _backendService.getSensorData(info.id, info.key).then((sensor) {
+              if (sensor != null) {
+                data = sensor;
+                _initMqtt();
+              }
+            });
+          },
+        ),
+      );
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+    }
   }
 
   /*
@@ -62,9 +96,9 @@ class _SensorDetailPageState extends State<SensorDetailPage> {
   }
 
   Future<void> _refreshData() async {
-    final resp = await _backendService.getSensorData(info.id, info.key);
-    if (resp != null) {
-      setState(() => data = resp);
+    final sensorData = await _backendService.getSensorData(info.id, info.key);
+    if (sensorData != null) {
+      setState(() => data = sensorData);
     } else {
       final snackbar = RipeSnackbar(
         context,

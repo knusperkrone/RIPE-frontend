@@ -11,13 +11,13 @@ typedef MqttReceiveFunc = void Function(String);
 
 class _MqttContext {
   final MqttServerClient client;
-  final Map<String, List<MqttReceiveFunc>> callbacks = new HashMap();
+  final Map<String, Set<MqttReceiveFunc>> callbacks = new HashMap();
 
   _MqttContext(this.client);
 
   void addCallback(String topic, MqttReceiveFunc callback) {
     if (callbacks[topic] == null) {
-      callbacks[topic] = [];
+      callbacks[topic] = {};
     }
     callbacks[topic]!.add(callback);
     if (callbacks[topic]!.length == 1) {
@@ -78,6 +78,7 @@ abstract class MqttClientService {
         }
       }
 
+      Log.debug('Connecting MQTT - $broker');
       ctx = new _MqttContext(client);
       client.updates!.listen((msg) => _listen(ctx!, msg));
       _contexts[broker] = ctx;
@@ -90,12 +91,12 @@ abstract class MqttClientService {
    */
 
   static void _onConnect(String broker) {
-    Log.debug('Connected to broker $broker');
+    Log.info('Connected to broker $broker');
     _contexts[broker]?.reconnect();
   }
 
   static void _onDisconnect(String broker) {
-    Log.debug('Disconnected from broker $broker');
+    Log.warn('Disconnected from broker $broker');
   }
 
   static void _listen(
@@ -109,6 +110,7 @@ abstract class MqttClientService {
       if (observers == null) {
         Log.error('No observers for $topic with $payload');
       } else {
+        Log.debug('MQTT message for $topic');
         for (final observer in observers) {
           observer(payload);
         }

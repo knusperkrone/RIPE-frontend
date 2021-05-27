@@ -5,6 +5,7 @@ import 'package:ripe/service/sensor_settings.dart';
 import 'agent_decorator.dart';
 
 class SliderDecorator extends BaseDecorator {
+  static const KEY = 'Slider';
   final List<double> values;
 
   SliderDecorator(
@@ -19,7 +20,7 @@ class SliderDecorator extends BaseDecorator {
   State<StatefulWidget> createState() => new _SliderDecoratorState();
 }
 
-class _SliderDecoratorState extends State<SliderDecorator> {
+class _SliderDecoratorState extends BaseDecoratorState<SliderDecorator> {
   late double _val;
 
   @override
@@ -27,6 +28,13 @@ class _SliderDecoratorState extends State<SliderDecorator> {
     super.initState();
     _val = widget.values[2];
   }
+
+  @override
+  void onUpdate() {}
+
+  /*
+   * BaseDecoratorContract
+   */
 
   /*
    * UI Callbacks
