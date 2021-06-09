@@ -1,13 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:ripe/service/backend_service.de.dart';
 import 'package:ripe/service/models/dto.dart';
 import 'package:ripe/service/sensor_listener_service.dart';
 import 'package:ripe/service/sensor_settings.dart';
 import 'package:ripe/ui/component/branded.dart';
-import 'package:ripe/ui/page/detail/sensor_data_card.dart';
 import 'package:ripe/ui/page/sensor_overview_page.dart';
 
 import 'agent_decorator.dart';
+import 'sensor_app_bar.dart';
+import 'sensor_data_card.dart';
 
 class SensorDetailPage extends StatefulWidget {
   final RegisteredSensor sensor;
@@ -118,11 +121,52 @@ class _SensorDetailPageState extends State<SensorDetailPage>
 
   @override
   Widget build(BuildContext context) {
+    final imgFile = new File(widget.sensor.imagePath);
     return WillPopScope(
       onWillPop: () async {
         _onBack(context);
         return true;
       },
+      child: Container(
+        color: Theme.of(context).primaryColor,
+        child: SafeArea(
+          bottom: false,
+          child: Material(
+            child: Container(
+              child: CustomScrollView(
+                slivers: [
+                  SliverPersistentHeader(
+                    pinned: true,
+                    delegate: SensorAppBar(
+                      expandedHeight: 180.0,
+                      onBack: _onBack,
+                      imageProvider: FileImage(imgFile),
+                      name: widget.sensor.name,
+                      textSize: 40.0,
+                    ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        if (index == 0) {
+                          return SensorDataCard(data.sensorData);
+                        }
+                        return new AgentDecorator(
+                          info: info,
+                          agent: data.agents[index - 1],
+                          refreshCallback: _refreshData,
+                        );
+                      },
+                      childCount: 1 + data.agents.length,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+      /*
       child: Scaffold(
         appBar: RipeAppBar(
           title: Text(data.name),
@@ -145,6 +189,8 @@ class _SensorDetailPageState extends State<SensorDetailPage>
           },
         ),
       ),
+
+       */
     );
   }
 }

@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:ripe/ui/component/colors.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:palette_generator/palette_generator.dart';
+import 'package:ripe/ui/component/colors.dart';
 
 class AddPhotoDialog extends StatefulWidget {
   final String imagePath;
@@ -36,8 +36,9 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
     if (picked != null) {
       // Select file and preview gradient
       _imagePath = new File(picked.path);
-      final palette =
-          await PaletteGenerator.fromImageProvider(new FileImage(_imagePath));
+      final palette = await PaletteGenerator.fromImageProvider(
+        FileImage(_imagePath),
+      );
       _imageShadow = (palette.lightVibrantColor ??
               palette.vibrantColor ??
               palette.dominantColor)!
@@ -58,14 +59,14 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
           borderRadius: BorderRadius.all(Radius.circular(12.0))),
       contentPadding: const EdgeInsets.only(top: 10.0),
       content: Container(
-        height: 270,
+        height: 350,
         child: Column(
           children: [
             const Text('Pflanzenprofilbild hinzufügen'),
             const Divider(),
             Container(
-              width: 100,
-              height: 100,
+              width: 150,
+              height: 150,
               foregroundDecoration: BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: <BoxShadow>[
@@ -76,11 +77,13 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
                   ),
                 ],
                 image: DecorationImage(
-                  fit: BoxFit.cover,
+                  fit: BoxFit.scaleDown,
+                  repeat: ImageRepeat.repeat,
                   image: FileImage(_imagePath),
                 ),
               ),
             ),
+            Container(height: 10),
             MaterialButton(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -109,6 +112,7 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
             InkWell(
               child: Container(
                 width: double.infinity,
+                height: 45,
                 padding: const EdgeInsets.all(10.0),
                 decoration: const BoxDecoration(
                   color: ACCENT_COLOR,

@@ -33,7 +33,7 @@ class RipeApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Ripe',
-      theme: _prepareTheme(ThemeData.light()),
+      theme: _prepareTheme(ThemeData.dark()),
       darkTheme: _prepareTheme(ThemeData.dark()),
       home: const SplashScreen(cachedLogo),
     );
