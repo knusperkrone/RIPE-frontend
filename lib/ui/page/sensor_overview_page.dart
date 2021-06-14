@@ -148,16 +148,12 @@ class _SensorCard extends StatefulWidget {
 }
 
 class _SensorCardState extends State<_SensorCard> {
-  late String _name;
-  late ImageProvider _image;
-  Color? _gradientColor;
+  late RegisteredSensor _sensor;
 
   @override
   void initState() {
     super.initState();
-    _name = widget.sensor.name;
-    _image = FileImage(File(widget.sensor.imagePath));
-    _gradientColor = widget.sensor.imageColor;
+    _sensor = widget.sensor;
   }
 
   /*
@@ -170,7 +166,7 @@ class _SensorCardState extends State<_SensorCard> {
     final data = await BackendService().getSensorData(id, key);
     if (data != null) {
       Navigator.push<void>(context, MaterialPageRoute(builder: (_) {
-        return new SensorDetailPage(widget.sensor, data);
+        return new SensorDetailPage(_sensor, data);
       }));
     } else {
       final snackbar = RipeSnackbar(
@@ -191,20 +187,18 @@ class _SensorCardState extends State<_SensorCard> {
     final file = await showDialog<File>(
       context: context,
       builder: (_) => AddPhotoDialog(
-        widget.sensor.imagePath,
+        widget.sensor.thumbPath,
         widget.sensor.imageColor,
       ),
     );
 
     if (file != null) {
-      final changeTuple =
-          await settings.changeImage(widget.sensor.id, file.path);
+      // clear file image cache
+      assert(PaintingBinding.instance!.imageCache!
+          .evict(FileImage(File(_sensor.thumbPath))));
 
-      // Update image
-      setState(() {
-        _image = FileImage(new File(changeTuple.item1));
-        _gradientColor = changeTuple.item2;
-      });
+      final sensor = await settings.changeImage(widget.sensor.id, file.path);
+      setState(() => _sensor = sensor);
     }
   }
 
@@ -216,9 +210,7 @@ class _SensorCardState extends State<_SensorCard> {
 
     if (name != null) {
       final settings = SensorSettingService();
-      setState(() {
-        _name = settings.changeName(widget.sensor.id, name);
-      });
+      setState(() => _sensor = settings.changeName(widget.sensor.id, name));
     }
   }
 
@@ -228,14 +220,13 @@ class _SensorCardState extends State<_SensorCard> {
 
   @override
   Widget build(BuildContext context) {
-    _gradientColor ??= Theme.of(context).cardColor;
     return Card(
       elevation: 0.7,
       child: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              _gradientColor!,
+              _sensor.imageColor,
               Theme.of(context).cardColor,
             ],
             stops: const [0.0, 0.3],
@@ -250,15 +241,16 @@ class _SensorCardState extends State<_SensorCard> {
           leading: Container(
             width: 60.0,
             height: 60.0,
+            key: UniqueKey(),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               image: DecorationImage(
                 fit: BoxFit.fill,
-                image: _image,
+                image: FileImage(File(_sensor.thumbPath)),
               ),
             ),
           ),
-          title: Text(_name),
+          title: Text(_sensor.name),
           trailing: PopupMenuButton(
             onSelected: (int i) {
               switch (i) {
@@ -269,13 +261,13 @@ class _SensorCardState extends State<_SensorCard> {
                   _onEdit();
                   break;
                 case 2:
-                  widget.onDelete(widget.sensor.id);
+                  widget.onDelete(_sensor.id);
                   break;
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
               const PopupMenuItem<int>(
-                child: Text('Foto hinzufügen'),
+                child: Text('Foto bearbeiten'),
                 value: 0,
               ),
               const PopupMenuItem<int>(

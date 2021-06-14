@@ -121,7 +121,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    final imgFile = new File(widget.sensor.imagePath);
+    final imgFile = new File(widget.sensor.thumbPath);
     return WillPopScope(
       onWillPop: () async {
         _onBack(context);
@@ -166,31 +166,6 @@ class _SensorDetailPageState extends State<SensorDetailPage>
           ),
         ),
       ),
-      /*
-      child: Scaffold(
-        appBar: RipeAppBar(
-          title: Text(data.name),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => _onBack(context),
-          ),
-        ),
-        body: ListView.builder(
-          itemCount: 1 + data.agents.length,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return SensorDataCard(data.sensorData);
-            }
-            return new AgentDecorator(
-              info: info,
-              agent: data.agents[index - 1],
-              refreshCallback: _refreshData,
-            );
-          },
-        ),
-      ),
-
-       */
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:ripe/ui/component/colors.dart';
 
 typedef ContextCallback = void Function(BuildContext);
 
@@ -41,13 +42,20 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
       fit: StackFit.expand,
       clipBehavior: Clip.none,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              stops: [gradientShrink, 1.0],
-              colors: [gradientVal, theme.canvasColor],
+        Opacity(
+          opacity: max(0.5, gradientShrink),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: [0.33, max(0.66, gradientShrink), 1.0],
+                colors: [
+                  PRIMARY_COLOR,
+                  ACCENT_COLOR,
+                  Theme.of(context).canvasColor
+                ],
+              ),
             ),
           ),
         ),
@@ -126,8 +134,7 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
     if (oldDelegate is SensorAppBar) {
-      return name != oldDelegate.name ||
-          imageProvider != oldDelegate.imageProvider;
+      return name != oldDelegate.name;
     }
     return false;
   }

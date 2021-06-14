@@ -21,7 +21,9 @@ class _SensorDataCardState extends State<SensorDataCard> {
     if (oldWidget.data != widget.data) {
       setState(() => isUpdating = true);
       Future.delayed(const Duration(milliseconds: 750), () {
-        setState(() => isUpdating = false);
+        if (mounted) {
+          setState(() => isUpdating = false);
+        }
       });
     }
   }

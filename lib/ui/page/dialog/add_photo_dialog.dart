@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:ripe/ui/component/colors.dart';
@@ -34,17 +35,31 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
   Future<void> _onPhoto(BuildContext context, ImageSource source) async {
     final picked = await _imagePicker.getImage(source: source);
     if (picked != null) {
-      // Select file and preview gradient
-      _imagePath = new File(picked.path);
-      final palette = await PaletteGenerator.fromImageProvider(
-        FileImage(_imagePath),
+      final croppedFile = await ImageCropper.cropImage(
+        sourcePath: picked.path,
+        aspectRatioPresets: [CropAspectRatioPreset.square],
       );
-      _imageShadow = (palette.lightVibrantColor ??
-              palette.vibrantColor ??
-              palette.dominantColor)!
-          .color;
+      if (croppedFile != null) {
+        // Select file and preview gradient
+        _imagePath = croppedFile;
+        final palette = await PaletteGenerator.fromImageProvider(
+          FileImage(_imagePath),
+        );
+        _imageShadow = (palette.lightVibrantColor ??
+                palette.vibrantColor ??
+                palette.dominantColor)!
+            .color;
 
-      setState(() {});
+        setState(() {});
+      }
+    }
+  }
+
+  void _onSubmit() {
+    if (_imagePath.path == widget.imagePath) {
+      Navigator.pop(context, null);
+    } else {
+      Navigator.pop(context, _imagePath);
     }
   }
 
@@ -59,12 +74,17 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
           borderRadius: BorderRadius.all(Radius.circular(12.0))),
       contentPadding: const EdgeInsets.only(top: 10.0),
       content: Container(
-        height: 350,
+        height: 360,
         child: Column(
           children: [
-            const Text('Pflanzenprofilbild hinzufügen'),
+            Text(
+              'Pflanzenbild hinzufügen',
+              maxLines: 1,
+              style: Theme.of(context).textTheme.headline6,
+            ),
             const Divider(),
             Container(
+              margin: const EdgeInsets.symmetric(vertical: 10.0),
               width: 150,
               height: 150,
               foregroundDecoration: BoxDecoration(
@@ -72,13 +92,12 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
                 boxShadow: <BoxShadow>[
                   BoxShadow(
                     color: _imageShadow,
-                    blurRadius: 7.0,
+                    blurRadius: 15.0,
                     offset: const Offset(0.0, 0.75),
                   ),
                 ],
                 image: DecorationImage(
                   fit: BoxFit.scaleDown,
-                  repeat: ImageRepeat.repeat,
                   image: FileImage(_imagePath),
                 ),
               ),
@@ -123,7 +142,7 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
                 ),
                 child: const Text('Bestätigen', textAlign: TextAlign.center),
               ),
-              onTap: () => Navigator.pop(context, _imagePath),
+              onTap: _onSubmit,
             ),
           ],
         ),

@@ -81,8 +81,8 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
         context: context,
         barrierDismissible: false,
         builder: (_) => AddPhotoDialog(
-          _settingService.placeholder,
-          _settingService.placeholderColor,
+          _settingService.placeholderPath,
+          _settingService.placeholderThumbnailColor,
         ),
       );
 
