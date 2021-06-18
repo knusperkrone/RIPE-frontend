@@ -10,6 +10,8 @@ import 'package:ripe/ui/component/validator.dart';
 import 'package:ripe/ui/page/dialog/add_photo_dialog.dart';
 import 'package:ripe/ui/page/sensor_overview_page.dart';
 
+import 'about_page.dart';
+
 class SensorRegisterPage extends StatefulWidget {
   @override
   State createState() => new _SensorRegisterPageState();
@@ -146,15 +148,20 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
           alignment: Alignment.center,
           child: ListView(
             children: [
-              Opacity(
-                opacity: canPop ? 1.0 : 0.0,
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: canPop ? () => Navigator.pop(context) : null,
-                  ),
-                ),
+              Align(
+                alignment: Alignment.topLeft,
+                child: canPop
+                    ? IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                      )
+                    : IconButton(
+                        icon: const Icon(Icons.settings_rounded),
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(builder: (_) => AboutPage()),
+                        ),
+                      ),
               ),
               Container(
                 height: (constraints.maxHeight / 6) - 40,

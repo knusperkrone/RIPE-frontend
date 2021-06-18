@@ -10,6 +10,10 @@ import 'package:tuple/tuple.dart';
 import 'models/dto.dart';
 
 class BackendService extends BasePrefService with DartHttpClientMixin {
+  BackendService() : super() {
+    setTimeout(const Duration(milliseconds: 750));
+  }
+
   Future<SensorDto?> getSensorData(int id, String key) async {
     try {
       final resp = await doGet(baseUrl, '/api/sensor/$id/$key', {});
@@ -84,6 +88,17 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
       );
 
       Log.debug('Set agent config $id $domain');
+      return true;
+    } catch (e) {
+      Log.error('setAgentConfig - $e');
+      return false;
+    }
+  }
+
+  Future<bool> checkBaseUrl(String tmpBaseUrl) async {
+    try {
+      await doGet(tmpBaseUrl, '/api/health', {});
+      Log.debug('Valid baseUrl $tmpBaseUrl');
       return true;
     } catch (e) {
       Log.error('setAgentConfig - $e');

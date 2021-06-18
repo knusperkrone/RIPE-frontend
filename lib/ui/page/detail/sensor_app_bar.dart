@@ -42,22 +42,33 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
       fit: StackFit.expand,
       clipBehavior: Clip.none,
       children: [
-        Opacity(
-          opacity: max(0.5, gradientShrink),
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: [0.33, max(0.66, gradientShrink), 1.0],
-                colors: [
-                  PRIMARY_COLOR,
-                  ACCENT_COLOR,
-                  Theme.of(context).canvasColor
-                ],
+        Stack(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [PRIMARY_COLOR, ACCENT_COLOR],
+                  stops: [0.66, 1.0],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
               ),
             ),
-          ),
+            Opacity(
+                opacity: 1 - shrink,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.transparent,
+                        Theme.of(context).canvasColor
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ))
+          ],
         ),
         Padding(
           padding: EdgeInsets.only(top: kToolbarHeight / 2 + shrinkOffset / 4),
