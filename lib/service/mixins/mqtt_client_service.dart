@@ -1,6 +1,8 @@
 import 'dart:collection';
 import 'dart:convert' show utf8;
+import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
@@ -56,6 +58,9 @@ abstract class MqttClientService {
   static bool _isOfflineMode = false;
 
   static Future<bool> connect(String broker) async {
+    if (!kReleaseMode && Platform.isAndroid && broker == "127.0.0.1") {
+      broker = "10.0.2.2";
+    }
     _MqttContext? ctx = _contexts[broker];
 
     if (ctx == null || !ctx.isConnected) {
