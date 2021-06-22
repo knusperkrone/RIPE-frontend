@@ -72,7 +72,7 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
     return Scaffold(body: Builder(builder: (context) {
       return Scaffold(
         appBar: RipeAppBar(
-          title: const Text('Ripe'),
+          title: const Text('RIPE'),
           centerTitle: true,
         ),
         body: Padding(

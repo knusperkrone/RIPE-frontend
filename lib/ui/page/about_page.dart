@@ -108,8 +108,11 @@ class AboutPage extends StatelessWidget {
                       child: TextFormField(
                         // The validator receives the text that the user has entered
                         autovalidateMode: AutovalidateMode.onUserInteraction,
-                        decoration:
-                            const InputDecoration(labelText: 'Backend URL'),
+                        decoration: InputDecoration(
+                            labelText: 'Backend URL',
+                            labelStyle: TextStyle(
+                              color: Theme.of(context).accentColor,
+                            )),
                         maxLines: 1,
                         initialValue: backendService.baseUrl,
                         validator: (value) {
@@ -131,7 +134,7 @@ class AboutPage extends StatelessWidget {
                               scaffoldMsgKey.currentState?.showSnackBar(
                                 RipeSnackbar(
                                   context,
-                                  label: 'BaseURL geändert',
+                                  label: 'URL geändert',
                                 ),
                               );
                             }

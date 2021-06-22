@@ -32,11 +32,8 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
       BuildContext context, double shrinkOffset, bool overlapsContent) {
     final theme = Theme.of(context);
     final qWidth = MediaQuery.of(context).size.width;
-    final Color gradientVal = theme.primaryColor;
-
-    final shrink = shrinkOffset / (maxExtent - kToolbarHeight - 8.0);
-    // ignore: invalid_use_of_protected_member
-    final gradientShrink = _GRADIENT_TWEEN.lerp(shrink);
+    double shrink = shrinkOffset / (maxExtent - kToolbarHeight - 8.0);
+    shrink = max(0.0, min(1.0, shrink));
 
     return Stack(
       fit: StackFit.expand,
@@ -55,7 +52,7 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
               ),
             ),
             Opacity(
-                opacity: 1 - shrink,
+                opacity: 1.0 - shrink,
                 child: Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -73,7 +70,7 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
         Padding(
           padding: EdgeInsets.only(top: kToolbarHeight / 2 + shrinkOffset / 4),
           child: Opacity(
-            opacity: max(0, 1 - (shrinkOffset / expandedHeight) * 3),
+            opacity: max(0.0, 1 - (shrinkOffset / expandedHeight) * 3),
             child: Column(
               children: <Widget>[
                 Container(

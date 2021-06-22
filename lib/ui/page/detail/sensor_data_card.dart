@@ -6,7 +6,7 @@ import 'package:ripe/ui/component/time_utils.dart';
 class SensorDataCard extends StatefulWidget {
   final SensorDataDto data;
 
-  const SensorDataCard(this.data);
+  const SensorDataCard(this.data, {Key? key}) : super(key: key);
 
   @override
   State createState() => _SensorDataCardState();

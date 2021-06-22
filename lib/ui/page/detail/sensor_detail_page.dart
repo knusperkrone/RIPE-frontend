@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:ripe/service/backend_service.de.dart';
@@ -25,9 +26,12 @@ class SensorDetailPage extends StatefulWidget {
 class _SensorDetailPageState extends State<SensorDetailPage>
     with WidgetsBindingObserver {
   final _backendService = new BackendService();
+  late List<GlobalKey> childKeys;
   late SensorListenerService? _service;
   late SensorDto data;
   late RegisteredSensor info;
+
+  double bottomPadding = 0.0;
 
   /*
    * Constructor/Destructor
@@ -40,6 +44,19 @@ class _SensorDetailPageState extends State<SensorDetailPage>
     data = widget.data;
     info = widget.sensor;
     _initMqtt();
+
+    childKeys =
+        List.generate(widget.data.agents.length + 1, (_) => GlobalKey());
+    Future.delayed(const Duration(milliseconds: 100), () {
+      setState(() {
+        bottomPadding = MediaQuery.of(context).size.height -
+            MediaQuery.of(context).padding.top -
+            kToolbarHeight -
+            childKeys.fold<double>(0.0,
+                (prev, el) => prev + (el.currentContext?.size?.height ?? 0.0));
+        bottomPadding = max(0.0, bottomPadding);
+      });
+    });
   }
 
   @override
@@ -149,16 +166,23 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
                         if (index == 0) {
-                          return SensorDataCard(data.sensorData);
+                          return SensorDataCard(
+                            data.sensorData,
+                            key: childKeys[index],
+                          );
                         }
                         return new AgentDecorator(
                           info: info,
                           agent: data.agents[index - 1],
+                          key: childKeys[index],
                           refreshCallback: _refreshData,
                         );
                       },
-                      childCount: 1 + data.agents.length,
+                      childCount: 1// + data.agents.length - 2,
                     ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Container(height: bottomPadding),
                   ),
                 ],
               ),

@@ -20,7 +20,8 @@ class AgentDecorator extends StatelessWidget {
     required this.info,
     required this.agent,
     required this.refreshCallback,
-  });
+    Key? key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
