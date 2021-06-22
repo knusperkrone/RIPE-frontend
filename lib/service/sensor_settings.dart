@@ -96,7 +96,7 @@ class SensorSettingService extends BasePrefService {
 
   void removeSensor(int id) {
     final sensor = _registered[id]!;
-    File(sensor.thumbPath).deleteSync();
+    File(_getThumbnailPath(id)).deleteSync();
 
     _registered.remove(id);
     _persist();
