@@ -47,11 +47,13 @@ class _SensorDataCardState extends State<SensorDataCard> {
     final valTheme = Theme.of(context)
         .textTheme
         .subtitle1!
-        .copyWith(fontWeight: FontWeight.bold, color: Colors.black87);
+        .copyWith(fontWeight: FontWeight.bold);
     return [
       ListTile(
         leading: Icon(icon),
         title: RichText(
+          maxLines: 2,
+          overflow: TextOverflow.clip,
           text: TextSpan(text: text, style: subhead, children: [
             TextSpan(text: ' ${value.toStringAsFixed(1)}', style: valTheme),
             TextSpan(text: appendix, style: valTheme),
