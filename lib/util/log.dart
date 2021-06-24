@@ -6,17 +6,31 @@ class _CallerTrace {
   late int lineNumber;
 
   _CallerTrace(this._trace) {
-    // Get caller line
-    final traceString = _trace.toString().split('\n')[1];
+    try {
+      // Get caller line
+      final traceString = _trace.toString().split('\n')[1];
 
-    // Search the 'file_name.dart:5:12' with regex
-    final indexOfFileName = traceString.indexOf(RegExp(r'[A-Za-z_]+.dart'));
-    final fileInfo = traceString.substring(indexOfFileName);
-    final tokens = fileInfo.split(':');
+      // Search the 'file_name.dart:5:12' with regex
+      final indexOfFileName = traceString.indexOf(RegExp(r'[A-Za-z_]+.dart'));
+      final fileInfo = traceString.substring(indexOfFileName);
+      final tokens = fileInfo.split(':');
 
-    // Split main.dart:5:12 into name and line number
-    fileName = tokens[0];
-    lineNumber = int.parse(tokens[1]);
+      // Split (main.dart:5:12) into name and line number
+
+      fileName = tokens[0];
+      if (tokens[1].endsWith(')')) {
+        tokens[1] = tokens[1].substring(0, tokens[1].length - 1);
+      }
+      lineNumber = int.parse(tokens[1]);
+    } catch (e) {
+      fileName = 'failed';
+      lineNumber = 0;
+
+      print('Failed creating trace $e');
+      if (Sentry.isEnabled) {
+        Sentry.captureException(e);
+      }
+    }
   }
 
   @override
