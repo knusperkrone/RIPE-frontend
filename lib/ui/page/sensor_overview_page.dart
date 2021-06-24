@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:ripe/service/backend_service.de.dart';
+import 'package:ripe/service/backend_service.dart';
 import 'package:ripe/service/sensor_settings.dart';
 import 'package:ripe/ui/component/branded.dart';
 import 'package:ripe/ui/component/colors.dart';

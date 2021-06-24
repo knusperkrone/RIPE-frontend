@@ -22,6 +22,7 @@ String toHR(DateTime? time, {bool withTimezone = false}) {
   if (time == null) {
     return '∞';
   }
+  time = time.toLocal();
   return '${time.year}-${pad(time.month)}-${pad(time.day)} ${pad(time.hour)}:${pad(time.minute)}:${pad(time.second)} ${withTimezone ? time.timeZoneName : ''}';
 }
 

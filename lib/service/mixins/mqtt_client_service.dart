@@ -58,8 +58,8 @@ abstract class MqttClientService {
   static bool _isOfflineMode = false;
 
   static Future<bool> connect(String broker) async {
-    if (!kReleaseMode && Platform.isAndroid && broker == "127.0.0.1") {
-      broker = "10.0.2.2";
+    if (!kReleaseMode && Platform.isAndroid && broker == '127.0.0.1') {
+      broker = '10.0.2.2';
     }
     _MqttContext? ctx = _contexts[broker];
 
@@ -150,6 +150,7 @@ abstract class MqttClientService {
   @protected
   void subscribe(String broker, String topic, MqttReceiveFunc recFunc) {
     if (!_isOfflineMode) {
+      Log.debug('Subscribed: $topic');
       _contexts[broker]?.addCallback(topic, recFunc);
     }
   }
@@ -157,6 +158,7 @@ abstract class MqttClientService {
   @protected
   void unsubscribe(String broker, String topic) {
     if (!_isOfflineMode) {
+      Log.debug('Unsubscribed: $topic');
       _contexts[broker]?.removeCallback(topic);
     }
   }

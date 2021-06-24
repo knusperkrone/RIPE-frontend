@@ -1,6 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:ripe/service/backend_service.de.dart';
+import 'package:ripe/service/backend_service.dart';
 import 'package:ripe/ui/component/branded.dart';
 import 'package:url_launcher/url_launcher.dart';
 

@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
 
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:ripe/env.dart';
 import 'package:ripe/service/base_pref_service.dart';
 import 'package:ripe/service/mixins/http_client_mixin.dart';
@@ -11,12 +12,15 @@ import 'models/dto.dart';
 
 class BackendService extends BasePrefService with DartHttpClientMixin {
   BackendService() : super() {
-    setTimeout(const Duration(milliseconds: 750));
+    setTimeout(const Duration(milliseconds: 1500));
   }
 
   Future<SensorDto?> getSensorData(int id, String key) async {
+    final currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
     try {
-      final resp = await doGet(baseUrl, '/api/sensor/$id/$key', {});
+      final resp = await doGet(baseUrl, '/api/sensor/$id/$key', {
+        'X-TZ': currentTimeZone,
+      });
       final json = jsonDecode(resp) as Map<String, dynamic>;
 
       Log.debug('Fetched sensor data for $id');
@@ -53,9 +57,11 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
     required String key,
     required String domain,
   }) async {
+    final currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
     try {
-      final resp =
-          await doGet(baseUrl, '/api/agent/$id/$key/$domain/config', {});
+      final resp = await doGet(baseUrl, '/api/agent/$id/$key/$domain/config', {
+        'X-TZ': currentTimeZone,
+      });
 
       final json = jsonDecode(resp) as Map<String, dynamic>;
       final Map<String, List<dynamic>> casted = json.cast();
@@ -79,11 +85,15 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
     required String domain,
     required Map<String, dynamic> settings,
   }) async {
+    final currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
     try {
       await doPost(
         baseUrl,
         '/api/agent/$id/$key/$domain/config',
-        {'Content-Type': 'application/json'},
+        {
+          'Content-Type': 'application/json',
+          'X-TZ': currentTimeZone,
+        },
         jsonEncode(settings),
       );
 
@@ -101,7 +111,7 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
       Log.debug('Valid baseUrl $tmpBaseUrl');
       return true;
     } catch (e) {
-      Log.error('setAgentConfig - $e');
+      Log.error('checkBaseUrl - $e');
       return false;
     }
   }
