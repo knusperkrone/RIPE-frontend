@@ -49,8 +49,11 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
   }
 
   Future<List<String>?> getSensorLogs(int id, String key) async {
+    final currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
     try {
-      final resp = await doGet(baseUrl, '/api/sensor/log/$id/$key', {});
+      final resp = await doGet(baseUrl, '/api/sensor/log/$id/$key', {
+        'X-TZ': currentTimeZone,
+      });
       final json = jsonDecode(resp) as List<dynamic>;
       final logs = json.cast<String>();
 
