@@ -77,10 +77,14 @@ class _SensorLogState extends State<SensorLogPage> {
       ),
       body: Container(
         child: ListView.builder(
-            itemCount: logs?.length ?? 0,
-            itemBuilder: (context, i) {
-              return Text(logs![i]);
-            }),
+          itemCount: logs?.length ?? 0,
+          itemBuilder: (context, i) {
+            return Text(
+              logs![i],
+              style: const TextStyle(fontSize: 13),
+            );
+          },
+        ),
       ),
     );
   }

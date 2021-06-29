@@ -98,7 +98,6 @@ abstract class MqttClientService {
 
   static void _onConnect(String broker) {
     Log.info('Connected to broker $broker');
-    _contexts[broker]?.reconnect();
   }
 
   static void _onDisconnect(String broker) {

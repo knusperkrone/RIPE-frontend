@@ -28,11 +28,12 @@ class SensorDetailPage extends StatefulWidget {
 class _SensorDetailPageState extends State<SensorDetailPage>
     with WidgetsBindingObserver {
   final _backendService = new BackendService();
+  SensorListenerService? service;
   late List<GlobalKey> childKeys;
-  late SensorListenerService? _service;
   late SensorDto data;
   late RegisteredSensor info;
-
+  late Timer connectionCheck;
+  bool isConnected = false;
   double bottomPadding = 0.0;
 
   /*
@@ -46,6 +47,8 @@ class _SensorDetailPageState extends State<SensorDetailPage>
     data = widget.data;
     info = widget.sensor;
     _initMqtt();
+    connectionCheck =
+        Timer.periodic(const Duration(seconds: 1), (_) => _checkMQTT());
 
     childKeys =
         List.generate(widget.data.agents.length + 1, (_) => GlobalKey());
@@ -64,7 +67,8 @@ class _SensorDetailPageState extends State<SensorDetailPage>
   @override
   void dispose() {
     WidgetsBinding.instance?.removeObserver(this);
-    _service?.dispose();
+    service?.dispose();
+    connectionCheck.cancel();
     super.dispose();
   }
 
@@ -75,11 +79,19 @@ class _SensorDetailPageState extends State<SensorDetailPage>
     }
   }
 
+  Future<void> _checkMQTT() async {
+    final newIsConnected = service?.isConnected() ?? false;
+    if (newIsConnected != isConnected) {
+      setState(() => isConnected = newIsConnected);
+    }
+  }
+
   void _initMqtt() {
     if (data.broker != null) {
-      _service = new SensorListenerService(data.broker!);
-      _service!.connect().then((_) {
-        _service!.listenSensor(
+      service = new SensorListenerService(data.broker!);
+      isConnected = service!.isConnected();
+      service!.connect().then((_) {
+        service!.listenSensor(
           info.id,
           info.key,
           () => Future.delayed(const Duration(milliseconds: 250), _refreshData),
@@ -193,10 +205,15 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                                   .copyWith(fontWeight: FontWeight.bold),
                             ),
                             trailing: Container(
-                              width: 50,
+                              width: 72,
                               child: Row(
                                 children: [
-                                  Container(width: 2),
+                                  Icon(
+                                    isConnected
+                                        ? Icons.sensors
+                                        : Icons.sensors_off,
+                                    color: Colors.white38,
+                                  ),
                                   IconButton(
                                     onPressed: _onLogs,
                                     icon: const Icon(Icons.analytics_outlined),

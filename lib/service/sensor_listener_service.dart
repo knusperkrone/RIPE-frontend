@@ -37,8 +37,12 @@ class SensorListenerService extends MqttClientService {
     await MqttClientService.connect(_broker);
   }
 
+  bool isConnected() {
+    return MqttClientService.isConnected(_broker);
+  }
+
   void listenSensor(int id, String key, VoidCallback callback) {
-    for (final topic in _buildTopics(id, key)) {
+    for (final topic in ['sensor/cmd/$id/$key', 'sensor/data/$id/$key']) {
       _subscribed.add(topic);
       subscribe(_broker, topic, (dynamic _) => callback());
     }
@@ -53,10 +57,6 @@ class SensorListenerService extends MqttClientService {
   void dispose() {
     _subscribed.forEach((t) => unsubscribe(_broker, t));
     _subscribed.clear();
-  }
-
-  List<String> _buildTopics(int id, String key) {
-    return ['sensor/cmd/$id/$key', 'sensor/data/$id/$key'];
   }
 
   /*
