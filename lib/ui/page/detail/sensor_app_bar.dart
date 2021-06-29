@@ -35,6 +35,12 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
     double shrink = shrinkOffset / (maxExtent - kToolbarHeight - 8.0);
     shrink = max(0.0, min(1.0, shrink));
 
+    final nameOpacity = max(
+      0.0,
+      min(1.0,
+          ((shrinkOffset - (kToolbarHeight + 2)) / (kToolbarHeight + 2)) - 1),
+    );
+
     return Stack(
       fit: StackFit.expand,
       clipBehavior: Clip.none,
@@ -52,31 +58,29 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
               ),
             ),
             Opacity(
-                opacity: 1.0 - shrink,
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.transparent,
-                        Theme.of(context).canvasColor
-                      ],
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                    ),
+              opacity: 1.0 - shrink,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.transparent, Theme.of(context).canvasColor],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
                   ),
-                ))
+                ),
+              ),
+            ),
           ],
         ),
         Padding(
-          padding: EdgeInsets.only(top: kToolbarHeight / 2 + shrinkOffset / 4),
+          padding: EdgeInsets.only(top: kToolbarHeight / 2 + shrinkOffset / 3),
           child: Opacity(
             opacity: max(0.0, 1 - (shrinkOffset / expandedHeight) * 3),
             child: Column(
               children: <Widget>[
                 Container(
-                  width: expandedHeight - 40,
+                  width: expandedHeight,
                   height: max(0.000000000000000000001,
-                      expandedHeight - kToolbarHeight - shrinkOffset - 40.0),
+                      expandedHeight - kToolbarHeight - shrinkOffset),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
@@ -86,36 +90,20 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
                     ),
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.only(top: 12.0),
-                  height:
-                      textSize - (shrinkOffset / expandedHeight) * textSize + 6,
-                  child: Container(
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: const BoxDecoration(
-                      color: Colors.black12,
-                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                    ),
-                    child: Text(
-                      name,
-                      style: theme.textTheme.subtitle1!
-                          .copyWith(color: Colors.white),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
         ),
         Positioned(
           top: kToolbarHeight / 3,
+          left: 70.0,
           child: Container(
             width: qWidth,
             child: Opacity(
-              opacity: shrink,
+              opacity: nameOpacity,
               child: Text(
                 name,
-                textAlign: TextAlign.center,
+                textAlign: TextAlign.start,
                 style: theme.textTheme.headline6!.copyWith(color: Colors.white),
               ),
             ),

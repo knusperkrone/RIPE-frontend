@@ -201,7 +201,7 @@ class SensorSettingService extends BasePrefService {
     assert(imageFile.existsSync());
 
     final img = image.decodeImage(imageFile.readAsBytesSync())!;
-    final thumbnailBytes = image.encodePng(image.copyResize(img, width: 240));
+    final thumbnailBytes = image.encodePng(image.copyResize(img, width: 500));
     thumbFile.writeAsBytesSync(thumbnailBytes);
 
     Log.info('Generated thumbnail for $imagePath at $thumbPath');

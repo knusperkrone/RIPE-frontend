@@ -29,10 +29,14 @@ class AgentConfigPageState extends State<AgentConfigPage> {
         final snackbar = RipeSnackbar(
           context,
           label: 'Einstellungen konnten nicht geladen werden',
+          duration: const Duration(seconds: 60),
+          action: SnackBarAction(
+            label: 'Ok',
+            onPressed: () => Navigator.pop(context),
+          ),
         );
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context).showSnackBar(snackbar);
-        Navigator.pop(context);
         return;
       }
 

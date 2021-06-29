@@ -11,10 +11,6 @@ import 'package:tuple/tuple.dart';
 import 'models/dto.dart';
 
 class BackendService extends BasePrefService with DartHttpClientMixin {
-  BackendService() : super() {
-    setTimeout(const Duration(milliseconds: 1500));
-  }
-
   Future<SensorDto?> getSensorData(int id, String key) async {
     final currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
     try {
@@ -49,6 +45,19 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
     } catch (e) {
       Log.error('forceAgent - $e');
       return false;
+    }
+  }
+
+  Future<List<String>?> getSensorLogs(int id, String key) async {
+    try {
+      final resp = await doGet(baseUrl, '/api/sensor/log/$id/$key', {});
+      final json = jsonDecode(resp) as List<dynamic>;
+      final logs = json.cast<String>();
+
+      Log.debug('Fetched sensor logs for $id');
+      return logs;
+    } catch (e) {
+      Log.error('GetSensorLogs - $e');
     }
   }
 

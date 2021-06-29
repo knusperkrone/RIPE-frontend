@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:convert' show utf8;
 import 'dart:io' show Platform;
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
@@ -64,7 +65,7 @@ abstract class MqttClientService {
     _MqttContext? ctx = _contexts[broker];
 
     if (ctx == null || !ctx.isConnected) {
-      const id = '_APP_'; // TODO(knukro): generate
+      final id = generateUUID();
       final client = new MqttServerClient(broker, id);
       final MqttConnectMessage connMess = MqttConnectMessage()
           .withClientIdentifier(id)
@@ -126,6 +127,11 @@ abstract class MqttClientService {
   /*
    * Class Methods
    */
+
+  static String generateUUID() {
+    final rand = new Random();
+    return 'APP${DateTime.now().toIso8601String()}-${rand.nextInt(4294967296)}-${rand.nextInt(4294967296)}';
+  }
 
   static bool isOfflineMode() {
     return _isOfflineMode;

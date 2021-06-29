@@ -44,6 +44,12 @@ class SensorListenerService extends MqttClientService {
     }
   }
 
+  void listenSensorLogs(int id, String key, VoidCallback callback) {
+    final topic = 'sensor/log/$id/$key';
+    _subscribed.add(topic);
+    subscribe(_broker, topic, (dynamic _) => callback());
+  }
+
   void dispose() {
     _subscribed.forEach((t) => unsubscribe(_broker, t));
     _subscribed.clear();

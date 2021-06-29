@@ -8,6 +8,7 @@ import 'package:ripe/service/models/dto.dart';
 import 'package:ripe/service/sensor_listener_service.dart';
 import 'package:ripe/service/sensor_settings.dart';
 import 'package:ripe/ui/component/branded.dart';
+import 'package:ripe/ui/page/sensor_log_page.dart';
 import 'package:ripe/ui/page/sensor_overview_page.dart';
 
 import 'agent_decorator.dart';
@@ -78,7 +79,11 @@ class _SensorDetailPageState extends State<SensorDetailPage>
     if (data.broker != null) {
       _service = new SensorListenerService(data.broker!);
       _service!.connect().then((_) {
-        _service!.listenSensor(info.id, info.key, _refreshData);
+        _service!.listenSensor(
+          info.id,
+          info.key,
+          () => Future.delayed(const Duration(milliseconds: 250), _refreshData),
+        );
       });
     } else {
       final snackbar = RipeSnackbar(
@@ -114,6 +119,18 @@ class _SensorDetailPageState extends State<SensorDetailPage>
         MaterialPageRoute(builder: (_) => SensorOverviewPage()),
       );
     }
+  }
+
+  void _onLogs() {
+    Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => SensorLogPage(
+          widget.sensor,
+          widget.data,
+        ),
+      ),
+    );
   }
 
   Future<void> _refreshData() async {
@@ -161,6 +178,35 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                       imageProvider: FileImage(imgFile),
                       name: widget.sensor.name,
                       textSize: 40.0,
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Container(
+                      child: Card(
+                        child: Column(children: [
+                          ListTile(
+                            title: Text(
+                              data.name,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .subtitle1!
+                                  .copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            trailing: Container(
+                              width: 50,
+                              child: Row(
+                                children: [
+                                  Container(width: 2),
+                                  IconButton(
+                                    onPressed: _onLogs,
+                                    icon: const Icon(Icons.analytics_outlined),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ]),
+                      ),
                     ),
                   ),
                   SliverList(
