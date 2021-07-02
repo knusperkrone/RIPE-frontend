@@ -14,8 +14,9 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
   Future<SensorDto?> getSensorData(int id, String key) async {
     final currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
     try {
-      final resp = await doGet(baseUrl, '/api/sensor/$id/$key', {
+      final resp = await doGet(baseUrl, '/api/sensor/$id', {
         'X-TZ': currentTimeZone,
+        'X-KEY': key,
       });
       final json = jsonDecode(resp) as Map<String, dynamic>;
 
@@ -35,15 +36,18 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
     try {
       await doPost(
         baseUrl,
-        '/api/agent/$id/$key/$domain',
-        {'Content-Type': 'application/json'},
+        '/api/agent/$id/${base64.encode(utf8.encode(domain))}',
+        {
+          'Content-Type': 'application/json',
+          'X-KEY': key,
+        },
         jsonEncode({'payload': payload}),
       );
 
       Log.debug('Send command to sensor $id, $payload');
       return true;
     } catch (e) {
-      Log.error('forceAgent - $e');
+      Log.error('sendAgentCmd - $e');
       return false;
     }
   }
@@ -51,8 +55,9 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
   Future<List<String>?> getSensorLogs(int id, String key) async {
     final currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
     try {
-      final resp = await doGet(baseUrl, '/api/sensor/log/$id/$key', {
+      final resp = await doGet(baseUrl, '/api/sensor/$id/log', {
         'X-TZ': currentTimeZone,
+        'X-KEY': key,
       });
       final json = jsonDecode(resp) as List<dynamic>;
       final logs = json.cast<String>();
@@ -71,8 +76,10 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
   }) async {
     final currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
     try {
-      final resp = await doGet(baseUrl, '/api/agent/$id/$key/$domain/config', {
+      final resp = await doGet(baseUrl,
+          '/api/agent/$id/${base64.encode(utf8.encode(domain))}/config', {
         'X-TZ': currentTimeZone,
+        'X-KEY': key,
       });
 
       final json = jsonDecode(resp) as Map<String, dynamic>;
@@ -101,10 +108,11 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
     try {
       await doPost(
         baseUrl,
-        '/api/agent/$id/$key/$domain/config',
+        '/api/agent/$id/${base64.encode(utf8.encode(domain))}/config',
         {
           'Content-Type': 'application/json',
           'X-TZ': currentTimeZone,
+          'X-KEY': key,
         },
         jsonEncode(settings),
       );
