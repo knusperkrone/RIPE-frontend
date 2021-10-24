@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ripe/service/mixins/mqtt_client_service.dart';
+import 'package:ripe/util/log.dart';
 
 class SensorListenerService extends MqttClientService {
   static final Map<String, SensorListenerService> _services = {};
@@ -16,10 +17,6 @@ class SensorListenerService extends MqttClientService {
     if (broker.startsWith('tcp://')) {
       broker = broker.substring('tcp://'.length);
     }
-    // trim end
-    if (broker.contains(':')) {
-      broker = broker.substring(0, broker.indexOf(':'));
-    }
 
     if (_services[broker] == null) {
       _services[broker] = new SensorListenerService._internal(broker);
@@ -34,7 +31,16 @@ class SensorListenerService extends MqttClientService {
    */
 
   Future<void> connect() async {
-    await MqttClientService.connect(_broker);
+    int? port;
+    String server = _broker;
+    if (_broker.contains(':')) {
+      port = int.tryParse(server.substring(server.indexOf(':') + 1));
+      server = server.substring(0, server.indexOf(':'));
+      if (port == null) {
+        Log.warn('Failed extracting (broker, port) from: $_broker');
+      }
+    }
+    await MqttClientService.connect(_broker, server, port ?? 1883);
   }
 
   bool isConnected() {

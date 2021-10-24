@@ -60,7 +60,7 @@ abstract class DartHttpClientMixin {
 
   Future<String> _handleResponse(HttpClientResponse response) async {
     final responseBody = await _parseBody(response);
-    if (response.statusCode >= 400) {
+    if (response.statusCode < 200 || response.statusCode >= 300) {
       throw new StateError(responseBody);
     }
     return responseBody;

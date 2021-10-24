@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:ripe/ui/component/colors.dart';
 
 class RipeAppBar extends AppBar {
@@ -11,10 +12,10 @@ class RipeAppBar extends AppBar {
     Color? shadowColor,
     ShapeBorder? shape,
     Color? backgroundColor,
-    Brightness? brightness,
+    SystemUiOverlayStyle? brightness,
     IconThemeData? iconTheme,
     IconThemeData? actionsIconTheme,
-    TextTheme? textTheme,
+    TextStyle? textTheme,
     bool primary = true,
     bool? centerTitle,
     bool excludeHeaderSemantics = false,
@@ -42,10 +43,10 @@ class RipeAppBar extends AppBar {
           shadowColor: shadowColor,
           shape: shape,
           backgroundColor: backgroundColor,
-          brightness: brightness,
+          systemOverlayStyle: brightness,
           iconTheme: iconTheme,
           actionsIconTheme: actionsIconTheme,
-          textTheme: textTheme,
+          toolbarTextStyle: textTheme,
           primary: primary,
           centerTitle: centerTitle,
           excludeHeaderSemantics: excludeHeaderSemantics,

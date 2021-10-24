@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:ripe/service/backend_service.dart';
 import 'package:ripe/service/sensor_settings.dart';
 import 'package:ripe/ui/component/branded.dart';
@@ -78,6 +77,7 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
         body: Padding(
           padding: const EdgeInsets.only(left: 4.0, right: 4.0),
           child: ListView.builder(
+
             itemCount: 1 + _sensors.length,
             itemBuilder: (_, index) {
               if (index == 0) {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:ripe/service/sensor_server_service.dart';
 import 'package:ripe/ui/component/branded.dart';
 import 'package:ripe/ui/component/colors.dart';
@@ -64,7 +63,7 @@ class SensorConfigPage extends StatelessWidget {
               end: Alignment.bottomCenter,
               stops: const [0.0, 0.33],
               colors: [
-                Theme.of(context).accentColor,
+                Theme.of(context).colorScheme.secondary,
                 Theme.of(context).canvasColor,
               ],
             ),

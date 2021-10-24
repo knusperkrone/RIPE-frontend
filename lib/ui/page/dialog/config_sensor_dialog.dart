@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ripe/ui/component/validator.dart';
 import 'package:tuple/tuple.dart';
@@ -132,7 +131,7 @@ class _ConfigSensorDialogState extends State<ConfigSensorDialog> {
                           width: double.infinity,
                           padding: const EdgeInsets.all(10.0),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).accentColor,
+                            color: Theme.of(context).colorScheme.secondary,
                             borderRadius: const BorderRadius.only(
                               bottomRight: Radius.circular(12.0),
                             ),

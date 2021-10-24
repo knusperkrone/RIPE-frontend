@@ -94,7 +94,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
         service!.listenSensor(
           info.id,
           info.key,
-          () => Future.delayed(const Duration(milliseconds: 250), _refreshData),
+          () => Future.delayed(const Duration(milliseconds: 500), _refreshData),
         );
       });
     } else {
@@ -179,76 +179,85 @@ class _SensorDetailPageState extends State<SensorDetailPage>
         child: SafeArea(
           bottom: false,
           child: Material(
-            child: Container(
-              child: CustomScrollView(
-                slivers: [
-                  SliverPersistentHeader(
-                    pinned: true,
-                    delegate: SensorAppBar(
-                      expandedHeight: 180.0,
-                      onBack: _onBack,
-                      imageProvider: FileImage(imgFile),
-                      name: widget.sensor.name,
-                      textSize: 40.0,
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Container(
-                      child: Card(
-                        child: Column(children: [
-                          ListTile(
-                            title: Text(
-                              data.name,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .subtitle1!
-                                  .copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            trailing: Container(
-                              width: 72,
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    isConnected
-                                        ? Icons.sensors
-                                        : Icons.sensors_off,
-                                    color: Colors.white38,
-                                  ),
-                                  IconButton(
-                                    onPressed: _onLogs,
-                                    icon: const Icon(Icons.analytics_outlined),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ]),
+            child: RefreshIndicator(
+              onRefresh: _refreshData,
+              displacement: 10.0,
+              edgeOffset: 180.0,
+              color: Theme.of(context).colorScheme.secondary,
+              child: Container(
+                child: CustomScrollView(
+                  slivers: [
+                    SliverPersistentHeader(
+                      pinned: true,
+                      delegate: SensorAppBar(
+                        expandedHeight: 180.0,
+                        onBack: _onBack,
+                        imageProvider: FileImage(imgFile),
+                        name: widget.sensor.name,
+                        textSize: 40.0,
                       ),
                     ),
-                  ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        if (index == 0) {
-                          return SensorDataCard(
-                            data.sensorData,
-                            key: childKeys[index],
-                          );
-                        }
-                        return new AgentDecorator(
-                          info: info,
-                          agent: data.agents[index - 1],
-                          key: childKeys[index],
-                          refreshCallback: _refreshData,
-                        );
-                      },
-                      childCount: 1 + data.agents.length,
+                    SliverToBoxAdapter(
+                      child: Container(
+                        child: Card(
+                          child: Column(children: [
+                            ListTile(
+                              title: Text(
+                                data.name,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .subtitle1!
+                                    .copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              trailing: Container(
+                                width: 72,
+                                child: Row(
+                                  children: [
+                                    Tooltip(
+                                        message: data.broker ?? 'broker',
+                                        child: Icon(
+                                          isConnected
+                                              ? Icons.sensors
+                                              : Icons.sensors_off,
+                                          color: Colors.white38,
+                                        )),
+                                    IconButton(
+                                      onPressed: _onLogs,
+                                      icon:
+                                          const Icon(Icons.analytics_outlined),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ]),
+                        ),
+                      ),
                     ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Container(height: bottomPadding),
-                  ),
-                ],
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          if (index == 0) {
+                            return SensorDataCard(
+                              data.sensorData,
+                              key: childKeys[index],
+                            );
+                          }
+                          return new AgentDecorator(
+                            info: info,
+                            agent: data.agents[index - 1],
+                            key: childKeys[index],
+                            refreshCallback: _refreshData,
+                          );
+                        },
+                        childCount: 1 + data.agents.length,
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Container(height: bottomPadding),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

@@ -40,7 +40,7 @@ class _SensorLogState extends State<SensorLogPage> {
         _listenerService!.listenSensorLogs(
           widget.sensor.id,
           widget.sensor.key,
-          () => Future.delayed(const Duration(milliseconds: 250), _refreshLogs),
+          () => Future.delayed(const Duration(milliseconds: 500), _refreshLogs),
         );
       });
     }

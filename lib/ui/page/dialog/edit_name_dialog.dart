@@ -97,7 +97,7 @@ class _EditNameDialogState extends State<EditNameDialog> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(10.0),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).accentColor,
+                        color: Theme.of(context).colorScheme.secondary,
                         borderRadius: const BorderRadius.only(
                           bottomRight: Radius.circular(12.0),
                         ),

@@ -29,13 +29,6 @@ class _SliderDecoratorState extends BaseDecoratorState<SliderDecorator> {
     _val = widget.values[2];
   }
 
-  @override
-  void onUpdate() {}
-
-  /*
-   * BaseDecoratorContract
-   */
-
   /*
    * UI Callbacks
    */

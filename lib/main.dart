@@ -41,7 +41,7 @@ class RipeApp extends StatelessWidget {
 
   static ThemeData _prepareTheme(ThemeData theme) {
     const primaryColor = PRIMARY_COLOR;
-    const accentColor = ACCENT_COLOR;
+    const secondaryColor = ACCENT_COLOR;
     const backgroundColor = BACKGROUND_COLOR;
     const errorColor = ERROR_COLOR;
     const buttonColorDark = BUTTON_COLOR;
@@ -49,15 +49,21 @@ class RipeApp extends StatelessWidget {
 
     final textTheme = theme.textTheme;
     return theme.copyWith(
+      androidOverscrollIndicator: AndroidOverscrollIndicator.stretch,
       primaryColor: primaryColor,
-      accentColor: accentColor,
+      colorScheme: theme.colorScheme.copyWith(
+        primary: primaryColor,
+        primaryVariant: buttonColorDark,
+        secondary: secondaryColor,
+        secondaryVariant: buttonColorLight,
+      ),
       backgroundColor: backgroundColor,
       disabledColor: Colors.white60,
       dividerColor: primaryColor,
       errorColor: errorColor,
       focusColor: buttonColorLight,
       visualDensity: VisualDensity.adaptivePlatformDensity,
-      toggleableActiveColor: accentColor,
+      toggleableActiveColor: secondaryColor,
       dividerTheme: theme.dividerTheme.copyWith(),
       inputDecorationTheme: const InputDecorationTheme(
         focusedBorder: UnderlineInputBorder(
@@ -82,7 +88,7 @@ class RipeApp extends StatelessWidget {
         }),
         trackColor: MaterialStateProperty.resolveWith((states) {
           return (states.contains(MaterialState.selected))
-              ? accentColor
+              ? secondaryColor
               : backgroundColor;
         }),
       ),
@@ -118,7 +124,7 @@ class RipeApp extends StatelessWidget {
       textButtonTheme: TextButtonThemeData(
         style: ButtonStyle(
           foregroundColor: MaterialStateProperty.all(primaryColor),
-          overlayColor: MaterialStateProperty.all(accentColor),
+          overlayColor: MaterialStateProperty.all(secondaryColor),
         ),
       ),
     );

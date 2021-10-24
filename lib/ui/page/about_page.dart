@@ -23,7 +23,7 @@ class AboutPage extends StatelessWidget {
                   end: Alignment.bottomCenter,
                   stops: const [0.0, 0.33],
                   colors: [
-                    Theme.of(context).accentColor,
+                    Theme.of(context).colorScheme.secondary,
                     Theme.of(context).canvasColor,
                   ],
                 ),
@@ -111,7 +111,7 @@ class AboutPage extends StatelessWidget {
                         decoration: InputDecoration(
                             labelText: 'Backend URL',
                             labelStyle: TextStyle(
-                              color: Theme.of(context).accentColor,
+                              color: Theme.of(context).colorScheme.secondary,
                             )),
                         maxLines: 1,
                         initialValue: backendService.baseUrl,

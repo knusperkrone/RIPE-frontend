@@ -1,6 +1,6 @@
 typedef ValidatorFun = String? Function(String?);
 
-class Validator {
+mixin Validator {
   static String? notEmpty(String? value) {
     value = value?.trim() ?? '';
     if (value.isEmpty) {

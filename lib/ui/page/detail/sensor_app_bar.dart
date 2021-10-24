@@ -6,8 +6,7 @@ import 'package:ripe/ui/component/colors.dart';
 typedef ContextCallback = void Function(BuildContext);
 
 class SensorAppBar extends SliverPersistentHeaderDelegate {
-  // ignore: non_constant_identifier_names
-  static final _GRADIENT_TWEEN = Tween(begin: 0.0, end: 1.0);
+  // static final _GRADIENT_TWEEN = Tween(begin: 0.0, end: 1.0);
 
   final double expandedHeight;
   final String name;

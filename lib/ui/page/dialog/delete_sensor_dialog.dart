@@ -23,7 +23,7 @@ class DeleteSensorDialog extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.all(10.0),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).accentColor,
+                        color: Theme.of(context).colorScheme.secondary,
                         borderRadius: const BorderRadius.only(
                           bottomLeft: Radius.circular(12.0),
                         ),

@@ -4,7 +4,6 @@ import 'dart:io' show Platform;
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:meta/meta.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:ripe/util/log.dart';
@@ -58,24 +57,29 @@ abstract class MqttClientService {
   static final Map<String, _MqttContext> _contexts = {}; // < BrokerUrl, Ctx>
   static bool _isOfflineMode = false;
 
-  static Future<bool> connect(String broker) async {
+  static Future<bool> connect(String broker, String server, int port) async {
     if (!kReleaseMode && Platform.isAndroid && broker == '127.0.0.1') {
-      broker = '10.0.2.2';
+      server = '10.0.2.2';
     }
-    _MqttContext? ctx = _contexts[broker];
 
+    _MqttContext? ctx = _contexts[broker];
     if (ctx == null || !ctx.isConnected) {
       final id = generateUUID();
-      final client = new MqttServerClient(broker, id);
       final MqttConnectMessage connMess = MqttConnectMessage()
           .withClientIdentifier(id)
-          .withWillQos(MqttQos.exactlyOnce);
-      client.connectionMessage = connMess;
-      client.keepAlivePeriod = 20;
+          .withWillQos(MqttQos.atLeastOnce);
+
+      final client = new MqttServerClient(server, id)
+        ..port = port
+        ..secure = false
+        ..connectionMessage = connMess
+        ..logging(on: false)
+        ..keepAlivePeriod = 20;
       client.onConnected = () => _onConnect;
       client.onDisconnected = () => _onDisconnect;
 
       if (!_isOfflineMode) {
+        Log.debug('Connecting MQTT - ${client.server}:${client.port}');
         try {
           await client.connect();
         } catch (e) {
@@ -84,7 +88,6 @@ abstract class MqttClientService {
         }
       }
 
-      Log.debug('Connecting MQTT - $broker');
       ctx = new _MqttContext(client);
       client.updates!.listen((msg) => _listen(ctx!, msg));
       _contexts[broker] = ctx;
@@ -109,7 +112,7 @@ abstract class MqttClientService {
     for (final msg in msgBuffer) {
       final topic = msg.topic;
       final casted = (msg.payload as MqttPublishMessage).payload;
-      final payload = MqttPublishPayload.bytesToStringAsString(casted.message!);
+      final payload = MqttPublishPayload.bytesToStringAsString(casted.message);
 
       final observers = ctx.callbacks[topic];
       if (observers == null) {

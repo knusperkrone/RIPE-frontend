@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:ripe/service/backend_service.dart';
 import 'package:ripe/service/sensor_settings.dart';
 import 'package:ripe/ui/component/branded.dart';
@@ -96,7 +95,7 @@ class _SplashScreenState extends State<SplashScreen> {
           gradient: LinearGradient(
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
-            colors: [theme.canvasColor, theme.accentColor],
+            colors: [theme.canvasColor, theme.colorScheme.secondary],
           ),
         ),
         child: Center(

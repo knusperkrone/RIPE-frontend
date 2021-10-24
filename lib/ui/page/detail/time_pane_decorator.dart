@@ -90,7 +90,7 @@ class _TimePaneDecoratorState extends BaseDecoratorState<TimePaneDecorator> {
         color = Theme.of(context).errorColor;
         break;
       case AgentState.FORCED:
-        color = Theme.of(context).accentColor;
+        color = Theme.of(context).colorScheme.secondary;
         break;
       default:
         color = Theme.of(context).primaryColor;

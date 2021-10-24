@@ -33,7 +33,7 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
    */
 
   Future<void> _onPhoto(BuildContext context, ImageSource source) async {
-    final picked = await _imagePicker.getImage(source: source);
+    final picked = await _imagePicker.pickImage(source: source);
     if (picked != null) {
       final croppedFile = await ImageCropper.cropImage(
         sourcePath: picked.path,
