@@ -221,7 +221,7 @@ class SensorSettingService extends BasePrefService {
     if (!placeholderFile.existsSync() || placeholderFile.lengthSync() == 0) {
       final imgBytes = await rootBundle.load('assets/icon.png');
       final img = image.decodePng(imgBytes.buffer.asUint8List().toList())!;
-      final thumbnailBytes = image.encodePng(image.copyResize(img, width: 120));
+      final thumbnailBytes = image.encodePng(image.copyResize(img, width: 256));
       placeholderFile.createSync(recursive: true);
       placeholderFile.writeAsBytesSync(thumbnailBytes);
 
