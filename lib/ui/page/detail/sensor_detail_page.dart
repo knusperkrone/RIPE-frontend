@@ -250,7 +250,10 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                             refreshCallback: _refreshData,
                           );
                         },
-                        childCount: 1 + data.agents.length,
+                        childCount: 1 +
+                            (data.sensorData.isEmpty()
+                                ? 0
+                                : data.agents.length),
                       ),
                     ),
                     SliverToBoxAdapter(

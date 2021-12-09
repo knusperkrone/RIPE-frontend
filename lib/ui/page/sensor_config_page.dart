@@ -6,40 +6,82 @@ import 'package:tuple/tuple.dart';
 
 import 'dialog/config_sensor_dialog.dart';
 
-class SensorConfigPage extends StatelessWidget {
+class SensorConfigPage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => SensorConfigPageState();
+}
+
+class SensorConfigPageState extends State<SensorConfigPage> {
   final _senderService = new SensorServerService();
   final List<String?> wifiData = List.filled(2, null, growable: false);
+
+  bool isChecking = false;
+
+  /*
+   * Helpers
+   */
+
+  Future<RipeSnackbar> checkForSuccessfulCredentials() async {
+    RipeSnackbar snackbar;
+
+    // Wait 5 Seconds, success on no loner available sensor
+    setState(() => isChecking = true);
+    await Future.delayed(const Duration(seconds: 5), () {});
+    if (!await _senderService.checkAvailable()) {
+      snackbar = RipeSnackbar(
+        context,
+        label: 'Sensor erfolgreich mit dem WLAN verbunden',
+        duration: const Duration(seconds: 5),
+      );
+    } else {
+      snackbar = RipeSnackbar(
+        context,
+        label: 'Falsche WLAN Zugangsdaten, versuche es erneute',
+      );
+    }
+    setState(() => isChecking = false);
+
+    return snackbar;
+  }
 
   /*
    * UI-Callbacks
    */
 
   Future<void> _onAdd(BuildContext context) async {
-    final result = await showDialog<Tuple2<String, String>>(
-      context: context,
-      builder: (_) => ConfigSensorDialog(
-        ssid: wifiData[0]!,
-        pwd: wifiData[1]!,
-      ),
-    );
-    if (result == null) {
-      return;
-    }
-    wifiData[0] = result.item1;
-    wifiData[1] = result.item2;
+    RipeSnackbar snackbar;
+    if (!await _senderService.checkAvailable()) {
+      snackbar = RipeSnackbar(
+        context,
+        label:
+            'Sensor nicht erreichbar. Haben sie sich den Sensor ein und wieder ausgeschalten, sich mit "InterFace-Bewässerung" verbunden und ihre mobilen Daten deaktiviert?',
+      );
+    } else {
+      final result = await showDialog<Tuple2<String, String>>(
+          context: context,
+          builder: (_) => ConfigSensorDialog(
+                ssid: wifiData[0] ?? '',
+                pwd: wifiData[1] ?? '',
+              ));
+      if (result == null) {
+        return;
+      }
+      wifiData[0] = result.item1;
+      wifiData[1] = result.item2;
 
-    if (await _senderService.sendWifiConfig(result.item1, result.item2)) {
-      Navigator.pop(context);
-      return;
+      if (await _senderService.sendWifiConfig(result.item1, result.item2)) {
+        snackbar = await checkForSuccessfulCredentials();
+      } else {
+        snackbar = RipeSnackbar(
+          context,
+          label: 'Konnte nicht verbinden..\nMit dem Sensor WLAN verbunden?',
+          action: SnackBarAction(
+            label: 'Erneut versuchen',
+            onPressed: () => _onAdd(context),
+          ),
+        );
+      }
     }
-    final snackbar = RipeSnackbar(
-      context,
-      label: 'Konnte nicht verbinden..\nMit dem Sensor WLAN verbunden?',
-      action: SnackBarAction(
-        label: 'Erneut versuchen',
-        onPressed: () => _onAdd(context),
-      ),
-    );
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
@@ -89,7 +131,7 @@ class SensorConfigPage extends StatelessWidget {
               ),
               Container(height: 20),
               Text(
-                'Einen Sensor konfigurieren',
+                'Sensor mit dem Internet verbinden',
                 textAlign: TextAlign.center,
                 style: Theme.of(context)
                     .textTheme
@@ -97,6 +139,11 @@ class SensorConfigPage extends StatelessWidget {
                     .copyWith(fontWeight: FontWeight.w200),
               ),
               Container(height: 30),
+              AnimatedOpacity(
+                opacity: isChecking ? 1.0 : 0.0,
+                duration: const Duration(milliseconds: 250),
+                child: const LinearProgressIndicator(),
+              ),
               Padding(
                 padding: EdgeInsets.only(left: linePadding, top: 15),
                 child: RichText(
@@ -109,7 +156,7 @@ class SensorConfigPage extends StatelessWidget {
                             textTheme.subtitle2!.copyWith(color: BUTTON_COLOR),
                       ),
                       TextSpan(
-                          text: 'Sensor ein und wieder ausschalten',
+                          text: 'Sensor aus und wieder einschalten',
                           style: textTheme.subtitle1)
                     ],
                   ),
@@ -126,10 +173,11 @@ class SensorConfigPage extends StatelessWidget {
                         style:
                             textTheme.subtitle2!.copyWith(color: BUTTON_COLOR),
                       ),
-                      TextSpan(text: 'WLAN mit ', style: textTheme.subtitle1),
+                      TextSpan(text: 'Mit WLAN  ', style: textTheme.subtitle1),
                       TextSpan(
                           text: 'InterFace-Bewässerung',
-                          style: textTheme.subtitle2),
+                          style: textTheme.subtitle1!
+                              .copyWith(fontWeight: FontWeight.bold)),
                       TextSpan(text: ' verbinden', style: textTheme.subtitle1),
                     ],
                   ),
@@ -147,7 +195,25 @@ class SensorConfigPage extends StatelessWidget {
                             textTheme.subtitle2!.copyWith(color: BUTTON_COLOR),
                       ),
                       TextSpan(
-                          text: 'Heim WLAN Verbinungsdaten angeben',
+                          text: 'Mobile Daten deaktivieren',
+                          style: textTheme.subtitle1),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: linePadding, top: 15),
+                child: RichText(
+                  textAlign: TextAlign.start,
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text: '• ',
+                        style:
+                            textTheme.subtitle2!.copyWith(color: BUTTON_COLOR),
+                      ),
+                      TextSpan(
+                          text: 'Ihre WLAN Zugangsdaten eingeben',
                           style: textTheme.subtitle1),
                     ],
                   ),

@@ -9,9 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:ripe/main.dart';
+import 'package:ripe/service/sensor_server_service.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+
+
+    expect(true, await SensorServerService().checkAvailable());
+    expect(true, await SensorServerService().sendWifiConfig("ssid", "pwd"));
+    return;
     // Build our app and trigger a frame.
     await tester.pumpWidget(RipeApp());
 

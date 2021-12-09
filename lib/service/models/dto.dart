@@ -37,6 +37,15 @@ class SensorDataDto {
   factory SensorDataDto.fromJson(Map<String, dynamic> json) =>
       _$SensorDataDtoFromJson(json);
 
+  bool isEmpty() {
+    return battery == null &&
+        moisture == null &&
+        temperature == null &&
+        carbon == null &&
+        conductivity == null &&
+        light == null;
+  }
+
   @override
   int get hashCode {
     return timestamp.hashCode *

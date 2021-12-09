@@ -65,7 +65,8 @@ class _ConfigSensorDialogState extends State<ConfigSensorDialog> {
       ),
       contentPadding: const EdgeInsets.only(top: 10.0),
       content: Container(
-        height: 225,
+        height: 200,
+        width: double.maxFinite,
         child: Form(
           key: _formKey,
           child: Column(

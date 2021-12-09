@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ripe/service/models/dto.dart';
 import 'package:ripe/ui/component/colors.dart';
 import 'package:ripe/ui/component/time_utils.dart';
+import 'package:ripe/ui/page/sensor_config_page.dart';
 
 class SensorDataCard extends StatefulWidget {
   final SensorDataDto data;
@@ -67,6 +68,41 @@ class _SensorDataCardState extends State<SensorDataCard> {
   @override
   Widget build(BuildContext context) {
     final data = widget.data;
+    if (data.isEmpty()) {
+      return Container(
+        width: double.infinity,
+        child: Card(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Center(
+                  child: Text(
+                    'Sensor ist nicht mit dem Internet verbunden!',
+                    style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                          color: ERROR_COLOR,
+                        ),
+                  ),
+                ),
+              ),
+              Container(height: 10),
+              Center(
+                child: OutlinedButton(
+                  child: const Text('Sensor über WLAN verbinden'),
+                  onPressed: () {
+                    Navigator.of(context).push<void>(MaterialPageRoute(
+                      builder: (context) => SensorConfigPage(),
+                    ));
+                  },
+                ),
+              ),
+              Container(height: 20),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Container(
       width: double.infinity,
       child: Card(
@@ -85,7 +121,9 @@ class _SensorDataCardState extends State<SensorDataCard> {
               title: Text(
                 'Zeitstempel: ${toHR(data.timestamp, withTimezone: true)}',
               ),
-              subtitle: Text('Battery: ${data.battery}%'),
+              subtitle: data.battery != null
+                  ? Text('Battery: ${data.battery}%')
+                  : null,
               trailing: AnimatedOpacity(
                 opacity: isUpdating ? 1.0 : 0.0,
                 duration: const Duration(milliseconds: 750 ~/ 2),
