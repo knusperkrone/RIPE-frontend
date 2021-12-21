@@ -56,7 +56,7 @@ class SensorSettingService extends BasePrefService {
 
   @override
   Future<void> init() async {
-    super.init();
+    await super.init();
     _applicationDir = await getApplicationDocumentsDirectory();
     _registered = await _fetch();
     _initPlaceHolderImage();
