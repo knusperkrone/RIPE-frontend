@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ripe/service/sensor_server_service.dart';
 import 'package:ripe/ui/component/branded.dart';
 import 'package:ripe/ui/component/colors.dart';
+import 'package:ripe/ui/page/sensor_overview_page.dart';
 import 'package:tuple/tuple.dart';
 
 import 'dialog/config_sensor_dialog.dart';
@@ -16,6 +17,7 @@ class SensorConfigPageState extends State<SensorConfigPage> {
   final List<String?> wifiData = List.filled(2, null, growable: false);
 
   bool isChecking = false;
+  bool canPop = false;
 
   /*
    * Helpers
@@ -92,6 +94,7 @@ class SensorConfigPageState extends State<SensorConfigPage> {
 
   @override
   Widget build(BuildContext context) {
+    canPop = Navigator.of(context).canPop();
     final textTheme = Theme.of(context).textTheme;
 
     return Scaffold(
@@ -115,11 +118,22 @@ class SensorConfigPageState extends State<SensorConfigPage> {
             children: [
               Align(
                 alignment: Alignment.topLeft,
-                child: IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
-                  color: Colors.white70,
-                ),
+                child: canPop
+                    ? IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        onPressed: () => Navigator.pop(context),
+                        color: Colors.white70,
+                      )
+                    : IconButton(
+                        icon: const Icon(Icons.close),
+                        color: Colors.white70,
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute<void>(
+                            builder: (_) => SensorOverviewPage(),
+                          ),
+                        ),
+                      ),
               ),
               Container(
                 height: (constraints.maxHeight / 6) - 40,

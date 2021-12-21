@@ -2,13 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:ripe/service/backend_service.dart';
-import 'package:ripe/service/models/dto.dart';
 import 'package:ripe/service/sensor_settings.dart';
 import 'package:ripe/ui/component/branded.dart';
 import 'package:ripe/ui/component/colors.dart';
 import 'package:ripe/ui/component/validator.dart';
 import 'package:ripe/ui/page/dialog/add_photo_dialog.dart';
-import 'package:ripe/ui/page/sensor_overview_page.dart';
+import 'package:ripe/ui/page/sensor_config_page.dart';
 
 import 'about_page.dart';
 
@@ -51,12 +50,6 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
    * UI-Callbacks
    */
 
-  void _onBack(RegisteredSensor setting, SensorDto dto) {
-    Navigator.of(context).pushReplacement<void, void>(MaterialPageRoute(
-      builder: (context) => SensorOverviewPage(),
-    ));
-  }
-
   Future<void> _onRegister(BuildContext context) async {
     // Validate input
     _formKey.currentState!.save();
@@ -91,20 +84,8 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
       final settings =
           await _settingService.addSensor(id, key, name, file?.path);
       if (settings != null) {
-        if (!canPop) {
-          // Show sensor
-          _onBack(settings, sensor);
-          return;
-        }
-
-        snackBar = RipeSnackbar(
-          context,
-          label: 'Registrierung erfolgreich',
-          action: SnackBarAction(
-            onPressed: () => _onBack(settings, sensor),
-            label: 'Abschliessen',
-          ),
-        );
+        return Navigator.of(context).pushReplacement<void, void>(
+            MaterialPageRoute<void>(builder: (context) => SensorConfigPage()));
       } else {
         isSuccess = false;
       }
@@ -152,7 +133,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
                 alignment: Alignment.topLeft,
                 child: canPop
                     ? IconButton(
-                        icon: const Icon(Icons.close),
+                        icon: const Icon(Icons.arrow_back),
                         onPressed: () => Navigator.pop(context),
                       )
                     : IconButton(
