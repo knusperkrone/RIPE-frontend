@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
-class SensorServerService {
+import 'package:ripe/service/backend_service.dart';
+
+class SensorServerService extends BackendService {
   static const String _BASE_URL = 'http://192.168.4.1';
 
   final HttpClient _client = new HttpClient()
@@ -30,7 +32,11 @@ class SensorServerService {
           _BASE_URL,
           '/config/wifi',
           {'Content-Type': 'application/json'},
-          jsonEncode({'ssid': ssid, 'pwd': pwd}));
+          jsonEncode({
+            'ssid': ssid,
+            'pwd': pwd,
+            'base_url': baseUrl,
+          }));
     } catch (e) {
       print(e);
       return false;
