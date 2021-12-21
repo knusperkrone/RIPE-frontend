@@ -77,7 +77,6 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
         body: Padding(
           padding: const EdgeInsets.only(left: 4.0, right: 4.0),
           child: ListView.builder(
-
             itemCount: 1 + _sensors.length,
             itemBuilder: (_, index) {
               if (index == 0) {
@@ -100,7 +99,7 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
           ringColor: BUTTON_COLOR_LIGHT,
           children: <Widget>[
             IconButton(
-                tooltip: 'Information',
+                tooltip: 'Über diese App',
                 icon: const Icon(Icons.info_outline, color: Colors.white),
                 onPressed: () async {
                   _fabKey.currentState!.close();
@@ -111,7 +110,9 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
                 }),
             IconButton(
                 tooltip: 'Sensor konfigurieren',
-                icon: const Icon(Icons.device_hub, color: Colors.white),
+                icon: const Icon(
+                    Icons.signal_cellular_connected_no_internet_4_bar,
+                    color: Colors.white),
                 onPressed: () async {
                   _fabKey.currentState!.close();
                   await Navigator.push<void>(context,
@@ -119,7 +120,7 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
                 }),
             IconButton(
                 tooltip: 'Sensor hinzufügen',
-                icon: const Icon(Icons.person_add, color: Colors.white),
+                icon: const Icon(Icons.add_to_queue, color: Colors.white),
                 onPressed: () async {
                   _fabKey.currentState!.close();
                   await Navigator.push<void>(
