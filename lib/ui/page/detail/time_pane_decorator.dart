@@ -23,7 +23,6 @@ class TimePaneDecorator extends BaseDecorator {
 }
 
 class _TimePaneDecoratorState extends BaseDecoratorState<TimePaneDecorator> {
-  final _slideKey = new GlobalKey<SlidableState>();
   late int forceSeconds;
 
   @override
@@ -112,15 +111,38 @@ class _TimePaneDecoratorState extends BaseDecoratorState<TimePaneDecorator> {
   @override
   Widget build(BuildContext context) {
     return Slidable(
-      key: _slideKey,
-      actionPane: const SlidableDrawerActionPane(),
+      startActionPane: ActionPane(
+        motion: const ScrollMotion(),
+        children: [
+          SlidableAction(
+            foregroundColor: Colors.white,
+            label: 'Dauer ändern',
+            autoClose: false,
+            backgroundColor: ACCENT_COLOR,
+            icon: Icons.more_time,
+            onPressed: (_) => _onIncrease,
+          ),
+          SlidableAction(
+            label: _buildEnableText(),
+            backgroundColor: PRIMARY_COLOR,
+            icon: Icons.settings_remote,
+            onPressed: (_) => _onForce(true),
+          ),
+          SlidableAction(
+            label: _buildDisableText(),
+            backgroundColor: ERROR_COLOR,
+            icon: Icons.power_settings_new,
+            onPressed: (_) => _onForce(false),
+          ),
+        ],
+      ),
       child: Card(
         child: Column(
           children: [
             ListTile(
               leading: Switch(
-                  onChanged: (_) => _slideKey.currentState
-                      ?.open(actionType: SlideActionType.primary),
+                  onChanged: (_) =>
+                      Slidable.of(context)?.openCurrentActionPane(),
                   value: widget.isActive),
               title: Text(widget.domainHR),
               trailing: Container(
@@ -155,28 +177,6 @@ class _TimePaneDecoratorState extends BaseDecoratorState<TimePaneDecorator> {
           ],
         ),
       ),
-      actions: <Widget>[
-        IconSlideAction(
-          foregroundColor: Colors.white,
-          caption: 'Dauer ändern',
-          closeOnTap: false,
-          color: ACCENT_COLOR,
-          icon: Icons.more_time,
-          onTap: _onIncrease,
-        ),
-        IconSlideAction(
-          caption: _buildEnableText(),
-          color: PRIMARY_COLOR,
-          icon: Icons.settings_remote,
-          onTap: () => _onForce(true),
-        ),
-        IconSlideAction(
-          caption: _buildDisableText(),
-          color: ERROR_COLOR,
-          icon: Icons.power_settings_new,
-          onTap: () => _onForce(false),
-        ),
-      ],
     );
   }
 }

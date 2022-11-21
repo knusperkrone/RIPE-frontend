@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:image/image.dart' as image;
 import 'package:palette_generator/palette_generator.dart';
 import 'package:path/path.dart' as path;

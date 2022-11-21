@@ -78,7 +78,7 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
               children: <Widget>[
                 Container(
                   width: expandedHeight,
-                  height: max(0.000000000000000000001,
+                  height: max(double.minPositive,
                       expandedHeight - kToolbarHeight - shrinkOffset),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,

@@ -45,11 +45,12 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _onConnect() async {
     final sensorsList = _sensorService.getSensors();
-    if (await _sensorServerService.checkAvailable()) {
+    /*if (await _sensorServerService.checkAvailable()) {
       await _delayFut;
       Navigator.pushReplacement<void, void>(
           context, MaterialPageRoute(builder: (_) => SensorConfigPage()));
-    } else if (sensorsList == null) {
+    } */
+    if (sensorsList == null) {
       // No sensor - register!
       await _delayFut;
       Navigator.pushReplacement<void, void>(

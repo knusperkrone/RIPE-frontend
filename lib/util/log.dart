@@ -1,5 +1,3 @@
-import 'package:sentry_flutter/sentry_flutter.dart';
-
 class _CallerTrace {
   final StackTrace _trace;
   late String fileName;
@@ -27,9 +25,6 @@ class _CallerTrace {
       lineNumber = 0;
 
       print('Failed creating trace $e');
-      if (Sentry.isEnabled) {
-        Sentry.captureException(e);
-      }
     }
   }
 
@@ -56,9 +51,6 @@ class Log {
     final time = new DateTime.now().toString().substring(0, 23);
     final formatted = '$time \x1B[34mDEBUG\x1B[0m \x1B[1m$msg\x1B[0m $trace';
     print(formatted);
-    if (Sentry.isEnabled) {
-      Sentry.captureMessage(formatted, level: SentryLevel.debug);
-    }
   }
 
   static void info(String msg) {
@@ -69,9 +61,6 @@ class Log {
     final time = new DateTime.now().toString().substring(0, 23);
     final formatted = '$time \x1B[32mINFO\x1B[0m \x1B[1m$msg\x1B[0m $trace';
     print(formatted);
-    if (Sentry.isEnabled) {
-      Sentry.captureMessage(formatted, level: SentryLevel.info);
-    }
   }
 
   static void warn(String msg) {
@@ -82,9 +71,6 @@ class Log {
     final time = new DateTime.now().toString().substring(0, 23);
     final formatted = '$time \x1B[33mWARN\x1B[0m \x1B[1m$msg\x1B[0m $trace';
     print(formatted);
-    if (Sentry.isEnabled) {
-      Sentry.captureMessage(formatted, level: SentryLevel.warning);
-    }
   }
 
   static void error(String msg) {
@@ -95,8 +81,5 @@ class Log {
     final time = new DateTime.now().toString().substring(0, 23);
     final formatted = '$time \x1B[31mERROR\x1B[0m \x1B[1m$msg\x1B[0m $trace';
     print(formatted);
-    if (Sentry.isEnabled) {
-      Sentry.captureMessage(formatted, level: SentryLevel.error);
-    }
   }
 }

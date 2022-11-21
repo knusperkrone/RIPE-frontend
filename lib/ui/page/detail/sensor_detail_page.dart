@@ -43,7 +43,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     data = widget.data;
     info = widget.sensor;
     _initMqtt();
@@ -66,7 +66,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     service?.dispose();
     connectionCheck.cancel();
     super.dispose();

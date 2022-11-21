@@ -240,6 +240,8 @@ class SensorConfigPageState extends State<SensorConfigPage> {
                 ),
                 child: ElevatedButton(
                   style: ButtonStyle(
+                    foregroundColor: MaterialStateProperty.all(
+                        Theme.of(context).textTheme.button!.color),
                     backgroundColor: MaterialStateProperty.all(PRIMARY_COLOR),
                   ),
                   child: const Text('Sensor konfigurieren'),

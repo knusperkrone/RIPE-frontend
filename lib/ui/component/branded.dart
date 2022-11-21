@@ -58,7 +58,7 @@ class RipeAppBar extends AppBar {
 }
 
 class RipeSnackbar extends SnackBar {
-  static Text style(BuildContext context, String label) {
+  static Text _styleContent(BuildContext context, String label) {
     final textTheme = Theme.of(context).textTheme.subtitle1!;
     return Text(label, style: textTheme.copyWith(color: Colors.black45));
   }
@@ -70,7 +70,7 @@ class RipeSnackbar extends SnackBar {
     Duration duration = const Duration(milliseconds: 4000),
     SnackBarBehavior behavior = SnackBarBehavior.floating,
   }) : super(
-          content: RipeSnackbar.style(context, label),
+          content: _styleContent(context, label),
           backgroundColor: BACKGROUND_COLOR,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),

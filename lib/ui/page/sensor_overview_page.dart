@@ -195,7 +195,7 @@ class _SensorCardState extends State<_SensorCard> {
 
     if (file != null) {
       // clear file image cache
-      PaintingBinding.instance!.imageCache!
+      PaintingBinding.instance.imageCache
           .evict(FileImage(File(_sensor.thumbPath)));
 
       final sensor = await settings.changeImage(widget.sensor.id, file.path);

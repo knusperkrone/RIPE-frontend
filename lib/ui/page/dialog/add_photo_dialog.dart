@@ -18,6 +18,7 @@ class AddPhotoDialog extends StatefulWidget {
 
 class _AddPhotoDialogState extends State<AddPhotoDialog> {
   final _imagePicker = new ImagePicker();
+  final _imageCropper = new ImageCropper();
   late File _imagePath;
   late Color _imageShadow;
 
@@ -35,22 +36,23 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
   Future<void> _onPhoto(BuildContext context, ImageSource source) async {
     final picked = await _imagePicker.pickImage(source: source);
     if (picked != null) {
-      final croppedFile = await ImageCropper.cropImage(
+      final croppedFile = await _imageCropper.cropImage(
         sourcePath: picked.path,
         aspectRatioPresets: [CropAspectRatioPreset.square],
       );
       if (croppedFile != null) {
         // Select file and preview gradient
-        _imagePath = croppedFile;
+        _imagePath = new File(croppedFile.path);
         final palette = await PaletteGenerator.fromImageProvider(
           FileImage(_imagePath),
         );
-        _imageShadow = (palette.lightVibrantColor ??
-                palette.vibrantColor ??
-                palette.dominantColor)!
-            .color;
 
-        setState(() {});
+        setState(() {
+          _imageShadow = (palette.lightVibrantColor ??
+                  palette.vibrantColor ??
+                  palette.dominantColor)!
+              .color;
+        });
       }
     }
   }

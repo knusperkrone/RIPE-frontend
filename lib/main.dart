@@ -1,24 +1,10 @@
-import 'dart:async';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:ripe/ui/component/colors.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
-import 'env.dart';
 import 'ui/page/splash_screen.dart';
 
-Future<void> main() async {
-  if (kReleaseMode) {
-    await SentryFlutter.init(
-      (options) => options.dsn = SENTRY_DSN,
-      appRunner: () => runApp(RipeApp()),
-    );
-  } else {
-    runApp(RipeApp());
-  }
-}
+void main() async => runApp(RipeApp());
 
 class RipeApp extends StatelessWidget {
   @override
@@ -33,7 +19,7 @@ class RipeApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Ripe',
-      theme: _prepareTheme(ThemeData.dark()),
+      theme: _prepareTheme(ThemeData.light()),
       darkTheme: _prepareTheme(ThemeData.dark()),
       home: const SplashScreen(cachedLogo),
     );
@@ -49,13 +35,13 @@ class RipeApp extends StatelessWidget {
 
     final textTheme = theme.textTheme;
     return theme.copyWith(
-      androidOverscrollIndicator: AndroidOverscrollIndicator.stretch,
+      useMaterial3: true,
       primaryColor: primaryColor,
       colorScheme: theme.colorScheme.copyWith(
         primary: primaryColor,
-        primaryVariant: buttonColorDark,
+        onPrimary: buttonColorDark,
         secondary: secondaryColor,
-        secondaryVariant: buttonColorLight,
+        onSecondary: buttonColorLight,
       ),
       backgroundColor: backgroundColor,
       disabledColor: Colors.white60,

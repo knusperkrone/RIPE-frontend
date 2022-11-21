@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'dart:convert';
 
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
-import 'package:ripe/env.dart';
 import 'package:ripe/service/base_pref_service.dart';
 import 'package:ripe/service/mixins/http_client_mixin.dart';
 import 'package:ripe/util/log.dart';
@@ -24,6 +23,7 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
       return SensorDto.fromJson(json);
     } catch (e) {
       Log.error('GetSensorData - $e');
+      return null;
     }
   }
 
@@ -66,6 +66,7 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
       return logs;
     } catch (e) {
       Log.error('GetSensorLogs - $e');
+      return null;
     }
   }
 
@@ -145,6 +146,6 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
   }
 
   String get baseUrl {
-    return prefs.getString('BASE_URL_V1') ?? BACKEND_URL;
+    return prefs.getString('BASE_URL_V1') ?? 'https://ripe.knukro.com';
   }
 }

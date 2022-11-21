@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:ripe/service/backend_service.dart';
 import 'package:ripe/ui/component/branded.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class AboutPage extends StatelessWidget {
   final backendService = new BackendService();
@@ -78,8 +78,8 @@ class AboutPage extends StatelessWidget {
                                   fontWeight: FontWeight.w200,
                                   color: const Color(0xffff8100)),
                           recognizer: new TapGestureRecognizer()
-                            ..onTap =
-                                () => launch('https://www.interface-ag.com/'),
+                            ..onTap = () => launchUrlString(
+                                'https://www.interface-ag.com/'),
                         ),
                       ],
                     ),
