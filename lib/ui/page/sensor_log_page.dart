@@ -34,9 +34,9 @@ class _SensorLogState extends State<SensorLogPage> {
   }
 
   void _initMqtt() {
-    if (widget.sensorDto.broker != null) {
+    if (widget.sensorDto.broker != null && _listenerService != null) {
       _listenerService = new SensorListenerService(widget.sensorDto.broker!);
-      _listenerService!.connect().then((_) {
+      _listenerService!.connect(onDisconnect: onMqttDisconnected).then((_) {
         _listenerService!.listenSensorLogs(
           widget.sensor.id,
           widget.sensor.key,
@@ -44,6 +44,10 @@ class _SensorLogState extends State<SensorLogPage> {
         );
       });
     }
+  }
+
+  void onMqttDisconnected() {
+    _listenerService!.reconnect();
   }
 
   Future<void> _refreshLogs() async {

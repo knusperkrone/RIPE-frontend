@@ -1,68 +1,71 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ripe/service/mixins/mqtt_client_service.dart';
-import 'package:ripe/util/log.dart';
+
+void _NoOp() {}
 
 class SensorListenerService extends MqttClientService {
-  static final Map<String, SensorListenerService> _services = {};
+  late String _broker;
+  Set<String> topics = {};
+  VoidCallback? _onConnect;
+  VoidCallback? _onDisconnect;
 
-  final Set<String> _subscribed = {};
-  final String _broker;
-
-  /*
-   * Flyweight constructor
-   */
-
-  factory SensorListenerService(String broker) {
-    // trim front
+  SensorListenerService(String broker) {
     if (broker.startsWith('tcp://')) {
       broker = broker.substring('tcp://'.length);
     }
-
-    if (_services[broker] == null) {
-      _services[broker] = new SensorListenerService._internal(broker);
-    }
-    return _services[broker]!;
+    _broker = broker;
   }
-
-  SensorListenerService._internal(this._broker);
 
   /*
    * Business methods
    */
 
-  Future<void> connect() async {
-    int? port;
-    String server = _broker;
-    if (_broker.contains(':')) {
-      port = int.tryParse(server.substring(server.indexOf(':') + 1));
-      server = server.substring(0, server.indexOf(':'));
-      if (port == null) {
-        Log.warn('Failed extracting (broker, port) from: $_broker');
-      }
+  Future<void> connect(
+      {required VoidCallback onDisconnect,
+      VoidCallback onConnect = _NoOp}) async {
+    dispose(); // Remove old callback first
+    _onConnect = onConnect;
+    _onDisconnect = onDisconnect;
+    await listenFromBroker(_broker, onConnect, onDisconnect);
+  }
+
+  void reconnect() {
+    if (_onConnect != null && _onDisconnect != null) {
+      listenFromBroker(_broker, _onConnect!, _onDisconnect!);
     }
-    await MqttClientService.connect(_broker, server, port ?? 1883);
   }
 
-  bool isConnected() {
-    return MqttClientService.isConnected(_broker);
+  void dispose() {
+    if (_onConnect != null && _onDisconnect != null) {
+      unlistenFromBroker(_broker, _onConnect!, _onDisconnect!);
+      topics.forEach((topic) => unsubscribe(_broker, topic));
+    }
   }
 
-  void listenSensor(int id, String key, VoidCallback callback) {
+  void listenSensorData(int id, String key, VoidCallback callback) {
     for (final topic in ['sensor/cmd/$id/$key', 'sensor/data/$id/$key']) {
-      _subscribed.add(topic);
+      topics.add(topic);
       subscribe(_broker, topic, (dynamic _) => callback());
+    }
+  }
+
+  void unlistenSensorData(int id, String key) {
+    for (final topic in ['sensor/cmd/$id/$key', 'sensor/data/$id/$key']) {
+      topics.remove(topic);
+      unsubscribe(_broker, topic);
     }
   }
 
   void listenSensorLogs(int id, String key, VoidCallback callback) {
     final topic = 'sensor/log/$id/$key';
-    _subscribed.add(topic);
+    topics.add(topic);
     subscribe(_broker, topic, (dynamic _) => callback());
   }
 
-  void dispose() {
-    _subscribed.forEach((t) => unsubscribe(_broker, t));
-    _subscribed.clear();
+  void unlistenSensorLogs(int id, String key) {
+    final topic = 'sensor/log/$id/$key';
+    topics.remove(topic);
+    unsubscribe(_broker, topic);
   }
 
   /*

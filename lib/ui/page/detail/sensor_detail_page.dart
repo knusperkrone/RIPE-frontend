@@ -31,8 +31,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
   SensorListenerService? service;
   late List<GlobalKey> childKeys;
   late SensorDto data;
-  late RegisteredSensor info;
-  late Timer connectionCheck;
+  late RegisteredSensor sensor;
   bool isConnected = false;
   double bottomPadding = 0.0;
 
@@ -45,10 +44,8 @@ class _SensorDetailPageState extends State<SensorDetailPage>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     data = widget.data;
-    info = widget.sensor;
+    sensor = widget.sensor;
     _initMqtt();
-    connectionCheck =
-        Timer.periodic(const Duration(seconds: 1), (_) => _checkMQTT());
 
     childKeys =
         List.generate(widget.data.agents.length + 1, (_) => GlobalKey());
@@ -68,7 +65,6 @@ class _SensorDetailPageState extends State<SensorDetailPage>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     service?.dispose();
-    connectionCheck.cancel();
     super.dispose();
   }
 
@@ -79,21 +75,24 @@ class _SensorDetailPageState extends State<SensorDetailPage>
     }
   }
 
-  Future<void> _checkMQTT() async {
-    final newIsConnected = service?.isConnected() ?? false;
-    if (newIsConnected != isConnected) {
-      setState(() => isConnected = newIsConnected);
-    }
+  void _onMqttConnect() {
+    setState(() => isConnected = true);
+  }
+
+  void _onMqttDisconnect() {
+    setState(() => isConnected = false);
+    service!.reconnect();
   }
 
   void _initMqtt() {
     if (data.broker != null) {
       service = new SensorListenerService(data.broker!);
-      isConnected = service!.isConnected();
-      service!.connect().then((_) {
-        service!.listenSensor(
-          info.id,
-          info.key,
+      service!
+          .connect(onConnect: _onMqttConnect, onDisconnect: _onMqttDisconnect)
+          .then((_) {
+        service!.listenSensorData(
+          sensor.id,
+          sensor.key,
           () => Future.delayed(const Duration(milliseconds: 500), _refreshData),
         );
       });
@@ -104,7 +103,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
         action: SnackBarAction(
           label: 'Erneut verbinden',
           onPressed: () {
-            _backendService.getSensorData(info.id, info.key).then((sensor) {
+            _backendService.getSensorData(sensor.id, sensor.key).then((sensor) {
               if (sensor != null) {
                 data = sensor;
                 _initMqtt();
@@ -146,7 +145,8 @@ class _SensorDetailPageState extends State<SensorDetailPage>
   }
 
   Future<void> _refreshData() async {
-    final sensorData = await _backendService.getSensorData(info.id, info.key);
+    final sensorData =
+        await _backendService.getSensorData(sensor.id, sensor.key);
     if (sensorData != null) {
       setState(() => data = sensorData);
     } else {
@@ -219,7 +219,6 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                                           isConnected
                                               ? Icons.sensors
                                               : Icons.sensors_off,
-                                          color: Colors.white38,
                                         )),
                                     IconButton(
                                       onPressed: _onLogs,
@@ -244,7 +243,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                             );
                           }
                           return new AgentDecorator(
-                            info: info,
+                            info: sensor,
                             agent: data.agents[index - 1],
                             key: childKeys[index],
                             refreshCallback: _refreshData,
