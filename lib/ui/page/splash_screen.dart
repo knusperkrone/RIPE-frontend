@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ripe/service/backend_service.dart';
-import 'package:ripe/service/sensor_server_service.dart';
-import 'package:ripe/service/sensor_settings.dart';
+import 'package:ripe/service/sensor_setting_service.dart';
 import 'package:ripe/ui/component/branded.dart';
 import 'package:ripe/ui/page/detail/sensor_detail_page.dart';
-import 'package:ripe/ui/page/sensor_config_page.dart';
 import 'package:ripe/ui/page/sensor_overview_page.dart';
 import 'package:ripe/ui/page/sensor_register_page.dart';
 
@@ -19,8 +17,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   final _backendService = new BackendService();
-  final _sensorServerService = new SensorServerService();
-  final _sensorService = new SensorSettingService();
+  final _sensorService = SensorSettingService.getInstance();
   late Future<void> _delayFut;
   bool isDirty = false;
 
@@ -45,12 +42,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _onConnect() async {
     final sensorsList = _sensorService.getSensors();
-    /*if (await _sensorServerService.checkAvailable()) {
-      await _delayFut;
-      Navigator.pushReplacement<void, void>(
-          context, MaterialPageRoute(builder: (_) => SensorConfigPage()));
-    } */
-    if (sensorsList == null) {
+    if (sensorsList.isEmpty) {
       // No sensor - register!
       await _delayFut;
       Navigator.pushReplacement<void, void>(

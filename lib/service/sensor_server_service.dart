@@ -1,22 +1,19 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:http/http.dart' as http;
 
 import 'package:ripe/service/backend_service.dart';
 
 class SensorServerService extends BackendService {
   static const String _BASE_URL = 'http://192.168.4.1';
 
-  final HttpClient _client = new HttpClient()
-    ..connectionTimeout = const Duration(milliseconds: 1000)
-    ..badCertificateCallback = (_, __, ___) => true;
+  final _client = new http.Client();
 
   Future<bool> checkAvailable() async {
     try {
-      await unchunkedPost(
-        _BASE_URL,
-        '/',
-        {'Content-Type': 'application/json'},
-        jsonEncode(<String, dynamic>{}),
+      await _client.post(
+        Uri.parse('$_BASE_URL/'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(<String, dynamic>{}),
       );
     } catch (e) {
       print(e);
@@ -26,13 +23,11 @@ class SensorServerService extends BackendService {
   }
 
   Future<bool> sendWifiConfig(String ssid, String pwd) async {
-    HttpClientResponse resp;
+    http.Response resp;
     try {
-      resp = await unchunkedPost(
-          _BASE_URL,
-          '/config/wifi',
-          {'Content-Type': 'application/json'},
-          jsonEncode({
+      resp = await _client.post(Uri.parse('$_BASE_URL/config/wifi'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
             'ssid': ssid,
             'pwd': pwd,
             'base_url': baseUrl,
@@ -42,17 +37,5 @@ class SensorServerService extends BackendService {
       return false;
     }
     return resp.statusCode == 200;
-  }
-
-  Future<HttpClientResponse> unchunkedPost(String base, String path,
-      Map<String, String> headers, String body) async {
-    assert(path.codeUnitAt(0) == '/'.codeUnitAt(0));
-    final req = await _client.postUrl(Uri.parse('$base$path'));
-    req.headers.chunkedTransferEncoding = false;
-    req.headers.contentLength = body.length;
-    headers.forEach((key, value) => req.headers.set(key, value));
-    req.add(utf8.encode(body));
-
-    return await req.close();
   }
 }

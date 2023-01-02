@@ -1,28 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:ripe/service/mixins/mqtt_client_service.dart';
+import 'package:ripe/service/models/dto.dart';
 
-void _NoOp() {}
+void _noOp() {}
 
 class SensorListenerService extends MqttClientService {
-  late String _broker;
-  Set<String> topics = {};
+  final Set<String> _subscribedTopics = {};
+  final BrokerDto _broker;
   VoidCallback? _onConnect;
   VoidCallback? _onDisconnect;
 
-  SensorListenerService(String broker) {
-    if (broker.startsWith('tcp://')) {
-      broker = broker.substring('tcp://'.length);
-    }
-    _broker = broker;
-  }
+  SensorListenerService(this._broker);
 
   /*
    * Business methods
    */
 
   Future<void> connect(
-      {required VoidCallback onDisconnect,
-      VoidCallback onConnect = _NoOp}) async {
+      {VoidCallback onDisconnect = _noOp,
+      VoidCallback onConnect = _noOp}) async {
     dispose(); // Remove old callback first
     _onConnect = onConnect;
     _onDisconnect = onDisconnect;
@@ -38,33 +34,33 @@ class SensorListenerService extends MqttClientService {
   void dispose() {
     if (_onConnect != null && _onDisconnect != null) {
       unlistenFromBroker(_broker, _onConnect!, _onDisconnect!);
-      topics.forEach((topic) => unsubscribe(_broker, topic));
+      _subscribedTopics.forEach((t) => unsubscribe(_broker, t));
     }
   }
 
   void listenSensorData(int id, String key, VoidCallback callback) {
     for (final topic in ['sensor/cmd/$id/$key', 'sensor/data/$id/$key']) {
-      topics.add(topic);
+      _subscribedTopics.add(topic);
       subscribe(_broker, topic, (dynamic _) => callback());
     }
   }
 
   void unlistenSensorData(int id, String key) {
     for (final topic in ['sensor/cmd/$id/$key', 'sensor/data/$id/$key']) {
-      topics.remove(topic);
+      _subscribedTopics.remove(topic);
       unsubscribe(_broker, topic);
     }
   }
 
   void listenSensorLogs(int id, String key, VoidCallback callback) {
     final topic = 'sensor/log/$id/$key';
-    topics.add(topic);
+    _subscribedTopics.add(topic);
     subscribe(_broker, topic, (dynamic _) => callback());
   }
 
   void unlistenSensorLogs(int id, String key) {
     final topic = 'sensor/log/$id/$key';
-    topics.remove(topic);
+    _subscribedTopics.remove(topic);
     unsubscribe(_broker, topic);
   }
 
@@ -74,7 +70,7 @@ class SensorListenerService extends MqttClientService {
 
   @override
   int get hashCode {
-    return _broker.hashCode;
+    return _broker.hashCode + _onConnect.hashCode + _onDisconnect.hashCode;
   }
 
   @override

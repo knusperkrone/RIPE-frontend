@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:ripe/service/models/dto.dart';
-import 'package:ripe/service/sensor_settings.dart';
+import 'package:ripe/service/sensor_setting_service.dart';
 import 'package:ripe/ui/component/colors.dart';
 import 'package:ripe/ui/component/time_utils.dart';
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ripe/service/backend_service.dart';
 import 'package:ripe/service/models/dto.dart';
 import 'package:ripe/service/sensor_listener_service.dart';
-import 'package:ripe/service/sensor_settings.dart';
+import 'package:ripe/service/sensor_setting_service.dart';
 import 'package:ripe/ui/component/branded.dart';
 
 class SensorLogPage extends StatefulWidget {
@@ -34,8 +34,8 @@ class _SensorLogState extends State<SensorLogPage> {
   }
 
   void _initMqtt() {
-    if (widget.sensorDto.broker != null && _listenerService != null) {
-      _listenerService = new SensorListenerService(widget.sensorDto.broker!);
+    if (widget.sensorDto.broker.tcp != null && _listenerService != null) {
+      _listenerService = new SensorListenerService(widget.sensorDto.broker);
       _listenerService!.connect(onDisconnect: onMqttDisconnected).then((_) {
         _listenerService!.listenSensorLogs(
           widget.sensor.id,

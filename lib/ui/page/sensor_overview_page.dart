@@ -1,9 +1,10 @@
 import 'dart:io';
 
 import 'package:fab_circular_menu/fab_circular_menu.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ripe/service/backend_service.dart';
-import 'package:ripe/service/sensor_settings.dart';
+import 'package:ripe/service/sensor_setting_service.dart';
 import 'package:ripe/ui/component/branded.dart';
 import 'package:ripe/ui/component/colors.dart';
 import 'package:ripe/ui/page/about_page.dart';
@@ -33,7 +34,7 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
   @override
   void initState() {
     super.initState();
-    _sensors = SensorSettingService().getSensors()!;
+    _sensors = SensorSettingService.getInstance().getSensors();
   }
 
   /*
@@ -47,18 +48,11 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
     );
 
     if (isAnnihilated == true) {
-      final settings = SensorSettingService();
+      final settings = SensorSettingService.getInstance();
       settings.removeSensor(id);
 
       final sensors = settings.getSensors();
-      if (sensors == null) {
-        Navigator.pushReplacement<void, void>(
-            context, MaterialPageRoute(builder: (_) => SensorRegisterPage()));
-      } else {
-        setState(() {
-          _sensors = sensors;
-        });
-      }
+      setState(() => _sensors = sensors);
     }
   }
 
@@ -184,7 +178,7 @@ class _SensorCardState extends State<_SensorCard> {
   }
 
   Future<void> _onImage() async {
-    final settings = SensorSettingService();
+    final settings = SensorSettingService.getInstance();
     final file = await showDialog<File>(
       context: context,
       builder: (_) => AddPhotoDialog(
@@ -210,7 +204,7 @@ class _SensorCardState extends State<_SensorCard> {
     );
 
     if (name != null) {
-      final settings = SensorSettingService();
+      final settings = SensorSettingService.getInstance();
       setState(() => _sensor = settings.changeName(widget.sensor.id, name));
     }
   }
@@ -221,6 +215,13 @@ class _SensorCardState extends State<_SensorCard> {
 
   @override
   Widget build(BuildContext context) {
+    final ImageProvider image;
+    if (kIsWeb) {
+      image = NetworkImage(_sensor.thumbPath);
+    } else {
+      image = FileImage(File(_sensor.thumbPath));
+    }
+
     return Card(
       elevation: 0.7,
       child: Container(
@@ -247,30 +248,25 @@ class _SensorCardState extends State<_SensorCard> {
               shape: BoxShape.circle,
               image: DecorationImage(
                 fit: BoxFit.fill,
-                image: FileImage(File(_sensor.thumbPath)),
+                image: image,
               ),
             ),
           ),
           title: Text(_sensor.name),
-          trailing: PopupMenuButton(
-            onSelected: (int i) {
-              switch (i) {
-                case 0:
-                  _onImage();
-                  break;
-                case 1:
-                  _onEdit();
-                  break;
-                case 2:
-                  widget.onDelete(_sensor.id);
-                  break;
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
-              const PopupMenuItem<int>(
-                child: Text('Foto bearbeiten'),
-                value: 0,
-              ),
+          trailing: PopupMenuButton(onSelected: (int i) {
+            switch (i) {
+              case 0:
+                _onImage();
+                break;
+              case 1:
+                _onEdit();
+                break;
+              case 2:
+                widget.onDelete(_sensor.id);
+                break;
+            }
+          }, itemBuilder: (BuildContext context) {
+            final entries = <PopupMenuEntry<int>>[
               const PopupMenuItem<int>(
                 child: Text('Name bearbeiten'),
                 value: 1,
@@ -279,8 +275,17 @@ class _SensorCardState extends State<_SensorCard> {
                 child: Text('Löschen'),
                 value: 2,
               ),
-            ],
-          ),
+            ];
+            if (!kIsWeb) {
+              entries.insert(
+                  0,
+                  const PopupMenuItem<int>(
+                    child: Text('Foto bearbeiten'),
+                    value: 0,
+                  ));
+            }
+            return entries;
+          }),
         ),
       ),
     );

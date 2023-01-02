@@ -2,11 +2,12 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ripe/service/backend_service.dart';
 import 'package:ripe/service/models/dto.dart';
 import 'package:ripe/service/sensor_listener_service.dart';
-import 'package:ripe/service/sensor_settings.dart';
+import 'package:ripe/service/sensor_setting_service.dart';
 import 'package:ripe/ui/component/branded.dart';
 import 'package:ripe/ui/page/sensor_log_page.dart';
 import 'package:ripe/ui/page/sensor_overview_page.dart';
@@ -31,7 +32,6 @@ class _SensorDetailPageState extends State<SensorDetailPage>
   SensorListenerService? service;
   late List<GlobalKey> childKeys;
   late SensorDto data;
-  late RegisteredSensor sensor;
   bool isConnected = false;
   double bottomPadding = 0.0;
 
@@ -42,9 +42,8 @@ class _SensorDetailPageState extends State<SensorDetailPage>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     data = widget.data;
-    sensor = widget.sensor;
+    WidgetsBinding.instance.addObserver(this);
     _initMqtt();
 
     childKeys =
@@ -85,14 +84,14 @@ class _SensorDetailPageState extends State<SensorDetailPage>
   }
 
   void _initMqtt() {
-    if (data.broker != null) {
-      service = new SensorListenerService(data.broker!);
+    if (data.broker.wss != null) {
+      service = new SensorListenerService(data.broker);
       service!
           .connect(onConnect: _onMqttConnect, onDisconnect: _onMqttDisconnect)
           .then((_) {
         service!.listenSensorData(
-          sensor.id,
-          sensor.key,
+          widget.sensor.id,
+          widget.sensor.key,
           () => Future.delayed(const Duration(milliseconds: 500), _refreshData),
         );
       });
@@ -103,7 +102,9 @@ class _SensorDetailPageState extends State<SensorDetailPage>
         action: SnackBarAction(
           label: 'Erneut verbinden',
           onPressed: () {
-            _backendService.getSensorData(sensor.id, sensor.key).then((sensor) {
+            _backendService
+                .getSensorData(widget.sensor.id, widget.sensor.key)
+                .then((sensor) {
               if (sensor != null) {
                 data = sensor;
                 _initMqtt();
@@ -145,8 +146,8 @@ class _SensorDetailPageState extends State<SensorDetailPage>
   }
 
   Future<void> _refreshData() async {
-    final sensorData =
-        await _backendService.getSensorData(sensor.id, sensor.key);
+    final sensorData = await _backendService.getSensorData(
+        widget.sensor.id, widget.sensor.key);
     if (sensorData != null) {
       setState(() => data = sensorData);
     } else {
@@ -168,7 +169,13 @@ class _SensorDetailPageState extends State<SensorDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    final imgFile = new File(widget.sensor.thumbPath);
+    ImageProvider headerImage;
+    if (kIsWeb) {
+      headerImage = NetworkImage(widget.sensor.thumbPath);
+    } else {
+      headerImage = FileImage(File(widget.sensor.thumbPath));
+    }
+
     return WillPopScope(
       onWillPop: () async {
         _onBack(context);
@@ -192,7 +199,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                       delegate: SensorAppBar(
                         expandedHeight: 180.0,
                         onBack: _onBack,
-                        imageProvider: FileImage(imgFile),
+                        imageProvider: headerImage,
                         name: widget.sensor.name,
                         textSize: 40.0,
                       ),
@@ -203,7 +210,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                           child: Column(children: [
                             ListTile(
                               title: Text(
-                                data.name,
+                                widget.sensor.name,
                                 style: Theme.of(context)
                                     .textTheme
                                     .subtitle1!
@@ -214,7 +221,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                                 child: Row(
                                   children: [
                                     Tooltip(
-                                        message: data.broker ?? 'broker',
+                                        message: data.broker.tcp ?? 'broker',
                                         child: Icon(
                                           isConnected
                                               ? Icons.sensors
@@ -243,7 +250,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                             );
                           }
                           return new AgentDecorator(
-                            info: sensor,
+                            info: widget.sensor,
                             agent: data.agents[index - 1],
                             key: childKeys[index],
                             refreshCallback: _refreshData,

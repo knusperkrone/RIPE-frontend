@@ -1,13 +1,15 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ripe/service/backend_service.dart';
-import 'package:ripe/service/sensor_settings.dart';
+import 'package:ripe/service/sensor_setting_service.dart';
 import 'package:ripe/ui/component/branded.dart';
 import 'package:ripe/ui/component/colors.dart';
 import 'package:ripe/ui/component/validator.dart';
 import 'package:ripe/ui/page/dialog/add_photo_dialog.dart';
 import 'package:ripe/ui/page/sensor_config_page.dart';
+import 'package:ripe/ui/page/sensor_overview_page.dart';
 
 import 'about_page.dart';
 
@@ -17,7 +19,7 @@ class SensorRegisterPage extends StatefulWidget {
 }
 
 class _SensorRegisterPageState extends State<SensorRegisterPage> {
-  final _settingService = new SensorSettingService();
+  final _settingService = SensorSettingService.getInstance();
   final _backendService = new BackendService();
   final _formKey = new GlobalKey<FormState>();
 
@@ -68,24 +70,31 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
     bool isSuccess = sensor != null;
     if (isSuccess) {
       if (name.trim().isEmpty) {
-        name = sensor.name;
+        name = 'Sensor ${_settingService.getSensors().length + 1}';
       }
 
       // Ask for photo
-      final file = await showDialog<File>(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => AddPhotoDialog(
-          _settingService.placeholderPath,
-          _settingService.placeholderThumbnailColor,
-        ),
-      );
+      File? file;
+      if (!kIsWeb) {
+        file = await showDialog<File>(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => AddPhotoDialog(
+            _settingService.placeholderPath,
+            _settingService.placeholderThumbnailColor,
+          ),
+        );
+      }
 
-      final settings =
+      final registered =
           await _settingService.addSensor(id, key, name, file?.path);
-      if (settings != null) {
+      if (registered != null && kIsWeb) {
         return Navigator.of(context).pushReplacement<void, void>(
-            MaterialPageRoute<void>(builder: (context) => SensorConfigPage()));
+            MaterialPageRoute<void>(builder: (context) => SensorOverviewPage()));
+      } else if (registered != null) {
+        return Navigator.of(context).pushReplacement<void, void>(
+            MaterialPageRoute<void>(
+                builder: (context) => SensorConfigPage()));
       } else {
         isSuccess = false;
       }

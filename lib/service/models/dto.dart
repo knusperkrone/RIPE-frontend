@@ -210,30 +210,52 @@ class AgentDto {
 }
 
 @JsonSerializable(createToJson: false)
+class BrokerDto {
+  @JsonKey()
+  final String? tcp;
+  @JsonKey()
+  final String? wss;
+
+  BrokerDto({this.tcp, this.wss});
+
+  factory BrokerDto.fromJson(Map<String, dynamic> json) =>
+      _$BrokerDtoFromJson(json);
+
+  @override
+  int get hashCode {
+    return tcp.hashCode * wss.hashCode;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is BrokerDto) {
+      return hashCode == other.hashCode;
+    }
+    return false;
+  }
+}
+
+@JsonSerializable(createToJson: false)
 class SensorDto {
-  final String name;
   @JsonKey(required: false)
-  final String? broker;
+  final BrokerDto broker;
   @JsonKey(name: 'data')
   final SensorDataDto sensorData;
   final List<AgentDto> agents;
 
-  SensorDto(this.name, this.broker, this.sensorData, this.agents);
+  SensorDto(this.broker, this.sensorData, this.agents);
 
   factory SensorDto.fromJson(Map<String, dynamic> json) =>
       _$SensorDtoFromJson(json);
 
   @override
   int get hashCode {
-    return name.hashCode *
-        broker.hashCode *
-        sensorData.hashCode *
-        _LIST_EQ.hash(agents);
+    return broker.hashCode * sensorData.hashCode * _LIST_EQ.hash(agents);
   }
 
   @override
   bool operator ==(Object other) {
-    if (other == SensorDto) {
+    if (other is SensorDto) {
       return hashCode == other.hashCode;
     }
     return false;
