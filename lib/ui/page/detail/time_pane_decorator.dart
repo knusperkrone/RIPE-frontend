@@ -112,6 +112,7 @@ class _TimePaneDecoratorState extends BaseDecoratorState<TimePaneDecorator> {
   Widget build(BuildContext context) {
     return Slidable(
       startActionPane: ActionPane(
+        extentRatio: 0.9,
         motion: const ScrollMotion(),
         children: [
           SlidableAction(
@@ -120,7 +121,7 @@ class _TimePaneDecoratorState extends BaseDecoratorState<TimePaneDecorator> {
             autoClose: false,
             backgroundColor: ACCENT_COLOR,
             icon: Icons.more_time,
-            onPressed: (_) => _onIncrease,
+            onPressed: (_) => _onIncrease(),
           ),
           SlidableAction(
             label: _buildEnableText(),
