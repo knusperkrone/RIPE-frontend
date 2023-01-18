@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ripe/service/backend_service.dart';
 import 'package:ripe/service/models/dto.dart';
@@ -12,6 +10,7 @@ import 'package:ripe/ui/component/branded.dart';
 import 'package:ripe/ui/page/sensor_log_page.dart';
 import 'package:ripe/ui/page/sensor_overview_page.dart';
 
+import '../../component/platform.dart';
 import 'agent_decorator.dart';
 import 'sensor_app_bar.dart';
 import 'sensor_data_card.dart';
@@ -75,12 +74,16 @@ class _SensorDetailPageState extends State<SensorDetailPage>
   }
 
   void _onMqttConnect() {
-    setState(() => isConnected = true);
+    if (mounted) {
+      setState(() => isConnected = true);
+    }
   }
 
   void _onMqttDisconnect() {
-    setState(() => isConnected = false);
-    service!.reconnect();
+    if (mounted) {
+      setState(() => isConnected = false);
+      service!.reconnect();
+    }
   }
 
   void _initMqtt() {
@@ -148,7 +151,9 @@ class _SensorDetailPageState extends State<SensorDetailPage>
   Future<void> _refreshData() async {
     final sensorData = await _backendService.getSensorData(
         widget.sensor.id, widget.sensor.key);
-    if (sensorData != null) {
+    if (!mounted) {
+      return;
+    } else if (sensorData != null) {
       setState(() => data = sensorData);
     } else {
       final snackbar = RipeSnackbar(
@@ -169,13 +174,6 @@ class _SensorDetailPageState extends State<SensorDetailPage>
 
   @override
   Widget build(BuildContext context) {
-    ImageProvider headerImage;
-    if (kIsWeb) {
-      headerImage = NetworkImage(widget.sensor.thumbPath);
-    } else {
-      headerImage = FileImage(File(widget.sensor.thumbPath));
-    }
-
     return WillPopScope(
       onWillPop: () async {
         _onBack(context);
@@ -199,7 +197,8 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                       delegate: SensorAppBar(
                         expandedHeight: 180.0,
                         onBack: _onBack,
-                        imageProvider: headerImage,
+                        imageProvider:
+                            PlatformAssetImage(widget.sensor.thumbPath),
                         name: widget.sensor.name,
                         textSize: 40.0,
                       ),

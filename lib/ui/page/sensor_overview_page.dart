@@ -7,6 +7,7 @@ import 'package:ripe/service/backend_service.dart';
 import 'package:ripe/service/sensor_setting_service.dart';
 import 'package:ripe/ui/component/branded.dart';
 import 'package:ripe/ui/component/colors.dart';
+import 'package:ripe/ui/component/platform.dart';
 import 'package:ripe/ui/page/about_page.dart';
 import 'package:ripe/ui/page/detail/sensor_detail_page.dart';
 import 'package:ripe/ui/page/dialog/delete_sensor_dialog.dart';
@@ -215,13 +216,6 @@ class _SensorCardState extends State<_SensorCard> {
 
   @override
   Widget build(BuildContext context) {
-    final ImageProvider image;
-    if (kIsWeb) {
-      image = NetworkImage(_sensor.thumbPath);
-    } else {
-      image = FileImage(File(_sensor.thumbPath));
-    }
-
     return Card(
       elevation: 0.7,
       child: Container(
@@ -248,7 +242,7 @@ class _SensorCardState extends State<_SensorCard> {
               shape: BoxShape.circle,
               image: DecorationImage(
                 fit: BoxFit.fill,
-                image: image,
+                image: PlatformAssetImage(_sensor.thumbPath),
               ),
             ),
           ),
