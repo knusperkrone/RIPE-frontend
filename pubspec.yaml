@@ -4,7 +4,7 @@ description: Control your plants the IoT way
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.13.0 <3.0.0"
+  sdk: ">=2.18.6 <3.0.0"
 
 dependencies:
   cupertino_icons: ^1.0.5
@@ -14,7 +14,7 @@ dependencies:
   flutter_native_timezone: ^2.0.0
   flutter_slidable: ^2.0.0
   http: ^0.13.5
-  image: ^4.0.4
+  image: ^4.0.10
   image_cropper: ^3.0.1
   image_picker: ^0.8.6
   intl: ^0.18.0
@@ -22,8 +22,8 @@ dependencies:
   mqtt_client: ^9.7.4
   palette_generator: ^0.3.2+2
   path_provider: ^2.0.11
-  shared_preferences: ^2.0.15
-  synchronized: ^3.0.0+3
+  shared_preferences: ^2.0.16
+  synchronized: ^3.0.1
   tuple: ^2.0.1
   url_launcher: ^6.1.7
 

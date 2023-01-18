@@ -44,7 +44,7 @@ class PlatformAssetImage implements ImageProvider {
 
   @override
   ImageStream resolve(ImageConfiguration configuration) =>
-      resolve(configuration);
+      delegate.resolve(configuration);
 
   @override
   void resolveStreamForKey(ImageConfiguration configuration, ImageStream stream,
