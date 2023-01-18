@@ -4,8 +4,9 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:mqtt_client/mqtt_client.dart';
-import 'package:ripe/service/mixins/mqtt_platform_adapter_mobile.dart'
-    if (kIsWeb) 'package:ripe/service/mixins/mqtt_platform_adapter_web.dart';
+import 'package:ripe/service/mixins/mqtt_platform_adapter_stub.dart'
+    if (dart.library.io) 'package:ripe/service/mixins/mqtt_platform_adapter_mobile.dart'
+    if (dart.library.html) 'package:ripe/service/mixins/mqtt_platform_adapter_web.dart';
 import 'package:ripe/service/models/dto.dart';
 import 'package:ripe/util/log.dart';
 import 'package:typed_data/typed_buffers.dart';
