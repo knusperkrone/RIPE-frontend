@@ -8,7 +8,7 @@ class PlatformAssetImage implements ImageProvider {
 
   PlatformAssetImage(String path) {
     if (kIsWeb) {
-      delegate = NetworkImage(path);
+      delegate = AssetImage(path);
     } else {
       delegate = FileImage(File(path));
     }
