@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:ripe/service/models/dto.dart';
 import 'package:ripe/service/sensor_setting_service.dart';
 import 'package:ripe/ui/component/colors.dart';
 import 'package:ripe/ui/component/time_utils.dart';
+import 'package:ripe/ui/page/dialog/timed_decorator_dialog.dart';
 
-import 'agent_decorator.dart';
+import 'base_decorator.dart';
 
-class TimePaneDecorator extends BaseDecorator {
+class TimedDecorator extends BaseDecorator {
   static const KEY = 'TimePane';
   final int defaultTimeout;
 
-  TimePaneDecorator(
+  TimedDecorator(
     RegisteredSensor info,
     AgentDto agent,
     RefreshFn refreshFn,
@@ -19,65 +19,22 @@ class TimePaneDecorator extends BaseDecorator {
   ) : super(info, agent, refreshFn);
 
   @override
-  State<StatefulWidget> createState() => new _TimePaneDecoratorState();
+  State<StatefulWidget> createState() => new _TimeDecoratorState();
 }
 
-class _TimePaneDecoratorState extends BaseDecoratorState<TimePaneDecorator> {
-  late int forceSeconds;
-
-  @override
-  void initState() {
-    super.initState();
-    forceSeconds = widget.defaultTimeout;
-  }
-
+class _TimeDecoratorState extends BaseDecoratorState<TimedDecorator> {
   /*
    * UI-Callbacks
    */
 
-  void _onIncrease() {
-    setState(() {
-      forceSeconds += widget.defaultTimeout;
-    });
-  }
-
-  void _onForce(bool on) {
-    // TRANSFORM
+  void _onForce(bool on, int forceSeconds) {
     final payload = forceSeconds * (on ? 1 : -1);
     widget.sendAgentCmd(context, payload);
-
-    setState(() {
-      forceSeconds = widget.defaultTimeout;
-    });
   }
 
   /*
    * Build
    */
-
-  String _formatPayloadSecond() {
-    final pad = (num n) => n < 10 ? '0$n' : '$n';
-    if (forceSeconds % 60 == 0 || forceSeconds > 100) {
-      return '${forceSeconds ~/ 60}:${pad(forceSeconds % 60)} Minuten';
-    }
-    return '$forceSeconds Sekunden';
-  }
-
-  String _buildEnableText() {
-    String msg = '';
-    if (!widget.isActive && !widget.isForcedOff) {
-      msg = _formatPayloadSecond() + '\n';
-    }
-    return '${msg}einschalten';
-  }
-
-  String _buildDisableText() {
-    String msg = '';
-    if (widget.isActive && !widget.isForcedOn) {
-      msg = _formatPayloadSecond() + '\n';
-    }
-    return '${msg}ausschalten';
-  }
 
   Widget buildStatusText() {
     String appendix = ' ';
@@ -108,43 +65,30 @@ class _TimePaneDecoratorState extends BaseDecoratorState<TimePaneDecorator> {
     ]);
   }
 
+  Future<void> _showDialog(BuildContext context) async {
+    final result = await showDialog<TimePaneDecoratorDialogResult?>(
+      context: context,
+      builder: (context) => TimePaneDecoratorDialog(
+          domainHR: widget.domainHR, defaultTimeout: widget.defaultTimeout),
+    );
+
+    if (result != null) {
+      _onForce(result.isEnabled, result.forceSeconds);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Slidable(
-      startActionPane: ActionPane(
-        extentRatio: 0.9,
-        motion: const ScrollMotion(),
-        children: [
-          SlidableAction(
-            foregroundColor: Colors.white,
-            label: 'Dauer ändern',
-            autoClose: false,
-            backgroundColor: ACCENT_COLOR,
-            icon: Icons.more_time,
-            onPressed: (_) => _onIncrease(),
-          ),
-          SlidableAction(
-            label: _buildEnableText(),
-            backgroundColor: PRIMARY_COLOR,
-            icon: Icons.settings_remote,
-            onPressed: (_) => _onForce(true),
-          ),
-          SlidableAction(
-            label: _buildDisableText(),
-            backgroundColor: ERROR_COLOR,
-            icon: Icons.power_settings_new,
-            onPressed: (_) => _onForce(false),
-          ),
-        ],
-      ),
-      child: Card(
+    return Card(
+      child: InkWell(
+        onTap: () => _showDialog(context),
         child: Column(
           children: [
             ListTile(
               leading: Switch(
-                  onChanged: (_) =>
-                      Slidable.of(context)?.openCurrentActionPane(),
-                  value: widget.isActive),
+                onChanged: (_) => _showDialog(context),
+                value: widget.isActive,
+              ),
               title: Text(widget.domainHR),
               trailing: Container(
                 width: 68,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:ripe/service/models/dto.dart';
 import 'package:ripe/service/sensor_setting_service.dart';
 
-import 'agent_decorator.dart';
+import 'base_decorator.dart';
 
 class SliderDecorator extends BaseDecorator {
   static const KEY = 'Slider';

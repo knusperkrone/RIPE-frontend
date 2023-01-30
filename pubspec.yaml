@@ -12,7 +12,6 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_native_timezone: ^2.0.0
-  flutter_slidable: ^2.0.0
   http: ^0.13.5
   image: ^4.0.10
   image_cropper: ^3.0.1

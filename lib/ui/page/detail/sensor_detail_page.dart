@@ -11,7 +11,7 @@ import 'package:ripe/ui/page/sensor_log_page.dart';
 import 'package:ripe/ui/page/sensor_overview_page.dart';
 
 import '../../component/platform.dart';
-import 'agent_decorator.dart';
+import 'decorator/agent_decorator.dart';
 import 'sensor_app_bar.dart';
 import 'sensor_data_card.dart';
 
