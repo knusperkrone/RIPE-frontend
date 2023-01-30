@@ -17,27 +17,27 @@ class SensorLogPage extends StatefulWidget {
 
 class _SensorLogState extends State<SensorLogPage> {
   final _backendService = new BackendService();
-  SensorListenerService? _listenerService;
+  late SensorListenerService _listenerService;
   List<String>? logs;
 
   @override
   void initState() {
     super.initState();
+    _listenerService = new SensorListenerService(widget.sensorDto.broker);
     _refreshLogs();
     _initMqtt();
   }
 
   @override
   void dispose() {
-    _listenerService?.dispose();
+    _listenerService.dispose();
     super.dispose();
   }
 
   void _initMqtt() {
-    if (widget.sensorDto.broker.tcp != null && _listenerService != null) {
-      _listenerService = new SensorListenerService(widget.sensorDto.broker);
-      _listenerService!.connect(onDisconnect: onMqttDisconnected).then((_) {
-        _listenerService!.listenSensorLogs(
+    if (widget.sensorDto.broker.tcp != null) {
+      _listenerService.connect(onDisconnect: _onMqttDisconnected).then((_) {
+        _listenerService.listenSensorLogs(
           widget.sensor.id,
           widget.sensor.key,
           () => Future.delayed(const Duration(milliseconds: 500), _refreshLogs),
@@ -46,31 +46,29 @@ class _SensorLogState extends State<SensorLogPage> {
     }
   }
 
-  void onMqttDisconnected() {
-    _listenerService!.reconnect();
+  void _onMqttDisconnected() {
+    _listenerService.reconnect();
   }
 
   Future<void> _refreshLogs() async {
-    _backendService
-        .getSensorLogs(widget.sensor.id, widget.sensor.key)
-        .then((value) {
-      if (value == null) {
-        final snackbar = RipeSnackbar(
-          context,
-          label: 'Logs konnten nicht geladen werden',
-          duration: const Duration(seconds: 60),
-          action: SnackBarAction(
-            label: 'Ok',
-            onPressed: () => Navigator.pop(context),
-          ),
-        );
-        ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(snackbar);
-        return;
-      } else {
-        setState(() => logs = value);
-      }
-    });
+    final updatedLogs = await _backendService.getSensorLogs(
+        widget.sensor.id, widget.sensor.key);
+    if (updatedLogs == null) {
+      final snackbar = RipeSnackbar(
+        context,
+        label: 'Logs konnten nicht geladen werden',
+        duration: const Duration(seconds: 60),
+        action: SnackBarAction(
+          label: 'Ok',
+          onPressed: () => Navigator.pop(context),
+        ),
+      );
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      return;
+    } else {
+      setState(() => logs = updatedLogs);
+    }
   }
 
   @override
