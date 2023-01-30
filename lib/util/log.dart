@@ -10,7 +10,8 @@ class _CallerTrace {
 
       // Search the 'file_name.dart:5:12' with regex
       final indexOfFileName = traceString.indexOf(RegExp(r'[A-Za-z_]+.dart'));
-      final fileInfo = traceString.substring(indexOfFileName);
+      final fileInfo =
+          traceString.substring(indexOfFileName).replaceAll(' ', ':');
       final tokens = fileInfo.split(':');
 
       // Split (main.dart:5:12) into name and line number
