@@ -44,10 +44,10 @@ class _SensorDataCardState extends State<SensorDataCard> {
       return [];
     }
 
-    final subhead = Theme.of(context).textTheme.subtitle1!.copyWith();
+    final subhead = Theme.of(context).textTheme.titleMedium!.copyWith();
     final valTheme = Theme.of(context)
         .textTheme
-        .subtitle1!
+        .titleMedium!
         .copyWith(fontWeight: FontWeight.bold);
     return [
       ListTile(
@@ -79,7 +79,7 @@ class _SensorDataCardState extends State<SensorDataCard> {
                 child: Center(
                   child: Text(
                     'Sensor ist nicht mit dem Internet verbunden!',
-                    style: Theme.of(context).textTheme.subtitle1!.copyWith(
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
                           color: ERROR_COLOR,
                         ),
                   ),

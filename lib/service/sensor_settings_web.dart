@@ -20,13 +20,13 @@ class SensorSettingServiceWeb extends SensorSettingService {
   @override
   Future<RegisteredSensor?> addSensor(
       int id, String key, String name, String? imagePath) async {
-    if (sensors.containsKey(id))  {
+    if (sensors.containsKey(id)) {
       return null;
     }
 
     // copy to app directory folder
     // generate thumbnail
-    const color = Color(0);
+    const color = Color.fromARGB(0, 0, 0, 0);
     sensors[id] = new RegisteredSensor(
       id,
       key,
@@ -60,5 +60,4 @@ class SensorSettingServiceWeb extends SensorSettingService {
 
   @override
   Color get placeholderThumbnailColor => const Color(0x00000000);
-
 }

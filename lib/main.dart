@@ -42,14 +42,13 @@ class RipeApp extends StatelessWidget {
         onPrimary: buttonColorDark,
         secondary: secondaryColor,
         onSecondary: buttonColorLight,
+        background: backgroundColor,
+        error: errorColor,
       ),
-      backgroundColor: backgroundColor,
       disabledColor: Colors.white60,
       dividerColor: primaryColor,
-      errorColor: errorColor,
       focusColor: buttonColorLight,
       visualDensity: VisualDensity.adaptivePlatformDensity,
-      toggleableActiveColor: secondaryColor,
       dividerTheme: theme.dividerTheme.copyWith(),
       inputDecorationTheme: const InputDecorationTheme(
         focusedBorder: UnderlineInputBorder(
@@ -63,8 +62,8 @@ class RipeApp extends StatelessWidget {
         cursorColor: buttonColorLight,
       ),
       textTheme: textTheme.copyWith(
-        subtitle1: textTheme.subtitle1!.copyWith(fontWeight: FontWeight.w300),
-        subtitle2: textTheme.subtitle2!.copyWith(fontWeight: FontWeight.w400),
+        titleMedium: textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w300),
+        titleSmall: textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w400),
       ),
       switchTheme: theme.switchTheme.copyWith(
         thumbColor: MaterialStateProperty.resolveWith((states) {
@@ -86,7 +85,7 @@ class RipeApp extends StatelessWidget {
         overlayColor: buttonColorLight.withOpacity(0.25),
       ),
       dialogTheme: theme.dialogTheme.copyWith(
-        titleTextStyle: textTheme.button!.copyWith(
+        titleTextStyle: textTheme.labelLarge!.copyWith(
           color: primaryColor,
         ),
       ),

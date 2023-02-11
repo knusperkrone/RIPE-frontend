@@ -79,7 +79,7 @@ class _NotSupportedState extends AgentConfigDecoratorState<NotSupportedWidget> {
   Widget build(BuildContext context) => Text(
       '${widget.jsonKey} noch nicht unterstützt - update die App!',
       style:
-          Theme.of(context).textTheme.subtitle1!.copyWith(color: ERROR_COLOR));
+          Theme.of(context).textTheme.titleMedium!.copyWith(color: ERROR_COLOR));
 }
 
 /*
@@ -252,7 +252,7 @@ class _TimeSliderState extends AgentConfigDecoratorState<TimeSliderDecorator> {
       child: Column(children: [
         Text(
           formatted,
-          style: Theme.of(context).textTheme.button,
+          style: Theme.of(context).textTheme.labelLarge,
         ),
         Slider(
             min: lower.toDouble(),
@@ -315,7 +315,7 @@ class _IntSliderRangeDecoratorState
       child: Column(children: [
         Text(
           val.toStringAsFixed(0),
-          style: Theme.of(context).textTheme.button,
+          style: Theme.of(context).textTheme.labelLarge,
         ),
         Slider(
             min: lower * 1.0,

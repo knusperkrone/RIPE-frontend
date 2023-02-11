@@ -41,7 +41,7 @@ class AgentDecorator extends StatelessWidget {
           '$uiKey ist noch nicht unterstützt - update die App!',
           style: Theme.of(context)
               .textTheme
-              .subtitle1!
+              .titleMedium!
               .copyWith(color: ERROR_COLOR),
         ),
       ),

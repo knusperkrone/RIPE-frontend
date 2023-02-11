@@ -70,7 +70,7 @@ class _TimePaneDecoratorState extends State<TimePaneDecoratorDialog> {
       title: Center(
           child: Text(
         '${widget.domainHR}',
-        style: Theme.of(context).textTheme.headline6,
+        style: Theme.of(context).textTheme.titleLarge,
       )),
       content: Container(
         height: 200,

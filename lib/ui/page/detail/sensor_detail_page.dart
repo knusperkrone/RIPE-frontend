@@ -212,7 +212,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                                 widget.sensor.name,
                                 style: Theme.of(context)
                                     .textTheme
-                                    .subtitle1!
+                                    .titleMedium!
                                     .copyWith(fontWeight: FontWeight.bold),
                               ),
                               trailing: Container(

@@ -103,7 +103,7 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
               child: Text(
                 name,
                 textAlign: TextAlign.start,
-                style: theme.textTheme.headline6!.copyWith(color: Colors.white),
+                style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
               ),
             ),
           ),

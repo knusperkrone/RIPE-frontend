@@ -115,7 +115,7 @@ class _ConfigSensorDialogState extends State<ConfigSensorDialog> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(10.0),
                         decoration: BoxDecoration(
-                          color: Theme.of(context).errorColor,
+                          color: Theme.of(context).colorScheme.error,
                           borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(12.0),
                           ),

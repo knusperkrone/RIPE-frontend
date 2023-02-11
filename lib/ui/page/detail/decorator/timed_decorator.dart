@@ -43,7 +43,7 @@ class _TimeDecoratorState extends BaseDecoratorState<TimedDecorator> {
     switch (widget.state) {
       case AgentState.ERROR:
       case AgentState.STOPPED:
-        color = Theme.of(context).errorColor;
+        color = Theme.of(context).colorScheme.error;
         break;
       case AgentState.FORCED:
         color = Theme.of(context).colorScheme.secondary;

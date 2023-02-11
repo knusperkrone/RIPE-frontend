@@ -149,7 +149,7 @@ class SensorConfigPageState extends State<SensorConfigPage> {
                 textAlign: TextAlign.center,
                 style: Theme.of(context)
                     .textTheme
-                    .headline6!
+                    .titleLarge!
                     .copyWith(fontWeight: FontWeight.w200),
               ),
               Container(height: 30),
@@ -167,11 +167,11 @@ class SensorConfigPageState extends State<SensorConfigPage> {
                       TextSpan(
                         text: '• ',
                         style:
-                            textTheme.subtitle2!.copyWith(color: BUTTON_COLOR),
+                            textTheme.titleSmall!.copyWith(color: BUTTON_COLOR),
                       ),
                       TextSpan(
                           text: 'Sensor aus und wieder einschalten',
-                          style: textTheme.subtitle1)
+                          style: textTheme.titleMedium)
                     ],
                   ),
                 ),
@@ -185,14 +185,14 @@ class SensorConfigPageState extends State<SensorConfigPage> {
                       TextSpan(
                         text: '• ',
                         style:
-                            textTheme.subtitle2!.copyWith(color: BUTTON_COLOR),
+                            textTheme.titleSmall!.copyWith(color: BUTTON_COLOR),
                       ),
-                      TextSpan(text: 'Mit WLAN  ', style: textTheme.subtitle1),
+                      TextSpan(text: 'Mit WLAN  ', style: textTheme.titleMedium),
                       TextSpan(
                           text: 'InterFace-Bewässerung',
-                          style: textTheme.subtitle1!
+                          style: textTheme.titleMedium!
                               .copyWith(fontWeight: FontWeight.bold)),
-                      TextSpan(text: ' verbinden', style: textTheme.subtitle1),
+                      TextSpan(text: ' verbinden', style: textTheme.titleMedium),
                     ],
                   ),
                 ),
@@ -206,11 +206,11 @@ class SensorConfigPageState extends State<SensorConfigPage> {
                       TextSpan(
                         text: '• ',
                         style:
-                            textTheme.subtitle2!.copyWith(color: BUTTON_COLOR),
+                            textTheme.titleSmall!.copyWith(color: BUTTON_COLOR),
                       ),
                       TextSpan(
                           text: 'Mobile Daten deaktivieren',
-                          style: textTheme.subtitle1),
+                          style: textTheme.titleMedium),
                     ],
                   ),
                 ),
@@ -224,11 +224,11 @@ class SensorConfigPageState extends State<SensorConfigPage> {
                       TextSpan(
                         text: '• ',
                         style:
-                            textTheme.subtitle2!.copyWith(color: BUTTON_COLOR),
+                            textTheme.titleSmall!.copyWith(color: BUTTON_COLOR),
                       ),
                       TextSpan(
                           text: 'Ihre WLAN Zugangsdaten eingeben',
-                          style: textTheme.subtitle1),
+                          style: textTheme.titleMedium),
                     ],
                   ),
                 ),
@@ -241,7 +241,7 @@ class SensorConfigPageState extends State<SensorConfigPage> {
                 child: ElevatedButton(
                   style: ButtonStyle(
                     foregroundColor: MaterialStateProperty.all(
-                        Theme.of(context).textTheme.button!.color),
+                        Theme.of(context).textTheme.labelLarge!.color),
                     backgroundColor: MaterialStateProperty.all(PRIMARY_COLOR),
                   ),
                   child: const Text('Sensor konfigurieren'),

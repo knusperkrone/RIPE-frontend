@@ -59,7 +59,7 @@ class RipeAppBar extends AppBar {
 
 class RipeSnackbar extends SnackBar {
   static Text _styleContent(BuildContext context, String label) {
-    final textTheme = Theme.of(context).textTheme.subtitle1!;
+    final textTheme = Theme.of(context).textTheme.titleMedium!;
     return Text(label, style: textTheme.copyWith(color: Colors.black45));
   }
 

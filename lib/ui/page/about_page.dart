@@ -52,7 +52,7 @@ class AboutPage extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
-                        .headline5!
+                        .headlineSmall!
                         .copyWith(fontWeight: FontWeight.w200),
                   ),
                   Padding(
@@ -66,14 +66,14 @@ class AboutPage extends StatelessWidget {
                           text: 'Powered by ',
                           style: Theme.of(context)
                               .textTheme
-                              .headline6!
+                              .titleLarge!
                               .copyWith(fontWeight: FontWeight.w200),
                         ),
                         TextSpan(
                           text: 'InterFace AG',
                           style: Theme.of(context)
                               .textTheme
-                              .headline6!
+                              .titleLarge!
                               .copyWith(
                                   fontWeight: FontWeight.w200,
                                   color: const Color(0xffff8100)),
@@ -92,7 +92,7 @@ class AboutPage extends StatelessWidget {
                       'Softwarelizenzen',
                       style: Theme.of(context)
                           .textTheme
-                          .headline6!
+                          .titleLarge!
                           .copyWith(fontWeight: FontWeight.w200),
                     ),
                     onPressed: () => showLicensePage(context: context),

@@ -167,7 +167,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
                 textAlign: TextAlign.center,
                 style: Theme.of(context)
                     .textTheme
-                    .headline6!
+                    .titleLarge!
                     .copyWith(fontWeight: FontWeight.w200),
               ),
               Container(height: 30),
@@ -220,7 +220,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
                 child: ElevatedButton(
                   style: ButtonStyle(
                     foregroundColor: MaterialStateProperty.all(
-                        Theme.of(context).textTheme.button!.color),
+                        Theme.of(context).textTheme.labelLarge!.color),
                     backgroundColor: MaterialStateProperty.all(PRIMARY_COLOR),
                   ),
                   child: const Text('Bestätigen'),
