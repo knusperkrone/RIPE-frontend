@@ -73,7 +73,7 @@ class _TimePaneDecoratorState extends State<TimePaneDecoratorDialog> {
         style: Theme.of(context).textTheme.titleLarge,
       )),
       content: Container(
-        height: 200,
+        height: 220,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -123,6 +123,7 @@ class _TimePaneDecoratorState extends State<TimePaneDecoratorDialog> {
                 ),
               ],
             ),
+            const Padding(padding: EdgeInsets.all(10)),
           ],
         ),
       ),

@@ -44,12 +44,17 @@ class RipeApp extends StatelessWidget {
         onSecondary: buttonColorLight,
         background: backgroundColor,
         error: errorColor,
+        outline: Colors.transparent,
       ),
+      iconTheme: theme.iconTheme.copyWith(
+        color: backgroundColor,
+        opacity: 1.0,
+      ),
+      iconButtonTheme: theme.iconButtonTheme,
       disabledColor: Colors.white60,
-      dividerColor: primaryColor,
       focusColor: buttonColorLight,
       visualDensity: VisualDensity.adaptivePlatformDensity,
-      dividerTheme: theme.dividerTheme.copyWith(),
+      dividerTheme: theme.dividerTheme.copyWith(color: primaryColor),
       inputDecorationTheme: const InputDecorationTheme(
         focusedBorder: UnderlineInputBorder(
           borderSide: BorderSide(
@@ -62,7 +67,8 @@ class RipeApp extends StatelessWidget {
         cursorColor: buttonColorLight,
       ),
       textTheme: textTheme.copyWith(
-        titleMedium: textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w300),
+        titleMedium:
+            textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w300),
         titleSmall: textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w400),
       ),
       switchTheme: theme.switchTheme.copyWith(
@@ -74,7 +80,7 @@ class RipeApp extends StatelessWidget {
         trackColor: MaterialStateProperty.resolveWith((states) {
           return (states.contains(MaterialState.selected))
               ? secondaryColor
-              : backgroundColor;
+              : Colors.white10;
         }),
       ),
       sliderTheme: theme.sliderTheme.copyWith(
