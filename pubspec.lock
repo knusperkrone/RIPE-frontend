@@ -5,18 +5,18 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: "0c80aeab9bc807ab10022cd3b2f4cf2ecdf231949dc1ddd9442406a003f19201"
+      sha256: "569ddca58d535e601dd1584afa117710abc999d036c0cd2c51777fb257df78e8"
       url: "https://pub.dev"
     source: hosted
-    version: "52.0.0"
+    version: "53.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
-      sha256: cd8ee83568a77f3ae6b913a36093a1c9b1264e7cb7f834d9ddd2311dade9c1f4
+      sha256: "10927c4b7c7c88b1adbca278c3d5531db92e2f4b4abf04e2919a800af965f3f5"
       url: "https://pub.dev"
     source: hosted
-    version: "5.4.0"
+    version: "5.5.0"
   analyzer_plugin:
     dependency: transitive
     description:
@@ -241,6 +241,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
+  executor:
+    dependency: "direct main"
+    description:
+      name: executor
+      sha256: "87d935b31b2bdf7fe2af0b77dd8ffe8864eaade25715e9c68bc49497e48c9851"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.2.3"
   fab_circular_menu:
     dependency: "direct main"
     description:
@@ -364,10 +372,10 @@ packages:
     dependency: "direct main"
     description:
       name: image
-      sha256: "3686865febd85c57a632d87a0fb1f0a8a9ef602fdb68d909c3e9aa29ec70fd24"
+      sha256: "483a389d6ccb292b570c31b3a193779b1b0178e7eb571986d9a49904b6861227"
       url: "https://pub.dev"
     source: hosted
-    version: "4.0.13"
+    version: "4.0.15"
   image_cropper:
     dependency: "direct main"
     description:
@@ -520,6 +528,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "9.7.4"
+  mrx_charts:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: memory_leaks
+      resolved-ref: "4988452bf89b56f35980367d5da0d4775fce4368"
+      url: "git@github.com:knusperkrone/mrx-flutter-charts.git"
+    source: git
+    version: "0.1.4"
   package_config:
     dependency: transitive
     description:
@@ -664,6 +681,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.1.0"
+  scidart:
+    dependency: "direct main"
+    description:
+      name: scidart
+      sha256: af816eed552cadb6a9a324c594515b0cdff41617839345c382047927bd8dc02d
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2-dev.12"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -821,22 +846,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.0"
-  syncfusion_flutter_charts:
-    dependency: "direct main"
-    description:
-      name: syncfusion_flutter_charts
-      sha256: "400fa4c57a22f17b78fac6d086e39ecc7b7ece760fdf2041f235951f05640976"
-      url: "https://pub.dev"
-    source: hosted
-    version: "20.4.49"
-  syncfusion_flutter_core:
-    dependency: transitive
-    description:
-      name: syncfusion_flutter_core
-      sha256: b5cb2525beb38fae36a363f72f8a2db92ed3995d6f0695968412cc6836e3a7b7
-      url: "https://pub.dev"
-    source: hosted
-    version: "20.4.49"
   synchronized:
     dependency: "direct main"
     description:

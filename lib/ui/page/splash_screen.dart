@@ -28,15 +28,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _delayFut = new Future.delayed(const Duration(milliseconds: 1250), () {});
-    Future(() async {
-      await _sensorService.init();
-      await _backendService.init();
-      _onConnect();
-    });
+    _delayFut = new Future.delayed(const Duration(milliseconds: 750), () {});
+    Future.wait([
+      _sensorService.init(),
+      _backendService.init(),
+    ]).then((_) => _onConnect());
   }
 
-  /*
+/*
    * UI-Callbacks
    */
 
@@ -49,7 +48,7 @@ class _SplashScreenState extends State<SplashScreen> {
           context, MaterialPageRoute(builder: (_) => SensorRegisterPage()));
     } else if (!isDirty && sensorsList.length == 1) {
       final first = sensorsList.first;
-      final data = await BackendService().getSensorData(first.id, first.key);
+      final data = await BackendService().getSensorStatus(first.id, first.key);
       if (data != null) {
         await _delayFut;
         return Navigator.pushReplacement<void, void>(context,
@@ -82,7 +81,7 @@ class _SplashScreenState extends State<SplashScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackbar);
   }
 
-  /*
+/*
    * Build
    */
 

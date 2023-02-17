@@ -106,7 +106,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
           label: 'Erneut verbinden',
           onPressed: () {
             _backendService
-                .getSensorData(widget.sensor.id, widget.sensor.key)
+                .getSensorStatus(widget.sensor.id, widget.sensor.key)
                 .then((sensor) {
               if (sensor != null) {
                 data = sensor;
@@ -149,7 +149,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
   }
 
   Future<void> _refreshData() async {
-    final sensorData = await _backendService.getSensorData(
+    final sensorData = await _backendService.getSensorStatus(
         widget.sensor.id, widget.sensor.key);
     if (!mounted) {
       return;
@@ -244,6 +244,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                         (context, index) {
                           if (index == 0) {
                             return SensorDataCard(
+                              widget.sensor,
                               data.sensorData,
                               key: childKeys[index],
                             );

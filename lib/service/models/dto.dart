@@ -37,6 +37,23 @@ class SensorDataDto {
   factory SensorDataDto.fromJson(Map<String, dynamic> json) =>
       _$SensorDataDtoFromJson(json);
 
+  SensorDataDto copyWith(
+      {double? battery,
+      double? moisture,
+      double? temperature,
+      int? carbon,
+      int? conductivity,
+      int? light}) {
+    return new SensorDataDto(
+        timestamp,
+        battery ?? this.battery,
+        moisture ?? this.moisture,
+        temperature ?? this.temperature,
+        carbon ?? this.carbon,
+        conductivity ?? this.conductivity,
+        light ?? this.light);
+  }
+
   bool isEmpty() {
     return battery == null &&
         moisture == null &&

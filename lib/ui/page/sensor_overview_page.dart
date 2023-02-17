@@ -159,7 +159,7 @@ class _SensorCardState extends State<_SensorCard> {
   Future<void> _onTab() async {
     final id = widget.sensor.id;
     final key = widget.sensor.key;
-    final data = await BackendService().getSensorData(id, key);
+    final data = await BackendService().getSensorStatus(id, key);
     if (data != null) {
       Navigator.push<void>(context, MaterialPageRoute(builder: (_) {
         return new SensorDetailPage(_sensor, data);

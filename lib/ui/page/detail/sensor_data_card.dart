@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:ripe/service/models/dto.dart';
 import 'package:ripe/ui/component/colors.dart';
 import 'package:ripe/ui/component/time_utils.dart';
+import 'package:ripe/ui/page/data/data_page.dart';
 import 'package:ripe/ui/page/sensor_config_page.dart';
 
+import '../../../service/sensor_setting_service.dart';
+
 class SensorDataCard extends StatefulWidget {
+  final RegisteredSensor sensor;
   final SensorDataDto data;
 
-  const SensorDataCard(this.data, {Key? key}) : super(key: key);
+  const SensorDataCard(this.sensor, this.data, {Key? key}) : super(key: key);
 
   @override
   State createState() => _SensorDataCardState();
@@ -33,13 +37,14 @@ class _SensorDataCardState extends State<SensorDataCard> {
    * Build
    */
 
-  List<Widget> _buildTile(
-    BuildContext context,
-    IconData icon,
-    String text,
-    num? value,
-    String appendix,
-  ) {
+  List<Widget> _buildTile({
+    required BuildContext context,
+    required IconData icon,
+    required String unitName,
+    required num? value,
+    required String unit,
+    required int tabIndex,
+  }) {
     if (value == null) {
       return [];
     }
@@ -52,12 +57,18 @@ class _SensorDataCardState extends State<SensorDataCard> {
     return [
       ListTile(
         leading: Icon(icon),
+        onTap: () => Navigator.push<void>(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DataPage(widget.sensor, tabIndex),
+          ),
+        ),
         title: RichText(
           maxLines: 2,
           overflow: TextOverflow.clip,
-          text: TextSpan(text: text, style: subhead, children: [
+          text: TextSpan(text: '$unitName:', style: subhead, children: [
             TextSpan(text: ' ${value.toStringAsFixed(1)}', style: valTheme),
-            TextSpan(text: appendix, style: valTheme),
+            TextSpan(text: ' $unit', style: valTheme),
           ]),
         ),
       ),
@@ -109,13 +120,37 @@ class _SensorDataCardState extends State<SensorDataCard> {
         child: Column(
           children: <Widget>[
             ..._buildTile(
-                context, Icons.whatshot, 'Temperatur:', data.temperature, '°C'),
+              context: context,
+              icon: Icons.whatshot,
+              unitName: 'Temperatur',
+              value: data.temperature,
+              unit: '°C',
+              tabIndex: 0,
+            ),
             ..._buildTile(
-                context, Icons.pool, 'Feuchtigkeit:', data.moisture, '%'),
-            ..._buildTile(context, Icons.power_settings_new, 'Leitbarkeit:',
-                data.conductivity, ' μS/cm²'),
+              context: context,
+              icon: Icons.pool,
+              unitName: 'Feuchtigkeit',
+              value: data.moisture,
+              unit: '%',
+              tabIndex: 1,
+            ),
             ..._buildTile(
-                context, Icons.brightness_4, 'Helligkeit:', data.light, ' lux'),
+              context: context,
+              icon: Icons.power_settings_new,
+              unitName: 'Leitbarkeit',
+              value: data.conductivity,
+              unit: 'μS/cm²',
+              tabIndex: 2,
+            ),
+            ..._buildTile(
+              context: context,
+              icon: Icons.brightness_4,
+              unitName: 'Helligkeit',
+              value: data.conductivity,
+              unit: 'lux',
+              tabIndex: 2,
+            ),
             ListTile(
               dense: true,
               title: Text(

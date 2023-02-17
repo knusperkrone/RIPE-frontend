@@ -63,7 +63,7 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
     final id = int.parse(_idController.value.text);
     final key = _pwdController.value.text;
     String name = _nameController.value.text;
-    final sensor = await _backendService.getSensorData(id, key);
+    final sensor = await _backendService.getSensorStatus(id, key);
 
     // Notify user
     SnackBar? snackBar;

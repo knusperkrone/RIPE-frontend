@@ -10,7 +10,7 @@ import 'package:tuple/tuple.dart';
 import 'models/dto.dart';
 
 class BackendService extends BasePrefService with DartHttpClientMixin {
-  Future<SensorDto?> getSensorData(int id, String key) async {
+  Future<SensorDto?> getSensorStatus(int id, String key) async {
     final currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
     try {
       final resp = await doGet(baseUrl, '/api/sensor/$id', {
@@ -19,10 +19,10 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
       });
       final json = jsonDecode(resp) as Map<String, dynamic>;
 
-      Log.debug('Fetched sensor data for $id');
+      Log.debug('Fetched sensor status for $id');
       return SensorDto.fromJson(json);
     } catch (e) {
-      Log.error('GetSensorData - $e');
+      Log.error('FetchSensorData - $e');
       return null;
     }
   }
@@ -64,6 +64,44 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
 
       Log.debug('Fetched sensor logs for $id');
       return logs;
+    } catch (e) {
+      Log.error('GetSensorLogs - $e');
+      return null;
+    }
+  }
+
+  Future<List<SensorDataDto>?> getSensorData(
+      int id, String key, DateTime from, DateTime until) async {
+    final queryParams = <String, dynamic>{
+      'from': from.toUtc().toIso8601String(),
+      'until': until.toUtc().toIso8601String()
+    };
+    final encodedQuery = Uri(queryParameters: queryParams).query;
+
+    try {
+      final resp = await doGet(baseUrl, '/api/sensor/$id/data?$encodedQuery', {
+        'X-KEY': key,
+      });
+      final jsonList = jsonDecode(resp) as List<dynamic>;
+      final json = jsonList.cast<Map<String, dynamic>>();
+
+      Log.debug('Fetched sensor data for $id');
+      return json.map((str) => SensorDataDto.fromJson(str)).toList();
+    } catch (e) {
+      Log.error('GetSensorData - $e');
+      return null;
+    }
+  }
+
+  Future<SensorDataDto?> getFirstData(int id, String key) async {
+    try {
+      final resp = await doGet(baseUrl, '/api/sensor/$id/data/first', {
+        'X-KEY': key,
+      });
+      final json = jsonDecode(resp) as Map<String, dynamic>;
+
+      Log.debug('Fetched sensor data for $id');
+      return SensorDataDto.fromJson(json);
     } catch (e) {
       Log.error('GetSensorLogs - $e');
       return null;

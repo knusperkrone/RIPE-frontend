@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:ripe/ui/component/colors.dart';
 
 import 'ui/page/splash_screen.dart';
@@ -11,11 +10,6 @@ class RipeApp extends StatelessWidget {
   Widget build(BuildContext context) {
     const cachedLogo = AssetImage('assets/icon.png');
     precacheImage(cachedLogo, context, size: const Size(200.0, 200.0));
-
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
 
     return MaterialApp(
       title: 'Ripe',
