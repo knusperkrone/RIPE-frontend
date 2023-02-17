@@ -13,7 +13,7 @@ class RipeApp extends StatelessWidget {
 
     return MaterialApp(
       title: 'Ripe',
-      theme: _prepareTheme(ThemeData.light()),
+      themeMode: ThemeMode.dark,
       darkTheme: _prepareTheme(ThemeData.dark()),
       home: const SplashScreen(cachedLogo),
     );
@@ -38,7 +38,7 @@ class RipeApp extends StatelessWidget {
         onSecondary: buttonColorLight,
         background: backgroundColor,
         error: errorColor,
-        outline: Colors.transparent,
+        outline: Colors.white70,
       ),
       iconTheme: theme.iconTheme.copyWith(
         color: backgroundColor,
