@@ -1,8 +1,6 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:ripe/service/backend_service.dart';
 import 'package:ripe/ui/component/branded.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class AboutPage extends StatelessWidget {
   final backendService = new BackendService();
@@ -57,32 +55,6 @@ class AboutPage extends StatelessWidget {
                   ),
                   Padding(
                     padding: EdgeInsets.all(constraints.maxHeight / 21),
-                  ),
-                  RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: 'Powered by ',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge!
-                              .copyWith(fontWeight: FontWeight.w200),
-                        ),
-                        TextSpan(
-                          text: 'InterFace AG',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge!
-                              .copyWith(
-                                  fontWeight: FontWeight.w200,
-                                  color: const Color(0xffff8100)),
-                          recognizer: new TapGestureRecognizer()
-                            ..onTap = () => launchUrlString(
-                                'https://www.interface-ag.com/'),
-                        ),
-                      ],
-                    ),
                   ),
                   Padding(
                     padding: EdgeInsets.all(constraints.maxHeight / 40),
