@@ -218,68 +218,70 @@ class _SensorCardState extends State<_SensorCard> {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0.7,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              _sensor.imageColor,
-              Theme.of(context).cardColor,
-            ],
-            stops: const [0.0, 0.3],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        height: 80.0,
-        alignment: Alignment.center,
-        child: ListTile(
-          onTap: _onTab,
-          leading: Container(
-            width: 60.0,
-            height: 60.0,
-            key: UniqueKey(),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                fit: BoxFit.fill,
-                image: PlatformAssetImage(_sensor.thumbPath),
-              ),
+      child: InkWell(
+        onTap: _onTab,
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                _sensor.imageColor,
+                Theme.of(context).cardColor,
+              ],
+              stops: const [0.0, 0.3],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
           ),
-          title: Text(_sensor.name),
-          trailing: PopupMenuButton(onSelected: (int i) {
-            switch (i) {
-              case 0:
-                _onImage();
-                break;
-              case 1:
-                _onEdit();
-                break;
-              case 2:
-                widget.onDelete(_sensor.id);
-                break;
-            }
-          }, itemBuilder: (BuildContext context) {
-            final entries = <PopupMenuEntry<int>>[
-              const PopupMenuItem<int>(
-                child: Text('Name bearbeiten'),
-                value: 1,
+          height: 80.0,
+          alignment: Alignment.center,
+          child: ListTile(
+            leading: Container(
+              width: 60.0,
+              height: 60.0,
+              key: UniqueKey(),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  fit: BoxFit.fill,
+                  image: PlatformAssetImage(_sensor.thumbPath),
+                ),
               ),
-              const PopupMenuItem<int>(
-                child: Text('Löschen'),
-                value: 2,
-              ),
-            ];
-            if (!kIsWeb) {
-              entries.insert(
-                  0,
-                  const PopupMenuItem<int>(
-                    child: Text('Foto bearbeiten'),
-                    value: 0,
-                  ));
-            }
-            return entries;
-          }),
+            ),
+            title: Text(_sensor.name),
+            trailing: PopupMenuButton(onSelected: (int i) {
+              switch (i) {
+                case 0:
+                  _onImage();
+                  break;
+                case 1:
+                  _onEdit();
+                  break;
+                case 2:
+                  widget.onDelete(_sensor.id);
+                  break;
+              }
+            }, itemBuilder: (BuildContext context) {
+              final entries = <PopupMenuEntry<int>>[
+                const PopupMenuItem<int>(
+                  child: Text('Name bearbeiten'),
+                  value: 1,
+                ),
+                const PopupMenuItem<int>(
+                  child: Text('Löschen'),
+                  value: 2,
+                ),
+              ];
+              if (!kIsWeb) {
+                entries.insert(
+                    0,
+                    const PopupMenuItem<int>(
+                      child: Text('Foto bearbeiten'),
+                      value: 0,
+                    ));
+              }
+              return entries;
+            }),
+          ),
         ),
       ),
     );
