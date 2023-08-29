@@ -147,9 +147,9 @@ class _SensorDataCardState extends State<SensorDataCard> {
               context: context,
               icon: Icons.brightness_4,
               unitName: 'Helligkeit',
-              value: data.conductivity,
+              value: data.light,
               unit: 'lux',
-              tabIndex: 2,
+              tabIndex: 3,
             ),
             ListTile(
               dense: true,
