@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -19,8 +21,9 @@ class PlatformAssetImage implements ImageProvider {
       delegate.createStream(configuration);
 
   @override
-  Future<bool> evict({ImageCache? cache,
-    ImageConfiguration configuration = ImageConfiguration.empty}) =>
+  Future<bool> evict(
+          {ImageCache? cache,
+          ImageConfiguration configuration = ImageConfiguration.empty}) =>
       delegate.evict(cache: cache, configuration: configuration);
 
   @override
@@ -33,8 +36,8 @@ class PlatformAssetImage implements ImageProvider {
 
   @override
   Future<ImageCacheStatus?> obtainCacheStatus(
-      {required ImageConfiguration configuration,
-        ImageErrorListener? handleError}) =>
+          {required ImageConfiguration configuration,
+          ImageErrorListener? handleError}) =>
       delegate.obtainCacheStatus(
           configuration: configuration, handleError: handleError);
 
@@ -48,6 +51,11 @@ class PlatformAssetImage implements ImageProvider {
 
   @override
   void resolveStreamForKey(ImageConfiguration configuration, ImageStream stream,
-      Object key, ImageErrorListener handleError) =>
+          Object key, ImageErrorListener handleError) =>
       delegate.resolveStreamForKey(configuration, stream, key, handleError);
+
+  @override
+  ImageStreamCompleter loadImage(Object key, ImageDecoderCallback decode) {
+    return delegate.loadImage(key, decode);
+  }
 }

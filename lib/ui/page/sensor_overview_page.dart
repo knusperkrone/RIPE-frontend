@@ -1,12 +1,10 @@
 import 'dart:io';
 
-import 'package:fab_circular_menu/fab_circular_menu.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ripe/service/backend_service.dart';
 import 'package:ripe/service/sensor_setting_service.dart';
 import 'package:ripe/ui/component/branded.dart';
-import 'package:ripe/ui/component/colors.dart';
 import 'package:ripe/ui/component/platform.dart';
 import 'package:ripe/ui/page/about_page.dart';
 import 'package:ripe/ui/page/detail/sensor_detail_page.dart';
@@ -25,7 +23,7 @@ class SensorOverviewPage extends StatefulWidget {
 }
 
 class _SensorOverviewPageState extends State<SensorOverviewPage> {
-  final _fabKey = new GlobalKey<FabCircularMenuState>();
+  //final _fabKey = new GlobalKey<Object>();
   late List<RegisteredSensor> _sensors;
 
   /*
@@ -84,45 +82,32 @@ class _SensorOverviewPageState extends State<SensorOverviewPage> {
             },
           ),
         ),
-        floatingActionButton: FabCircularMenu(
-          key: _fabKey,
-          ringDiameter: MediaQuery.of(context).size.width * 0.66,
-          animationDuration: const Duration(milliseconds: 450),
-          fabOpenIcon: const Icon(Icons.menu, color: Colors.white),
-          fabCloseIcon: const Icon(Icons.menu, color: Colors.white),
-          fabColor: BUTTON_COLOR,
-          ringColor: BUTTON_COLOR_LIGHT,
-          children: <Widget>[
-            IconButton(
-                tooltip: 'Über diese App',
-                icon: const Icon(Icons.info_outline, color: Colors.white),
-                onPressed: () async {
-                  _fabKey.currentState!.close();
-                  await Navigator.push<void>(
-                    context,
-                    MaterialPageRoute(builder: (_) => AboutPage()),
-                  );
-                }),
-            IconButton(
-                tooltip: 'Sensor konfigurieren',
-                icon: const Icon(
-                    Icons.signal_cellular_connected_no_internet_4_bar,
-                    color: Colors.white),
-                onPressed: () async {
-                  _fabKey.currentState!.close();
-                  await Navigator.push<void>(context,
-                      MaterialPageRoute(builder: (_) => SensorConfigPage()));
-                }),
-            IconButton(
-                tooltip: 'Sensor hinzufügen',
-                icon: const Icon(Icons.add_to_queue, color: Colors.white),
-                onPressed: () async {
-                  _fabKey.currentState!.close();
-                  await Navigator.push<void>(
-                      context,
-                      MaterialPageRoute<void>(
-                          builder: (_) => SensorRegisterPage()));
-                }),
+        bottomNavigationBar: BottomNavigationBar(
+          onTap: (index) async => {
+            await Navigator.push<void>(context,
+                MaterialPageRoute<void>(builder: (_) {
+              if (index == 0) {
+                return SensorRegisterPage();
+              } else if (index == 1) {
+                return SensorConfigPage();
+              }
+              return AboutPage();
+            }))
+          },
+          items: const [
+            BottomNavigationBarItem(
+              label: 'Sensor hinzufügen',
+              icon: Icon(Icons.add_to_queue, color: Colors.white),
+            ),
+            BottomNavigationBarItem(
+              label: 'Sensor konfigurieren',
+              icon: Icon(Icons.settings,
+                  color: Colors.white),
+            ),
+            BottomNavigationBarItem(
+              label: 'Über diese App',
+              icon: Icon(Icons.info_outline, color: Colors.white),
+            ),
           ],
         ),
       );

@@ -73,7 +73,7 @@ class _TimePaneDecoratorState extends State<TimePaneDecoratorDialog> {
         style: Theme.of(context).textTheme.titleLarge,
       )),
       content: Container(
-        height: 220,
+        height: 240,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

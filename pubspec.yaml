@@ -8,37 +8,36 @@ environment:
 
 dependencies:
   cupertino_icons: ^1.0.5
-  drift: ^2.5.0
+  drift: ^2.11.1
   executor: ^2.2.3
-  fab_circular_menu: ^1.0.2
   flutter:
     sdk: flutter
   flutter_native_timezone: ^2.0.0
-  http: ^0.13.5
-  image: ^4.0.13
-  image_cropper: ^3.0.1
-  image_picker: ^0.8.6+1
-  intl: ^0.18.0
-  json_annotation: ^4.8.0
-  mqtt_client: ^9.7.4
+  http: ^1.1.0
+  image: ^4.0.15
+  image_cropper: ^5.0.0
+  image_picker: ^1.0.2
+  intl: ^0.18.1
+  json_annotation: ^4.8.1
+  mqtt_client: 10.0.0
   mrx_charts:
     git:
       url: git@github.com:knusperkrone/mrx-flutter-charts.git
       ref: memory_leaks
   palette_generator: ^0.3.2+2
-  path_provider: ^2.0.12
+  path_provider: ^2.1.0
   scidart: ^0.0.2-dev.12
-  shared_preferences: ^2.0.17
-  sqlite3_flutter_libs: ^0.5.0
-  synchronized: ^3.0.1
-  tuple: ^2.0.1
+  shared_preferences: ^2.2.0
+  sqlite3_flutter_libs: ^0.5.16
+  synchronized: ^3.1.0
+  tuple: ^2.0.2
 
 dev_dependencies:
-  build_runner: ^2.3.3
-  drift_dev: ^2.5.2
+  build_runner: ^2.4.6
+  drift_dev: ^2.11.1
   flutter_test:
     sdk: flutter
-  json_serializable: ^6.5.4
+  json_serializable: ^6.7.1
 
 flutter:
   uses-material-design: true

@@ -76,7 +76,7 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
           borderRadius: BorderRadius.all(Radius.circular(12.0))),
       contentPadding: const EdgeInsets.only(top: 10.0),
       content: Container(
-        height: 360,
+        height: 364,
         child: Column(
           children: [
             Text(
