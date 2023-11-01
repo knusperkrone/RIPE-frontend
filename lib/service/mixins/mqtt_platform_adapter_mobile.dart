@@ -15,9 +15,9 @@ Tuple2<String, int?> _splitURI(String rawString) {
 
 MqttClient createMqttClient(
     BrokerDto broker, String id, MqttConnectMessage connMess) {
-  final uri = _splitURI(broker.tcp!.substring('tcp://'.length));
-  return new MqttServerClient.withPort(uri.item1, id, uri.item2 ?? 1883)
-    ..secure = false
+  final uri = _splitURI(broker.wss!);
+  return new MqttServerClient.withPort(uri.item1, id, uri.item2 ?? 443)
+    ..useWebSocket = true
     ..connectionMessage = connMess
     ..logging(on: false)
     ..keepAlivePeriod = 20;
