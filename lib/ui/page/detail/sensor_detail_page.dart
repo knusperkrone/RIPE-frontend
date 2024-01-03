@@ -220,7 +220,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                                 child: Row(
                                   children: [
                                     Tooltip(
-                                        message: data.broker.tcp ?? 'broker',
+                                        message: data.broker.wss ?? 'broker',
                                         child: Icon(
                                           isConnected
                                               ? Icons.sensors

@@ -4,7 +4,7 @@ part of 'shared.dart';
 
 // ignore_for_file: type=lint
 class $SensorDataTable extends SensorData
-    with TableInfo<$SensorDataTable, SensorDataDao> {
+    with TableInfo<$SensorDataTable, SensorDataData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -77,11 +77,12 @@ class $SensorDataTable extends SensorData
         light
       ];
   @override
-  String get aliasedName => _alias ?? 'sensor_data';
+  String get aliasedName => _alias ?? actualTableName;
   @override
-  String get actualTableName => 'sensor_data';
+  String get actualTableName => $name;
+  static const String $name = 'sensor_data';
   @override
-  VerificationContext validateIntegrity(Insertable<SensorDataDao> instance,
+  VerificationContext validateIntegrity(Insertable<SensorDataData> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -134,9 +135,9 @@ class $SensorDataTable extends SensorData
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  SensorDataDao map(Map<String, dynamic> data, {String? tablePrefix}) {
+  SensorDataData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return SensorDataDao(
+    return SensorDataData(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       sensorId: attachedDatabase.typeMapping
@@ -164,7 +165,7 @@ class $SensorDataTable extends SensorData
   }
 }
 
-class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
+class SensorDataData extends DataClass implements Insertable<SensorDataData> {
   final int id;
   final int sensorId;
   final DateTime timestamp;
@@ -174,7 +175,7 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
   final int? carbon;
   final int? conductivity;
   final int? light;
-  const SensorDataDao(
+  const SensorDataData(
       {required this.id,
       required this.sensorId,
       required this.timestamp,
@@ -235,10 +236,10 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
     );
   }
 
-  factory SensorDataDao.fromJson(Map<String, dynamic> json,
+  factory SensorDataData.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return SensorDataDao(
+    return SensorDataData(
       id: serializer.fromJson<int>(json['id']),
       sensorId: serializer.fromJson<int>(json['sensorId']),
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
@@ -266,7 +267,7 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
     };
   }
 
-  SensorDataDao copyWith(
+  SensorDataData copyWith(
           {int? id,
           int? sensorId,
           DateTime? timestamp,
@@ -276,7 +277,7 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
           Value<int?> carbon = const Value.absent(),
           Value<int?> conductivity = const Value.absent(),
           Value<int?> light = const Value.absent()}) =>
-      SensorDataDao(
+      SensorDataData(
         id: id ?? this.id,
         sensorId: sensorId ?? this.sensorId,
         timestamp: timestamp ?? this.timestamp,
@@ -310,7 +311,7 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is SensorDataDao &&
+      (other is SensorDataData &&
           other.id == this.id &&
           other.sensorId == this.sensorId &&
           other.timestamp == this.timestamp &&
@@ -322,7 +323,7 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
           other.light == this.light);
 }
 
-class SensorDataCompanion extends UpdateCompanion<SensorDataDao> {
+class SensorDataCompanion extends UpdateCompanion<SensorDataData> {
   final Value<int> id;
   final Value<int> sensorId;
   final Value<DateTime> timestamp;
@@ -355,7 +356,7 @@ class SensorDataCompanion extends UpdateCompanion<SensorDataDao> {
     this.light = const Value.absent(),
   })  : sensorId = Value(sensorId),
         timestamp = Value(timestamp);
-  static Insertable<SensorDataDao> custom({
+  static Insertable<SensorDataData> custom({
     Expression<int>? id,
     Expression<int>? sensorId,
     Expression<DateTime>? timestamp,
@@ -473,9 +474,10 @@ class $InitialSensorDataTable extends InitialSensorData
   @override
   List<GeneratedColumn> get $columns => [sensorId, initial];
   @override
-  String get aliasedName => _alias ?? 'initial_sensor_data';
+  String get aliasedName => _alias ?? actualTableName;
   @override
-  String get actualTableName => 'initial_sensor_data';
+  String get actualTableName => $name;
+  static const String $name = 'initial_sensor_data';
   @override
   VerificationContext validateIntegrity(
       Insertable<InitialSensorDataData> instance,
@@ -581,30 +583,36 @@ class InitialSensorDataCompanion
     extends UpdateCompanion<InitialSensorDataData> {
   final Value<int> sensorId;
   final Value<DateTime> initial;
+  final Value<int> rowid;
   const InitialSensorDataCompanion({
     this.sensorId = const Value.absent(),
     this.initial = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   InitialSensorDataCompanion.insert({
     required int sensorId,
     required DateTime initial,
+    this.rowid = const Value.absent(),
   })  : sensorId = Value(sensorId),
         initial = Value(initial);
   static Insertable<InitialSensorDataData> custom({
     Expression<int>? sensorId,
     Expression<DateTime>? initial,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (sensorId != null) 'sensor_id': sensorId,
       if (initial != null) 'initial': initial,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   InitialSensorDataCompanion copyWith(
-      {Value<int>? sensorId, Value<DateTime>? initial}) {
+      {Value<int>? sensorId, Value<DateTime>? initial, Value<int>? rowid}) {
     return InitialSensorDataCompanion(
       sensorId: sensorId ?? this.sensorId,
       initial: initial ?? this.initial,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -617,6 +625,9 @@ class InitialSensorDataCompanion
     if (initial.present) {
       map['initial'] = Variable<DateTime>(initial.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -624,7 +635,8 @@ class InitialSensorDataCompanion
   String toString() {
     return (StringBuffer('InitialSensorDataCompanion(')
           ..write('sensorId: $sensorId, ')
-          ..write('initial: $initial')
+          ..write('initial: $initial, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }
@@ -650,9 +662,10 @@ class $FetchHistoriesTable extends FetchHistories
   @override
   List<GeneratedColumn> get $columns => [sensorId, day];
   @override
-  String get aliasedName => _alias ?? 'fetch_histories';
+  String get aliasedName => _alias ?? actualTableName;
   @override
-  String get actualTableName => 'fetch_histories';
+  String get actualTableName => $name;
+  static const String $name = 'fetch_histories';
   @override
   VerificationContext validateIntegrity(Insertable<FetchHistorie> instance,
       {bool isInserting = false}) {
@@ -754,30 +767,36 @@ class FetchHistorie extends DataClass implements Insertable<FetchHistorie> {
 class FetchHistoriesCompanion extends UpdateCompanion<FetchHistorie> {
   final Value<int> sensorId;
   final Value<DateTime> day;
+  final Value<int> rowid;
   const FetchHistoriesCompanion({
     this.sensorId = const Value.absent(),
     this.day = const Value.absent(),
+    this.rowid = const Value.absent(),
   });
   FetchHistoriesCompanion.insert({
     required int sensorId,
     required DateTime day,
+    this.rowid = const Value.absent(),
   })  : sensorId = Value(sensorId),
         day = Value(day);
   static Insertable<FetchHistorie> custom({
     Expression<int>? sensorId,
     Expression<DateTime>? day,
+    Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (sensorId != null) 'sensor_id': sensorId,
       if (day != null) 'day': day,
+      if (rowid != null) 'rowid': rowid,
     });
   }
 
   FetchHistoriesCompanion copyWith(
-      {Value<int>? sensorId, Value<DateTime>? day}) {
+      {Value<int>? sensorId, Value<DateTime>? day, Value<int>? rowid}) {
     return FetchHistoriesCompanion(
       sensorId: sensorId ?? this.sensorId,
       day: day ?? this.day,
+      rowid: rowid ?? this.rowid,
     );
   }
 
@@ -790,6 +809,9 @@ class FetchHistoriesCompanion extends UpdateCompanion<FetchHistorie> {
     if (day.present) {
       map['day'] = Variable<DateTime>(day.value);
     }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
     return map;
   }
 
@@ -797,7 +819,8 @@ class FetchHistoriesCompanion extends UpdateCompanion<FetchHistorie> {
   String toString() {
     return (StringBuffer('FetchHistoriesCompanion(')
           ..write('sensorId: $sensorId, ')
-          ..write('day: $day')
+          ..write('day: $day, ')
+          ..write('rowid: $rowid')
           ..write(')'))
         .toString();
   }

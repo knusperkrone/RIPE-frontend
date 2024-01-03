@@ -31,14 +31,13 @@ AgentDto _$AgentDtoFromJson(Map<String, dynamic> json) => AgentDto(
     );
 
 BrokerDto _$BrokerDtoFromJson(Map<String, dynamic> json) => BrokerDto(
-      tcp: json['tcp'] as String?,
-      wss: json['wss'] as String?,
+      (json['hosts'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
 SensorDto _$SensorDtoFromJson(Map<String, dynamic> json) => SensorDto(
       BrokerDto.fromJson(json['broker'] as Map<String, dynamic>),
       SensorDataDto.fromJson(json['data'] as Map<String, dynamic>),
       (json['agents'] as List<dynamic>)
-          .map((dynamic e) => AgentDto.fromJson(e as Map<String, dynamic>))
+          .map((e) => AgentDto.fromJson(e as Map<String, dynamic>))
           .toList(),
     );

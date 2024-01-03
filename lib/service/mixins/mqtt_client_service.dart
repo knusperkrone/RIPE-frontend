@@ -63,8 +63,7 @@ class _MqttContext {
     client.publishMessage(topic, MqttQos.atLeastOnce, data);
   }
 
-  bool get isConnected =>
-      client.connectionStatus?.state == MqttConnectionState.connected;
+  bool get isConnected => client.connectionStatus?.state == MqttConnectionState.connected;
 }
 
 abstract class MqttClientService {
@@ -72,8 +71,7 @@ abstract class MqttClientService {
   static bool _isOfflineMode = false;
 
   @protected
-  Future<bool> listenFromBroker(BrokerDto broker, VoidCallback onConnect,
-      VoidCallback onDisconnect) async {
+  Future<bool> listenFromBroker(BrokerDto broker, VoidCallback onConnect, VoidCallback onDisconnect) async {
     _MqttContext? ctx = _contexts[broker];
     if (ctx == null || !ctx.isConnected) {
       try {
@@ -103,8 +101,7 @@ abstract class MqttClientService {
   }
 
   @protected
-  void unlistenFromBroker(
-      BrokerDto broker, VoidCallback onConnect, VoidCallback onDisconnect) {
+  void unlistenFromBroker(BrokerDto broker, VoidCallback onConnect, VoidCallback onDisconnect) {
     _contexts[broker]?.removeConnectedCallback(onConnect);
     _contexts[broker]?.removeDisconnectedCallback(onConnect);
   }
@@ -117,8 +114,7 @@ abstract class MqttClientService {
     ctx.disconnectedCallbacks.forEach((callback) => callback());
   }
 
-  static void _dispatchMqttMessage(
-      _MqttContext ctx, List<MqttReceivedMessage<MqttMessage>> msgBuffer) {
+  static void _dispatchMqttMessage(_MqttContext ctx, List<MqttReceivedMessage<MqttMessage>> msgBuffer) {
     for (final msg in msgBuffer) {
       final topic = msg.topic;
       final casted = (msg.payload as MqttPublishMessage).payload;
@@ -138,13 +134,20 @@ abstract class MqttClientService {
 
   static Future<MqttClient?> _initMqttClient(BrokerDto broker) async {
     final id = _generateUUID();
-    final MqttConnectMessage connMess = MqttConnectMessage()
-        .withClientIdentifier(id)
-        .withWillQos(MqttQos.atLeastOnce);
+    final MqttConnectMessage connMess = MqttConnectMessage().withClientIdentifier(id).withWillQos(MqttQos.atLeastOnce);
 
-    final client = createMqttClient(broker, id, connMess);
+    MqttClient? client;
+    for (final rawUri in broker.items.where((element) => getSupportedSchemes().contains(element))) {
+      final uri = Uri.parse(rawUri);
+      try {
+        client = createMqttClient(uri, id, connMess);
+      } catch (e) {
+        Log.error('Failed creating MQTT client $e');
+        continue;
+      }
+    }
 
-    if (!_isOfflineMode) {
+    if (!_isOfflineMode && client != null) {
       Log.info('Connecting MQTT - ${client.server}:${client.port}');
       await client.connect();
     }

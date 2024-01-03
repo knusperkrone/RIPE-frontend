@@ -1,22 +1,10 @@
 import 'package:mqtt_client/mqtt_browser_client.dart';
 import 'package:mqtt_client/mqtt_client.dart';
-import 'package:ripe/service/models/dto.dart';
-import 'package:tuple/tuple.dart';
 
-Tuple2<String, int?> _splitURI(String rawString) {
-  final splitIndex = rawString.lastIndexOf(':');
-  if (splitIndex > 'https:'.length) {
-    final uri = rawString.substring(0, splitIndex);
-    final port = int.parse(rawString.substring(splitIndex + 1));
-    return new Tuple2(uri, port);
-  }
-  return new Tuple2(rawString, null);
-}
+List<String> getSupportedSchemes() => ['wss'];
 
-MqttClient createMqttClient(
-    BrokerDto broker, String id, MqttConnectMessage connMess) {
-  final uri = _splitURI(broker.wss!);
-  return new MqttBrowserClient.withPort(uri.item1, id, uri.item2 ?? 443)
+MqttClient createMqttClient(Uri uri, String id, MqttConnectMessage connMess) {
+  return new MqttBrowserClient.withPort(uri.host, id, uri.port)
     ..connectionMessage = connMess
     ..logging(on: false)
     ..keepAlivePeriod = 20;

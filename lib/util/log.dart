@@ -1,3 +1,4 @@
+
 class _CallerTrace {
   final StackTrace _trace;
   late String fileName;
@@ -42,7 +43,7 @@ enum LogLevel {
 
 // ignore: avoid_classes_with_only_static_members
 class Log {
-  static LogLevel level = LogLevel.DEBUG;
+  static LogLevel level = kIs LogLevel.DEBUG;
 
   static void debug(String msg) {
     if (level.index > LogLevel.DEBUG.index) {
