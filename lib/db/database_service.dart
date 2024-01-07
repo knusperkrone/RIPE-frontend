@@ -37,7 +37,7 @@ class DatabaseService {
         .getSingleOrNull();
   }
 
-  Future<List<FetchHistorie>> getHistory(
+  Future<List<FetchHistory>> getHistory(
       int sensorId, DateTime from, DateTime until) {
     return (_db.select(_db.fetchHistories)
           ..where((tbl) => tbl.sensorId.equals(sensorId))

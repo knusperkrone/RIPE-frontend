@@ -63,15 +63,18 @@ class _MqttContext {
     client.publishMessage(topic, MqttQos.atLeastOnce, data);
   }
 
-  bool get isConnected => client.connectionStatus?.state == MqttConnectionState.connected;
+  bool get isConnected =>
+      client.connectionStatus?.state == MqttConnectionState.connected;
 }
 
 abstract class MqttClientService {
-  static final Map<BrokerDto, _MqttContext> _contexts = {}; // < BrokerUrl, Ctx>
+  static final Map<BrokersDto, _MqttContext> _contexts =
+      {}; // < BrokerUrl, Ctx>
   static bool _isOfflineMode = false;
 
   @protected
-  Future<bool> listenFromBroker(BrokerDto broker, VoidCallback onConnect, VoidCallback onDisconnect) async {
+  Future<bool> listenFromBroker(BrokersDto broker, VoidCallback onConnect,
+      VoidCallback onDisconnect) async {
     _MqttContext? ctx = _contexts[broker];
     if (ctx == null || !ctx.isConnected) {
       try {
@@ -101,7 +104,8 @@ abstract class MqttClientService {
   }
 
   @protected
-  void unlistenFromBroker(BrokerDto broker, VoidCallback onConnect, VoidCallback onDisconnect) {
+  void unlistenFromBroker(
+      BrokersDto broker, VoidCallback onConnect, VoidCallback onDisconnect) {
     _contexts[broker]?.removeConnectedCallback(onConnect);
     _contexts[broker]?.removeDisconnectedCallback(onConnect);
   }
@@ -114,7 +118,8 @@ abstract class MqttClientService {
     ctx.disconnectedCallbacks.forEach((callback) => callback());
   }
 
-  static void _dispatchMqttMessage(_MqttContext ctx, List<MqttReceivedMessage<MqttMessage>> msgBuffer) {
+  static void _dispatchMqttMessage(
+      _MqttContext ctx, List<MqttReceivedMessage<MqttMessage>> msgBuffer) {
     for (final msg in msgBuffer) {
       final topic = msg.topic;
       final casted = (msg.payload as MqttPublishMessage).payload;
@@ -132,24 +137,28 @@ abstract class MqttClientService {
     }
   }
 
-  static Future<MqttClient?> _initMqttClient(BrokerDto broker) async {
+  static Future<MqttClient?> _initMqttClient(BrokersDto broker) async {
     final id = _generateUUID();
-    final MqttConnectMessage connMess = MqttConnectMessage().withClientIdentifier(id).withWillQos(MqttQos.atLeastOnce);
-
     MqttClient? client;
-    for (final rawUri in broker.items.where((element) => getSupportedSchemes().contains(element))) {
-      final uri = Uri.parse(rawUri);
-      try {
-        client = createMqttClient(uri, id, connMess);
-      } catch (e) {
-        Log.error('Failed creating MQTT client $e');
-        continue;
-      }
+
+    for (final broker in broker.items
+        .where((element) => getSupportedSchemes().contains(element.scheme))) {
+      final MqttConnectMessage connMess = MqttConnectMessage()
+          .withClientIdentifier(id)
+          .withWillQos(MqttQos.atLeastOnce)
+          .authenticateAs(
+            broker.credentials?.username,
+            broker.credentials?.password,
+          );
+
+      client = createMqttClient(broker, id, connMess);
+      assert(client.autoReconnect == false);
     }
 
     if (!_isOfflineMode && client != null) {
-      Log.info('Connecting MQTT - ${client.server}:${client.port}');
+      Log.info('MQTT Connecting ${client.server}:${client.port}');
       await client.connect();
+      Log.info('MQTT Connected ${client.server}:${client.port}');
     }
     return client;
   }
@@ -160,7 +169,7 @@ abstract class MqttClientService {
     return 'APP${DateTime.now().toIso8601String()}-${rand.nextInt(maxVal)}-${rand.nextInt(maxVal)}';
   }
 
-/*
+  /*
    * Class Methods
    */
 
@@ -176,7 +185,7 @@ abstract class MqttClientService {
   }
 
   @protected
-  void subscribe(BrokerDto broker, String topic, MqttReceiveFunc recFunc) {
+  void subscribe(BrokersDto broker, String topic, MqttReceiveFunc recFunc) {
     if (!_isOfflineMode) {
       Log.debug('Subscribed: $topic for broker ${broker.hashCode}');
 
@@ -185,7 +194,7 @@ abstract class MqttClientService {
   }
 
   @protected
-  void unsubscribe(BrokerDto broker, String topic) {
+  void unsubscribe(BrokersDto broker, String topic) {
     if (!_isOfflineMode) {
       Log.debug('Unsubscribed: $topic for broker ${broker.hashCode}');
       _contexts[broker]?.removeMessageCallback(topic);
@@ -193,7 +202,7 @@ abstract class MqttClientService {
   }
 
   @protected
-  void publish(BrokerDto broker, String topic, String data) {
+  void publish(BrokersDto broker, String topic, String data) {
     if (!_isOfflineMode) {
       Log.debug('Publish for broker ${broker.hashCode}');
       _contexts[broker]?.publish(topic, data);

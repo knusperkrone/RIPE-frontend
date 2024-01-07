@@ -4,7 +4,7 @@ part of 'shared.dart';
 
 // ignore_for_file: type=lint
 class $SensorDataTable extends SensorData
-    with TableInfo<$SensorDataTable, SensorDataData> {
+    with TableInfo<$SensorDataTable, SensorDataDao> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -82,7 +82,7 @@ class $SensorDataTable extends SensorData
   String get actualTableName => $name;
   static const String $name = 'sensor_data';
   @override
-  VerificationContext validateIntegrity(Insertable<SensorDataData> instance,
+  VerificationContext validateIntegrity(Insertable<SensorDataDao> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -135,9 +135,9 @@ class $SensorDataTable extends SensorData
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  SensorDataData map(Map<String, dynamic> data, {String? tablePrefix}) {
+  SensorDataDao map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return SensorDataData(
+    return SensorDataDao(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       sensorId: attachedDatabase.typeMapping
@@ -165,7 +165,7 @@ class $SensorDataTable extends SensorData
   }
 }
 
-class SensorDataData extends DataClass implements Insertable<SensorDataData> {
+class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
   final int id;
   final int sensorId;
   final DateTime timestamp;
@@ -175,7 +175,7 @@ class SensorDataData extends DataClass implements Insertable<SensorDataData> {
   final int? carbon;
   final int? conductivity;
   final int? light;
-  const SensorDataData(
+  const SensorDataDao(
       {required this.id,
       required this.sensorId,
       required this.timestamp,
@@ -236,10 +236,10 @@ class SensorDataData extends DataClass implements Insertable<SensorDataData> {
     );
   }
 
-  factory SensorDataData.fromJson(Map<String, dynamic> json,
+  factory SensorDataDao.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return SensorDataData(
+    return SensorDataDao(
       id: serializer.fromJson<int>(json['id']),
       sensorId: serializer.fromJson<int>(json['sensorId']),
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
@@ -267,7 +267,7 @@ class SensorDataData extends DataClass implements Insertable<SensorDataData> {
     };
   }
 
-  SensorDataData copyWith(
+  SensorDataDao copyWith(
           {int? id,
           int? sensorId,
           DateTime? timestamp,
@@ -277,7 +277,7 @@ class SensorDataData extends DataClass implements Insertable<SensorDataData> {
           Value<int?> carbon = const Value.absent(),
           Value<int?> conductivity = const Value.absent(),
           Value<int?> light = const Value.absent()}) =>
-      SensorDataData(
+      SensorDataDao(
         id: id ?? this.id,
         sensorId: sensorId ?? this.sensorId,
         timestamp: timestamp ?? this.timestamp,
@@ -311,7 +311,7 @@ class SensorDataData extends DataClass implements Insertable<SensorDataData> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is SensorDataData &&
+      (other is SensorDataDao &&
           other.id == this.id &&
           other.sensorId == this.sensorId &&
           other.timestamp == this.timestamp &&
@@ -323,7 +323,7 @@ class SensorDataData extends DataClass implements Insertable<SensorDataData> {
           other.light == this.light);
 }
 
-class SensorDataCompanion extends UpdateCompanion<SensorDataData> {
+class SensorDataCompanion extends UpdateCompanion<SensorDataDao> {
   final Value<int> id;
   final Value<int> sensorId;
   final Value<DateTime> timestamp;
@@ -356,7 +356,7 @@ class SensorDataCompanion extends UpdateCompanion<SensorDataData> {
     this.light = const Value.absent(),
   })  : sensorId = Value(sensorId),
         timestamp = Value(timestamp);
-  static Insertable<SensorDataData> custom({
+  static Insertable<SensorDataDao> custom({
     Expression<int>? id,
     Expression<int>? sensorId,
     Expression<DateTime>? timestamp,
@@ -643,7 +643,7 @@ class InitialSensorDataCompanion
 }
 
 class $FetchHistoriesTable extends FetchHistories
-    with TableInfo<$FetchHistoriesTable, FetchHistorie> {
+    with TableInfo<$FetchHistoriesTable, FetchHistory> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -667,7 +667,7 @@ class $FetchHistoriesTable extends FetchHistories
   String get actualTableName => $name;
   static const String $name = 'fetch_histories';
   @override
-  VerificationContext validateIntegrity(Insertable<FetchHistorie> instance,
+  VerificationContext validateIntegrity(Insertable<FetchHistory> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -689,9 +689,9 @@ class $FetchHistoriesTable extends FetchHistories
   @override
   Set<GeneratedColumn> get $primaryKey => {sensorId, day};
   @override
-  FetchHistorie map(Map<String, dynamic> data, {String? tablePrefix}) {
+  FetchHistory map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return FetchHistorie(
+    return FetchHistory(
       sensorId: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}sensor_id'])!,
       day: attachedDatabase.typeMapping
@@ -705,10 +705,10 @@ class $FetchHistoriesTable extends FetchHistories
   }
 }
 
-class FetchHistorie extends DataClass implements Insertable<FetchHistorie> {
+class FetchHistory extends DataClass implements Insertable<FetchHistory> {
   final int sensorId;
   final DateTime day;
-  const FetchHistorie({required this.sensorId, required this.day});
+  const FetchHistory({required this.sensorId, required this.day});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -724,10 +724,10 @@ class FetchHistorie extends DataClass implements Insertable<FetchHistorie> {
     );
   }
 
-  factory FetchHistorie.fromJson(Map<String, dynamic> json,
+  factory FetchHistory.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return FetchHistorie(
+    return FetchHistory(
       sensorId: serializer.fromJson<int>(json['sensorId']),
       day: serializer.fromJson<DateTime>(json['day']),
     );
@@ -741,13 +741,13 @@ class FetchHistorie extends DataClass implements Insertable<FetchHistorie> {
     };
   }
 
-  FetchHistorie copyWith({int? sensorId, DateTime? day}) => FetchHistorie(
+  FetchHistory copyWith({int? sensorId, DateTime? day}) => FetchHistory(
         sensorId: sensorId ?? this.sensorId,
         day: day ?? this.day,
       );
   @override
   String toString() {
-    return (StringBuffer('FetchHistorie(')
+    return (StringBuffer('FetchHistory(')
           ..write('sensorId: $sensorId, ')
           ..write('day: $day')
           ..write(')'))
@@ -759,12 +759,12 @@ class FetchHistorie extends DataClass implements Insertable<FetchHistorie> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is FetchHistorie &&
+      (other is FetchHistory &&
           other.sensorId == this.sensorId &&
           other.day == this.day);
 }
 
-class FetchHistoriesCompanion extends UpdateCompanion<FetchHistorie> {
+class FetchHistoriesCompanion extends UpdateCompanion<FetchHistory> {
   final Value<int> sensorId;
   final Value<DateTime> day;
   final Value<int> rowid;
@@ -779,7 +779,7 @@ class FetchHistoriesCompanion extends UpdateCompanion<FetchHistorie> {
     this.rowid = const Value.absent(),
   })  : sensorId = Value(sensorId),
         day = Value(day);
-  static Insertable<FetchHistorie> custom({
+  static Insertable<FetchHistory> custom({
     Expression<int>? sensorId,
     Expression<DateTime>? day,
     Expression<int>? rowid,

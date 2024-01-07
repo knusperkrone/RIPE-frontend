@@ -35,7 +35,7 @@ class _SensorLogState extends State<SensorLogPage> {
   }
 
   void _initMqtt() {
-    if (widget.sensorDto.broker.tcp != null) {
+    if (widget.sensorDto.broker.items.isNotEmpty) {
       _listenerService.connect(onDisconnect: _onMqttDisconnected).then((_) {
         _listenerService.listenSensorLogs(
           widget.sensor.id,

@@ -6,7 +6,7 @@ void _noOp() {}
 
 class SensorListenerService extends MqttClientService {
   final Set<String> _subscribedTopics = {};
-  final BrokerDto _broker;
+  final BrokersDto _broker;
   VoidCallback? _onConnect;
   VoidCallback? _onDisconnect;
 

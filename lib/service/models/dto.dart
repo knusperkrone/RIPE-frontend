@@ -34,12 +34,24 @@ class SensorDataDto {
     this.light,
   );
 
-  factory SensorDataDto.fromJson(Map<String, dynamic> json) => _$SensorDataDtoFromJson(json);
+  factory SensorDataDto.fromJson(Map<String, dynamic> json) =>
+      _$SensorDataDtoFromJson(json);
 
   SensorDataDto copyWith(
-      {double? battery, double? moisture, double? temperature, int? carbon, int? conductivity, int? light}) {
-    return new SensorDataDto(timestamp, battery ?? this.battery, moisture ?? this.moisture,
-        temperature ?? this.temperature, carbon ?? this.carbon, conductivity ?? this.conductivity, light ?? this.light);
+      {double? battery,
+      double? moisture,
+      double? temperature,
+      int? carbon,
+      int? conductivity,
+      int? light}) {
+    return new SensorDataDto(
+        timestamp,
+        battery ?? this.battery,
+        moisture ?? this.moisture,
+        temperature ?? this.temperature,
+        carbon ?? this.carbon,
+        conductivity ?? this.conductivity,
+        light ?? this.light);
   }
 
   bool isEmpty() {
@@ -77,7 +89,8 @@ class AgentDecoratorDto {
 
   AgentDecoratorDto(this.payload);
 
-  factory AgentDecoratorDto.fromJson(Map<String, dynamic> json) => new AgentDecoratorDto(json);
+  factory AgentDecoratorDto.fromJson(Map<String, dynamic> json) =>
+      new AgentDecoratorDto(json);
 
   @override
   int get hashCode {
@@ -133,9 +146,11 @@ class AgentStateDto {
 
   bool get isReady => _state == AgentState.READY;
 
-  bool get isActive => _state == AgentState.EXECUTING || _state == AgentState.FORCED;
+  bool get isActive =>
+      _state == AgentState.EXECUTING || _state == AgentState.FORCED;
 
-  bool get isForced => _state == AgentState.STOPPED || _state == AgentState.FORCED;
+  bool get isForced =>
+      _state == AgentState.STOPPED || _state == AgentState.FORCED;
 
   bool get isForcedOn => _state == AgentState.FORCED;
 
@@ -167,7 +182,8 @@ class AgentRenderDto {
 
   AgentRenderDto(this.decorator, this.state, this.rendered);
 
-  factory AgentRenderDto.fromJson(Map<String, dynamic> json) => _$AgentRenderDtoFromJson(json);
+  factory AgentRenderDto.fromJson(Map<String, dynamic> json) =>
+      _$AgentRenderDtoFromJson(json);
 
   @override
   int get hashCode {
@@ -192,9 +208,8 @@ class AgentDto {
 
   AgentDto(this.domain, this.agentName, this.ui);
 
-  factory AgentDto.fromJson(Map<String, dynamic> json) {
-    return _$AgentDtoFromJson(json);
-  }
+  factory AgentDto.fromJson(Map<String, dynamic> json) =>
+      _$AgentDtoFromJson(json);
 
   @override
   int get hashCode {
@@ -211,13 +226,51 @@ class AgentDto {
 }
 
 @JsonSerializable(createToJson: false)
-class BrokerDto {
+class BrokerCredentialsDto {
+  final String username;
+  final String password;
+
+  BrokerCredentialsDto(this.username, this.password);
+
+  factory BrokerCredentialsDto.fromJson(Map<String, dynamic> json) =>
+      _$BrokerCredentialsDtoFromJson(json);
+}
+
+@JsonSerializable(createToJson: false)
+class BrokerConnectionDetailsDto {
+  final String scheme;
+  final String host;
+  final int port;
+  final BrokerCredentialsDto? credentials;
+
+  BrokerConnectionDetailsDto(this.scheme, this.host, this.port, this.credentials);
+
+  factory BrokerConnectionDetailsDto.fromJson(Map<String, dynamic> json) =>
+      _$BrokerConnectionDetailsDtoFromJson(json);
+
+  @override
+  int get hashCode {
+    return scheme.hashCode * host.hashCode * port.hashCode;
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (other is BrokerConnectionDetailsDto) {
+      return hashCode == other.hashCode;
+    }
+    return false;
+  }
+}
+
+@JsonSerializable(createToJson: false)
+class BrokersDto {
   @JsonKey()
-  final List<String> items;
+  final List<BrokerConnectionDetailsDto> items;
 
-  BrokerDto(this.items);
+  BrokersDto(this.items);
 
-  factory BrokerDto.fromJson(Map<String, dynamic> json) => _$BrokerDtoFromJson(json);
+  factory BrokersDto.fromJson(Map<String, dynamic> json) =>
+      _$BrokersDtoFromJson(json);
 
   @override
   int get hashCode {
@@ -226,7 +279,7 @@ class BrokerDto {
 
   @override
   bool operator ==(Object other) {
-    if (other is BrokerDto) {
+    if (other is BrokersDto) {
       return hashCode == other.hashCode;
     }
     return false;
@@ -236,14 +289,15 @@ class BrokerDto {
 @JsonSerializable(createToJson: false)
 class SensorDto {
   @JsonKey(required: false)
-  final BrokerDto broker;
+  final BrokersDto broker;
   @JsonKey(name: 'data')
   final SensorDataDto sensorData;
   final List<AgentDto> agents;
 
   SensorDto(this.broker, this.sensorData, this.agents);
 
-  factory SensorDto.fromJson(Map<String, dynamic> json) => _$SensorDtoFromJson(json);
+  factory SensorDto.fromJson(Map<String, dynamic> json) =>
+      _$SensorDtoFromJson(json);
 
   @override
   int get hashCode {

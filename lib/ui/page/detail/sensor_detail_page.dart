@@ -87,11 +87,17 @@ class _SensorDetailPageState extends State<SensorDetailPage>
   }
 
   void _initMqtt() {
-    if (data.broker.wss != null) {
+    if (data.broker.items.isNotEmpty) {
       service = new SensorListenerService(data.broker);
       service!
           .connect(onConnect: _onMqttConnect, onDisconnect: _onMqttDisconnect)
-          .then((_) {
+          .catchError((e) {
+        final snackbar = RipeSnackbar(
+          context,
+          label: 'Mit dem Sensor konnte keine Verbindung hergestellt werden',
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackbar);
+      }).then((_) {
         service!.listenSensorData(
           widget.sensor.id,
           widget.sensor.key,
@@ -101,7 +107,7 @@ class _SensorDetailPageState extends State<SensorDetailPage>
     } else {
       final snackbar = RipeSnackbar(
         context,
-        label: 'Sensor ist nicht erreichbar',
+        label: 'Sensor ist nicht online',
         action: SnackBarAction(
           label: 'Erneut verbinden',
           onPressed: () {
@@ -220,7 +226,9 @@ class _SensorDetailPageState extends State<SensorDetailPage>
                                 child: Row(
                                   children: [
                                     Tooltip(
-                                        message: data.broker.wss ?? 'broker',
+                                        message: data.broker.items.firstOrNull
+                                                ?.host ??
+                                            'broker',
                                         child: Icon(
                                           isConnected
                                               ? Icons.sensors

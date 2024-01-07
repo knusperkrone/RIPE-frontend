@@ -27,10 +27,6 @@ class PlatformAssetImage implements ImageProvider {
       delegate.evict(cache: cache, configuration: configuration);
 
   @override
-  ImageStreamCompleter load(Object key, DecoderCallback decode) =>
-      delegate.load(key, decode);
-
-  @override
   ImageStreamCompleter loadBuffer(Object key, DecoderBufferCallback decode) =>
       loadBuffer(key, decode);
 

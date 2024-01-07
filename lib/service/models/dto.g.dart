@@ -30,12 +30,34 @@ AgentDto _$AgentDtoFromJson(Map<String, dynamic> json) => AgentDto(
       AgentRenderDto.fromJson(json['ui'] as Map<String, dynamic>),
     );
 
-BrokerDto _$BrokerDtoFromJson(Map<String, dynamic> json) => BrokerDto(
-      (json['hosts'] as List<dynamic>).map((e) => e as String).toList(),
+BrokerCredentialsDto _$BrokerCredentialsDtoFromJson(
+        Map<String, dynamic> json) =>
+    BrokerCredentialsDto(
+      json['username'] as String,
+      json['password'] as String,
+    );
+
+BrokerConnectionDetailsDto _$BrokerConnectionDetailsDtoFromJson(
+        Map<String, dynamic> json) =>
+    BrokerConnectionDetailsDto(
+      json['scheme'] as String,
+      json['host'] as String,
+      json['port'] as int,
+      json['credentials'] == null
+          ? null
+          : BrokerCredentialsDto.fromJson(
+              json['credentials'] as Map<String, dynamic>),
+    );
+
+BrokersDto _$BrokersDtoFromJson(Map<String, dynamic> json) => BrokersDto(
+      (json['items'] as List<dynamic>)
+          .map((e) =>
+              BrokerConnectionDetailsDto.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 SensorDto _$SensorDtoFromJson(Map<String, dynamic> json) => SensorDto(
-      BrokerDto.fromJson(json['broker'] as Map<String, dynamic>),
+      BrokersDto.fromJson(json['broker'] as Map<String, dynamic>),
       SensorDataDto.fromJson(json['data'] as Map<String, dynamic>),
       (json['agents'] as List<dynamic>)
           .map((e) => AgentDto.fromJson(e as Map<String, dynamic>))
