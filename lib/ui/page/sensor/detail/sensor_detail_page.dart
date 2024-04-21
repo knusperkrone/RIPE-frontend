@@ -11,7 +11,6 @@ import 'package:ripe/service/models/sensor.dart';
 import 'package:ripe/service/sensor_listener_service.dart';
 import 'package:ripe/ui/component/branded.dart';
 import 'package:ripe/ui/component/platform.dart';
-import 'package:ripe/ui/page/sensor/sensor_log_page.dart';
 import 'package:ripe/ui/page/sensor/sensor_overview_page.dart';
 import 'package:ripe/ui/page/util/mqtt_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
