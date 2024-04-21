@@ -111,111 +111,103 @@ class _SensorDetailPageState extends MqttState<SensorDetailPage> {
     return PopScope(
       canPop: true,
       onPopInvoked: (_) => _onBack(),
-      child: Container(
-        color: Theme.of(context).primaryColor,
-        child: SafeArea(
-          bottom: false,
-          child: Material(
-            child: RefreshIndicator(
-              onRefresh: _fetchData,
-              displacement: 10.0,
-              edgeOffset: 180.0,
-              color: Theme.of(context).colorScheme.secondary,
-              child: Container(
-                child: StreamBuilder(
-                    stream: _stateStream.stream,
-                    builder: (context, snapshot) {
-                      final host = (snapshot.data?.broker.items.isEmpty ?? true
-                          ? null
-                          : snapshot.requireData.broker.items.first.host);
+      child: Scaffold(
+        body: RefreshIndicator(
+          onRefresh: _fetchData,
+          displacement: 10.0,
+          edgeOffset: 180.0,
+          color: Theme.of(context).colorScheme.secondary,
+          child: Container(
+            child: StreamBuilder(
+                stream: _stateStream.stream,
+                builder: (context, snapshot) {
+                  final host = (snapshot.data?.broker.items.isEmpty ?? true
+                      ? null
+                      : snapshot.requireData.broker.items.first.host);
 
-                      return CustomScrollView(
-                        slivers: [
-                          SliverPersistentHeader(
-                            pinned: true,
-                            delegate: SensorAppBar(
-                              expandedHeight: 180.0,
-                              onBack: (_) => _onBack(),
-                              imageProvider:
-                                  PlatformAssetImage(widget.sensor.thumbPath),
-                              name: widget.sensor.name,
-                              textSize: 40.0,
-                            ),
-                          ),
-                          SliverToBoxAdapter(
-                            child: Container(
-                              child: Card(
-                                child: Column(children: [
-                                  ListTile(
-                                    title: Text(
-                                      widget.sensor.name,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium!
-                                          .copyWith(
-                                              fontWeight: FontWeight.bold),
-                                    ),
-                                    trailing: Tooltip(
-                                      message: host ?? 'Kein Broker verfügbar',
-                                      child: _MqttConnectionIcon(
-                                          sensor: widget.sensor,
-                                          brokers: snapshot.data?.broker),
-                                    ),
-                                  ),
-                                ]),
-                              ),
-                            ),
-                          ),
-                          if (snapshot.hasData)
-                            SliverList(
-                              delegate: SliverChildBuilderDelegate(
-                                (context, index) {
-                                  if (index == 0) {
-                                    return SensorDataCard(
-                                      widget.sensor,
-                                      snapshot.requireData.sensorData,
-                                    );
-                                  }
-                                  return new AgentDecorator(
-                                    info: widget.sensor,
-                                    agent:
-                                        snapshot.requireData.agents[index - 1],
-                                  );
-                                },
-                                childCount:
-                                    1 + snapshot.requireData.agents.length,
-                              ),
-                            )
-                          else if (snapshot.hasError)
-                            SliverFillRemaining(
-                              child: Center(
-                                child: Text(
-                                  'Sensor konnte nicht geladen werden',
+                  return CustomScrollView(
+                    slivers: [
+                      SliverPersistentHeader(
+                        pinned: true,
+                        delegate: SensorAppBar(
+                          expandedHeight: 180.0,
+                          topPadding: MediaQuery.of(context).viewPadding.top,
+                          onBack: (_) => _onBack(),
+                          imageProvider:
+                              PlatformAssetImage(widget.sensor.thumbPath),
+                          name: widget.sensor.name,
+                          textSize: 40.0,
+                        ),
+                      ),
+                      SliverToBoxAdapter(
+                        child: Container(
+                          child: Card(
+                            child: Column(children: [
+                              ListTile(
+                                title: Text(
+                                  widget.sensor.name,
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleMedium!
                                       .copyWith(fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                            ),
-                          if (snapshot.hasData)
-                            SliverToBoxAdapter(
-                              child: Container(
-                                height: max(
-                                  0,
-                                  MediaQuery.of(context).size.height -
-                                      kToolbarHeight -
-                                      (100 *
-                                          snapshot.requireData.sensorData
-                                              .fieldCount),
+                                trailing: Tooltip(
+                                  message: host ?? 'Kein Broker verfügbar',
+                                  child: _MqttConnectionIcon(
+                                      sensor: widget.sensor,
+                                      brokers: snapshot.data?.broker),
                                 ),
                               ),
+                            ]),
+                          ),
+                        ),
+                      ),
+                      if (snapshot.hasData)
+                        SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              if (index == 0) {
+                                return SensorDataCard(
+                                  widget.sensor,
+                                  snapshot.requireData.sensorData,
+                                );
+                              }
+                              return new AgentDecorator(
+                                info: widget.sensor,
+                                agent: snapshot.requireData.agents[index - 1],
+                              );
+                            },
+                            childCount: 1 + snapshot.requireData.agents.length,
+                          ),
+                        )
+                      else if (snapshot.hasError)
+                        SliverFillRemaining(
+                          child: Center(
+                            child: Text(
+                              'Sensor konnte nicht geladen werden',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(fontWeight: FontWeight.bold),
                             ),
-                        ],
-                      );
-                    }),
-              ),
-            ),
+                          ),
+                        ),
+                      if (snapshot.hasData)
+                        SliverToBoxAdapter(
+                          child: Container(
+                            height: max(
+                              0,
+                              MediaQuery.of(context).size.height -
+                                  kToolbarHeight -
+                                  (100 *
+                                      snapshot
+                                          .requireData.sensorData.fieldCount),
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                }),
           ),
         ),
       ),

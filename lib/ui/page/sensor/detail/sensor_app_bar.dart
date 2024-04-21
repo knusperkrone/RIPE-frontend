@@ -9,6 +9,7 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
   // static final _GRADIENT_TWEEN = Tween(begin: 0.0, end: 1.0);
 
   final double expandedHeight;
+  final double topPadding;
   final String name;
   final double textSize;
   final ImageProvider imageProvider;
@@ -16,6 +17,7 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
 
   SensorAppBar({
     required this.expandedHeight,
+    required this.topPadding,
     required this.onBack,
     required this.textSize,
     required this.name,
@@ -71,7 +73,8 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
           ],
         ),
         Padding(
-          padding: EdgeInsets.only(top: kToolbarHeight / 2 + shrinkOffset / 3),
+          padding: EdgeInsets.only(
+              top: kToolbarHeight / 2 + shrinkOffset / 3 + topPadding),
           child: Opacity(
             opacity: max(0.0, 1 - (shrinkOffset / expandedHeight) * 3),
             child: Column(
@@ -94,7 +97,7 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
           ),
         ),
         Positioned(
-          top: kToolbarHeight / 4,
+          top: kToolbarHeight / 4 + topPadding,
           left: 70.0,
           child: Container(
             width: qWidth,
@@ -103,13 +106,14 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
               child: Text(
                 name,
                 textAlign: TextAlign.start,
-                style: theme.textTheme.titleLarge!.copyWith(color: Colors.white),
+                style:
+                    theme.textTheme.titleLarge!.copyWith(color: Colors.white),
               ),
             ),
           ),
         ),
         Positioned(
-          top: 6.0,
+          top: 6.0 + topPadding,
           child: IconButton(
             icon: const Icon(Icons.arrow_back),
             color: Colors.white,
@@ -121,10 +125,10 @@ class SensorAppBar extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get maxExtent => expandedHeight;
+  double get maxExtent => expandedHeight + topPadding;
 
   @override
-  double get minExtent => kToolbarHeight;
+  double get minExtent => kToolbarHeight + topPadding;
 
   @override
   bool shouldRebuild(SliverPersistentHeaderDelegate oldDelegate) {
