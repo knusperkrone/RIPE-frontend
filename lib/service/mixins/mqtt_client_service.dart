@@ -84,7 +84,7 @@ abstract class MqttClientService {
         _contexts[broker] = ctx;
         if (!_isOfflineMode) {
           Future(() async {
-            Log.info('MQTT Connecting ${client.server}:${client.port}');
+            Log.debug('MQTT Connecting ${client.server}:${client.port}');
             try {
               await client.connect();
               Log.info('MQTT Connected ${client.server}:${client.port}');
