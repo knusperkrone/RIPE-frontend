@@ -29,6 +29,7 @@ Map<String, dynamic> _$NotificationConfigToJson(NotificationConfig instance) =>
     <String, dynamic>{
       'temperature': instance.temperature,
       'moisture': instance.moisture,
+      'battery': instance.battery,
     };
 
 RegisteredSensor _$RegisteredSensorFromJson(Map<String, dynamic> json) =>
