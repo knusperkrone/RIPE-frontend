@@ -13,6 +13,7 @@ MqttClient createMqttClient(
     return new MqttServerClient(broker.host, id)
       ..port = broker.port
       ..connectionMessage = connMess
+      ..autoReconnect = true
       ..logging(on: false)
       ..keepAlivePeriod = 20;
   }
@@ -20,6 +21,8 @@ MqttClient createMqttClient(
   return new MqttServerClient.withPort(wssServer, id, broker.port)
     ..useWebSocket = true
     ..connectionMessage = connMess
+    ..doAutoReconnect(force: true)
+    ..autoReconnect = true
     ..logging(on: false)
     ..keepAlivePeriod = 20;
 }

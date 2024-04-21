@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ripe/service/backend_service.dart';
 import 'package:ripe/ui/component/branded.dart';
+import 'package:ripe/ui/page/sensor/sensor_overview_page.dart';
 
 class AboutPage extends StatelessWidget {
+  static const String path = '/about';
+  static const String licensePath = '/about/license';
+
   final backendService = new BackendService();
   final scaffoldMsgKey = new GlobalKey<ScaffoldMessengerState>();
 
@@ -33,7 +38,9 @@ class AboutPage extends StatelessWidget {
                     alignment: Alignment.topLeft,
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed: () => GoRouter.of(context).push(
+                        SensorOverviewPage.path,
+                      ),
                     ),
                   ),
                   Container(

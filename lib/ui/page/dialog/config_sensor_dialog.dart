@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ripe/ui/component/validator.dart';
 import 'package:tuple/tuple.dart';
 
@@ -49,7 +50,7 @@ class _ConfigSensorDialogState extends State<ConfigSensorDialog> {
     if (_formKey.currentState!.validate()) {
       final ssid = _ssidController.value.text;
       final pwd = _pwdController.value.text;
-      Navigator.pop(context, Tuple2(ssid, pwd));
+      GoRouter.of(context).pop(Tuple2(ssid, pwd));
     }
   }
 
@@ -123,7 +124,7 @@ class _ConfigSensorDialogState extends State<ConfigSensorDialog> {
                         child: const Text('Abbrechen',
                             textAlign: TextAlign.center),
                       ),
-                      onTap: () => Navigator.pop(context),
+                      onTap: () => GoRouter.of(context).pop(),
                     ),
                   ),
                   Expanded(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class DeleteSensorDialog extends StatelessWidget {
   @override
@@ -31,7 +32,7 @@ class DeleteSensorDialog extends StatelessWidget {
                       child:
                           const Text('Abbrechen', textAlign: TextAlign.center),
                     ),
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => GoRouter.of(context).pop(false),
                   ),
                 ),
                 Expanded(
@@ -47,7 +48,7 @@ class DeleteSensorDialog extends StatelessWidget {
                       ),
                       child: const Text('Löschen', textAlign: TextAlign.center),
                     ),
-                    onTap: () => Navigator.pop(context, true),
+                    onTap: () => GoRouter.of(context).pop(true),
                   ),
                 ),
               ],

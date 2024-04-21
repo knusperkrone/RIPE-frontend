@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ripe/ui/component/validator.dart';
 
 class EditNameDialog extends StatefulWidget {
@@ -35,7 +36,7 @@ class _EditNameDialogState extends State<EditNameDialog> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    Navigator.pop(context, _textController.value.text);
+    GoRouter.of(context).pop(_textController.value.text);
   }
 
   /*
@@ -88,7 +89,7 @@ class _EditNameDialogState extends State<EditNameDialog> {
                       child:
                           const Text('Abbrechen', textAlign: TextAlign.center),
                     ),
-                    onTap: () => Navigator.pop(context),
+                    onTap: () => GoRouter.of(context).pop(),
                   ),
                 ),
                 Expanded(

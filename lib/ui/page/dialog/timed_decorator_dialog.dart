@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../component/colors.dart';
 
@@ -108,7 +109,7 @@ class _TimePaneDecoratorState extends State<TimePaneDecoratorDialog> {
                             .withRed(ERROR_COLOR.red + 15),
                       ),
                       backgroundColor: MaterialStateProperty.all(ERROR_COLOR)),
-                  onPressed: () => Navigator.of(context)
+                  onPressed: () => GoRouter.of(context)
                       .pop(TimePaneDecoratorDialogResult(false, forceSeconds)),
                 ),
                 const Padding(padding: EdgeInsets.all(5)),
@@ -118,7 +119,7 @@ class _TimePaneDecoratorState extends State<TimePaneDecoratorDialog> {
                       foregroundColor: MaterialStateProperty.all(Colors.white),
                       backgroundColor:
                           MaterialStateProperty.all(PRIMARY_COLOR)),
-                  onPressed: () => Navigator.of(context)
+                  onPressed: () => GoRouter.of(context)
                       .pop(TimePaneDecoratorDialogResult(true, forceSeconds)),
                 ),
               ],

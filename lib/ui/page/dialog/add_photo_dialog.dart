@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:palette_generator/palette_generator.dart';
@@ -58,11 +59,7 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
   }
 
   void _onSubmit() {
-    if (_imagePath.path == widget.imagePath) {
-      Navigator.pop(context, null);
-    } else {
-      Navigator.pop(context, _imagePath);
-    }
+    GoRouter.of(context).pop(_imagePath);
   }
 
   /*
@@ -76,11 +73,11 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
           borderRadius: BorderRadius.all(Radius.circular(12.0))),
       contentPadding: const EdgeInsets.only(top: 10.0),
       content: Container(
-        height: 364,
+        height: 370,
         child: Column(
           children: [
             Text(
-              'Pflanzenbild hinzufügen',
+              'Bild hinzufügen',
               maxLines: 1,
               style: Theme.of(context).textTheme.titleLarge,
             ),

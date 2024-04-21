@@ -14,7 +14,7 @@ enum AgentState {
   ERROR,
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class SensorDataDto {
   final DateTime timestamp;
   final double? battery;
@@ -63,6 +63,31 @@ class SensorDataDto {
         light == null;
   }
 
+  Map<String, dynamic> toJson() => _$SensorDataDtoToJson(this);
+
+  int get fieldCount {
+    int count = 0;
+    if (battery != null) {
+      count++;
+    }
+    if (moisture != null) {
+      count++;
+    }
+    if (temperature != null) {
+      count++;
+    }
+    if (carbon != null) {
+      count++;
+    }
+    if (conductivity != null) {
+      count++;
+    }
+    if (light != null) {
+      count++;
+    }
+    return count;
+  }
+
   @override
   int get hashCode {
     return timestamp.hashCode *
@@ -83,7 +108,7 @@ class SensorDataDto {
   }
 }
 
-@JsonSerializable(createToJson: false, createFactory: false)
+@JsonSerializable(createFactory: false)
 class AgentDecoratorDto {
   final Map<String, dynamic> payload;
 
@@ -91,6 +116,8 @@ class AgentDecoratorDto {
 
   factory AgentDecoratorDto.fromJson(Map<String, dynamic> json) =>
       new AgentDecoratorDto(json);
+
+  Map<String, dynamic> toJson() => payload;
 
   @override
   int get hashCode {
@@ -116,33 +143,41 @@ class AgentStateDto {
   late AgentState _state;
   DateTime? _time;
 
-  AgentStateDto(dynamic json) {
-    if (json is String) {
-      if (json == 'Disabled') {
+  AgentStateDto(dynamic value) {
+    if (value is String) {
+      final key = value.toLowerCase();
+      if (key == 'disabled') {
         _state = AgentState.DISABLED;
-      } else if (json == 'Ready') {
+      } else if (key == 'ready') {
         _state = AgentState.READY;
-      } else if (json == 'Error') {
+      } else if (key == 'error') {
         _state = AgentState.ERROR;
       } else {
-        throw StateError('Invalid json value: $json');
+        throw StateError('Invalid json value: $value');
       }
-    } else if (json is Map<String, dynamic>) {
-      final key = json.keys.first;
-      if (key == 'Executing') {
+    } else if (value is Map<String, dynamic>) {
+      final key = value.keys.first.toLowerCase();
+      if (key == 'executing') {
         _state = AgentState.EXECUTING;
-      } else if (key == 'Stopped') {
+      } else if (key == 'stopped') {
         _state = AgentState.STOPPED;
-      } else if (key == 'Forced') {
+      } else if (key == 'forced') {
         _state = AgentState.FORCED;
       } else {
-        throw StateError('Invalid json value: $json');
+        throw StateError('Invalid json value: $value');
       }
-      _time = DateTime.parse(json.values.first as String);
+      _time = DateTime.tryParse(value.values.first as String);
     }
   }
 
-  factory AgentStateDto.fromJson(dynamic json) => new AgentStateDto(json);
+  static AgentStateDto fromJson(dynamic json) => new AgentStateDto(json);
+
+  static dynamic toJson(AgentStateDto self) {
+    if (self._time == null) {
+    return self._state.name.toString();
+    }
+    return {self._state.name.toString(): self._time?.toString()};
+  }
 
   bool get isReady => _state == AgentState.READY;
 
@@ -174,16 +209,23 @@ class AgentStateDto {
   }
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class AgentRenderDto {
   final AgentDecoratorDto decorator;
+  @JsonKey(fromJson: AgentStateDto.fromJson, toJson: AgentStateDto.toJson)
   final AgentStateDto state;
   final String rendered;
 
-  AgentRenderDto(this.decorator, this.state, this.rendered);
+  AgentRenderDto({
+    required this.decorator,
+    required this.rendered,
+    required this.state,
+  });
 
   factory AgentRenderDto.fromJson(Map<String, dynamic> json) =>
       _$AgentRenderDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AgentRenderDtoToJson(this);
 
   @override
   int get hashCode {
@@ -199,7 +241,7 @@ class AgentRenderDto {
   }
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class AgentDto {
   final String domain;
   @JsonKey(name: 'agent_name')
@@ -210,6 +252,8 @@ class AgentDto {
 
   factory AgentDto.fromJson(Map<String, dynamic> json) =>
       _$AgentDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AgentDtoToJson(this);
 
   @override
   int get hashCode {
@@ -225,7 +269,7 @@ class AgentDto {
   }
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class BrokerCredentialsDto {
   final String username;
   final String password;
@@ -234,19 +278,24 @@ class BrokerCredentialsDto {
 
   factory BrokerCredentialsDto.fromJson(Map<String, dynamic> json) =>
       _$BrokerCredentialsDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BrokerCredentialsDtoToJson(this);
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class BrokerConnectionDetailsDto {
   final String scheme;
   final String host;
   final int port;
   final BrokerCredentialsDto? credentials;
 
-  BrokerConnectionDetailsDto(this.scheme, this.host, this.port, this.credentials);
+  BrokerConnectionDetailsDto(
+      this.scheme, this.host, this.port, this.credentials);
 
   factory BrokerConnectionDetailsDto.fromJson(Map<String, dynamic> json) =>
       _$BrokerConnectionDetailsDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BrokerConnectionDetailsDtoToJson(this);
 
   @override
   int get hashCode {
@@ -262,7 +311,7 @@ class BrokerConnectionDetailsDto {
   }
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class BrokersDto {
   @JsonKey()
   final List<BrokerConnectionDetailsDto> items;
@@ -271,6 +320,8 @@ class BrokersDto {
 
   factory BrokersDto.fromJson(Map<String, dynamic> json) =>
       _$BrokersDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BrokersDtoToJson(this);
 
   @override
   int get hashCode {
@@ -286,7 +337,7 @@ class BrokersDto {
   }
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable()
 class SensorDto {
   @JsonKey(required: false)
   final BrokersDto broker;
@@ -298,6 +349,8 @@ class SensorDto {
 
   factory SensorDto.fromJson(Map<String, dynamic> json) =>
       _$SensorDtoFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SensorDtoToJson(this);
 
   @override
   int get hashCode {

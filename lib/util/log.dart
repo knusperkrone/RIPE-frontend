@@ -1,4 +1,3 @@
-
 import 'package:flutter/foundation.dart';
 
 class _CallerTrace {
@@ -7,27 +6,34 @@ class _CallerTrace {
   late int lineNumber;
 
   _CallerTrace(this._trace) {
+    fileName = 'unknown';
+    lineNumber = 0;
     try {
       // Get caller line
-      final traceString = _trace.toString().split('\n')[1];
+      String traceString = _trace.toString().split('\n')[1];
 
       // Search the 'file_name.dart:5:12' with regex
       final indexOfFileName = traceString.indexOf(RegExp(r'[A-Za-z_]+.dart'));
-      final fileInfo =
-          traceString.substring(indexOfFileName).replaceAll(' ', ':');
-      final tokens = fileInfo.split(':');
-
-      // Split (main.dart:5:12) into name and line number
-
-      fileName = tokens[0];
-      if (tokens[1].endsWith(')')) {
-        tokens[1] = tokens[1].substring(0, tokens[1].length - 1);
+      if (indexOfFileName == -1) {
+        traceString = _trace.toString().split('\n')[2];
+        final indexOfFileName = traceString.indexOf(RegExp(r'[A-Za-z_]+.dart'));
+        if (indexOfFileName == -1) {
+          fileName = 'unknown';
+          lineNumber = 0;
+          return;
+        }
       }
+
+      String fileInfo =
+          traceString.substring(indexOfFileName).replaceAll(' ', ':');
+      if (fileInfo.endsWith(')')) {
+        fileInfo = fileInfo.substring(0, fileInfo.length - 1);
+      }
+
+      final tokens = fileInfo.split(':');
+      fileName = tokens[0];
       lineNumber = int.parse(tokens[1]);
     } catch (e) {
-      fileName = 'failed';
-      lineNumber = 0;
-
       print('Failed creating trace $e');
     }
   }
@@ -45,7 +51,7 @@ enum LogLevel {
 
 // ignore: avoid_classes_with_only_static_members
 class Log {
-  static LogLevel level = kReleaseMode ? LogLevel.DEBUG : LogLevel.INFO;
+  static LogLevel level = kReleaseMode ? LogLevel.INFO : LogLevel.DEBUG;
 
   static void debug(String msg) {
     if (level.index > LogLevel.DEBUG.index) {

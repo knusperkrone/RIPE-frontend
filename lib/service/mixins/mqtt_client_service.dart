@@ -1,5 +1,4 @@
-import 'dart:collection';
-import 'dart:convert' show utf8;
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -9,135 +8,101 @@ import 'package:ripe/service/mixins/mqtt_platform_adapter_stub.dart'
     if (dart.library.html) 'package:ripe/service/mixins/mqtt_platform_adapter_web.dart';
 import 'package:ripe/service/models/dto.dart';
 import 'package:ripe/util/log.dart';
-import 'package:typed_data/typed_buffers.dart';
 
 typedef MqttReceiveFunc = void Function(String);
+typedef MqttConnectionFunc = void Function(MqttConnectionState);
 
 class _MqttContext {
   final MqttClient client;
-  final Map<String, Set<MqttReceiveFunc>> messageCallbacks = new HashMap();
-  final Set<VoidCallback> connectedCallbacks = {};
-  final Set<VoidCallback> disconnectedCallbacks = {};
+  final connectionController =
+      new StreamController<MqttConnectionState>.broadcast();
+  final messages = <String, StreamController<String>>{};
+  final _subscriptionQueue = [];
 
-  _MqttContext(this.client);
-
-  void addMessageCallback(String topic, MqttReceiveFunc callback) {
-    messageCallbacks[topic] ??= {};
-    messageCallbacks[topic]!.add(callback);
-    client.subscribe(topic, MqttQos.atLeastOnce);
+  _MqttContext(this.client) : assert(client.onConnected == null) {
+    client.onAutoReconnected = () => _broadcastMqttConnectionStatus();
+    client.onDisconnected = () => _broadcastMqttConnectionStatus();
+    client.onConnected = () {
+      client.updates!.listen((msg) => _broadcastMqttMessage(msg));
+      _broadcastMqttConnectionStatus();
+      _subscriptionQueue.forEach((topic) {
+        Log.debug('Subscribing to $topic');
+        client.subscribe(topic, MqttQos.atLeastOnce);
+      });
+      _subscriptionQueue.clear();
+    };
   }
 
-  void removeMessageCallback(String topic) {
-    messageCallbacks[topic]?.clear();
-    client.unsubscribe(topic);
+  void _broadcastMqttConnectionStatus() {
+    connectionController.add(
+        client.connectionStatus?.state ?? MqttConnectionState.disconnected);
   }
 
-  void addConnectedCallback(VoidCallback callback) {
-    connectedCallbacks.add(callback);
-  }
-
-  void addDisconnectedCallback(VoidCallback callback) {
-    disconnectedCallbacks.add(callback);
-  }
-
-  void removeConnectedCallback(VoidCallback callback) {
-    connectedCallbacks.remove(callback);
-  }
-
-  void removeDisconnectedCallback(VoidCallback callback) {
-    disconnectedCallbacks.remove(callback);
-  }
-
-  void reconnect() {
-    for (final sub in messageCallbacks.entries) {
-      client.subscribe(sub.key, MqttQos.atLeastOnce);
-    }
-  }
-
-  void publish(String topic, String msg) {
-    final bytes = utf8.encode(msg);
-    final data = new Uint8Buffer(bytes.length);
-    for (int i = 0; i < bytes.length; i++) {
-      data[i] = bytes[i];
-    }
-    client.publishMessage(topic, MqttQos.atLeastOnce, data);
-  }
-
-  bool get isConnected =>
-      client.connectionStatus?.state == MqttConnectionState.connected;
-}
-
-abstract class MqttClientService {
-  static final Map<BrokersDto, _MqttContext> _contexts =
-      {}; // < BrokerUrl, Ctx>
-  static bool _isOfflineMode = false;
-
-  @protected
-  Future<bool> listenFromBroker(BrokersDto broker, VoidCallback onConnect,
-      VoidCallback onDisconnect) async {
-    _MqttContext? ctx = _contexts[broker];
-    if (ctx == null || !ctx.isConnected) {
-      try {
-        final client = await _initMqttClient(broker);
-        if (client == null) {
-          return false;
-        }
-
-        ctx = new _MqttContext(client);
-        _contexts[broker] = ctx;
-        client.updates!.listen((msg) => _dispatchMqttMessage(ctx!, msg));
-        client.onConnected = () => _dispatchMqttConnect(ctx!);
-        client.onDisconnected = () => _dispatchMqttDisconnect(ctx!);
-      } catch (e) {
-        Log.error('Failed connecting MQTT $e');
-        return false;
-      }
-    }
-
-    ctx.addConnectedCallback(onConnect);
-    ctx.addDisconnectedCallback(onDisconnect);
-    if (!_isOfflineMode) {
-      onConnect();
-    }
-
-    return true;
-  }
-
-  @protected
-  void unlistenFromBroker(
-      BrokersDto broker, VoidCallback onConnect, VoidCallback onDisconnect) {
-    _contexts[broker]?.removeConnectedCallback(onConnect);
-    _contexts[broker]?.removeDisconnectedCallback(onConnect);
-  }
-
-  static void _dispatchMqttConnect(_MqttContext ctx) {
-    ctx.connectedCallbacks.forEach((callback) => callback());
-  }
-
-  static void _dispatchMqttDisconnect(_MqttContext ctx) {
-    ctx.disconnectedCallbacks.forEach((callback) => callback());
-  }
-
-  static void _dispatchMqttMessage(
-      _MqttContext ctx, List<MqttReceivedMessage<MqttMessage>> msgBuffer) {
+  void _broadcastMqttMessage(List<MqttReceivedMessage<MqttMessage>> msgBuffer) {
     for (final msg in msgBuffer) {
       final topic = msg.topic;
       final casted = (msg.payload as MqttPublishMessage).payload;
       final payload = MqttPublishPayload.bytesToStringAsString(casted.message);
+      Log.debug('Received from $topic');
 
-      final observers = ctx.messageCallbacks[topic];
-      if (observers == null) {
-        Log.error('No observers for $topic with $payload');
-      } else {
-        Log.debug('MQTT message for $topic');
-        for (final observer in observers) {
-          observer(payload);
-        }
-      }
+      messages[topic]!.add(payload);
     }
   }
 
-  static Future<MqttClient?> _initMqttClient(BrokersDto broker) async {
+  Stream<String> getMessageStream(String topic) {
+    messages[topic] ??= new StreamController<String>.broadcast();
+    if (isConnected) {
+      Log.debug('Subscribing to $topic');
+      client.subscribe(topic, MqttQos.atLeastOnce);
+    } else {
+      _subscriptionQueue.add(topic);
+    }
+    return messages[topic]!.stream;
+  }
+
+  bool get isConnected => connectionState == MqttConnectionState.connected;
+
+  MqttConnectionState get connectionState =>
+      client.connectionStatus?.state ?? MqttConnectionState.disconnected;
+}
+
+abstract class MqttClientService {
+  static final Map<BrokersDto, _MqttContext> _contexts = {};
+  static bool _isOfflineMode = false;
+
+  @protected
+  _MqttContext? connectToBroker(BrokersDto broker) {
+    _MqttContext? ctx = _contexts[broker];
+    if (ctx == null || !ctx.isConnected) {
+      try {
+        final client = _createMqttClient(broker);
+        if (client == null) {
+          return null;
+        }
+
+        ctx = new _MqttContext(client);
+        _contexts[broker] = ctx;
+        if (!_isOfflineMode) {
+          Future(() async {
+            Log.info('MQTT Connecting ${client.server}:${client.port}');
+            try {
+              await client.connect();
+              Log.info('MQTT Connected ${client.server}:${client.port}');
+            } catch (e) {
+              Log.error('Failed connect() MQTT $e');
+            }
+          });
+        }
+      } catch (e, stacktrace) {
+        Log.error('Failed connecting MQTT $e $stacktrace');
+        return null;
+      }
+    }
+
+    return ctx;
+  }
+
+  static MqttClient? _createMqttClient(BrokersDto broker) {
     final id = _generateUUID();
     MqttClient? client;
 
@@ -152,14 +117,9 @@ abstract class MqttClientService {
           );
 
       client = createMqttClient(broker, id, connMess);
-      assert(client.autoReconnect == false);
+      assert(client.autoReconnect == true);
     }
 
-    if (!_isOfflineMode && client != null) {
-      Log.info('MQTT Connecting ${client.server}:${client.port}');
-      await client.connect();
-      Log.info('MQTT Connected ${client.server}:${client.port}');
-    }
     return client;
   }
 
@@ -185,27 +145,8 @@ abstract class MqttClientService {
   }
 
   @protected
-  void subscribe(BrokersDto broker, String topic, MqttReceiveFunc recFunc) {
-    if (!_isOfflineMode) {
-      Log.debug('Subscribed: $topic for broker ${broker.hashCode}');
-
-      _contexts[broker]?.addMessageCallback(topic, recFunc);
-    }
-  }
-
-  @protected
-  void unsubscribe(BrokersDto broker, String topic) {
-    if (!_isOfflineMode) {
-      Log.debug('Unsubscribed: $topic for broker ${broker.hashCode}');
-      _contexts[broker]?.removeMessageCallback(topic);
-    }
-  }
-
-  @protected
-  void publish(BrokersDto broker, String topic, String data) {
-    if (!_isOfflineMode) {
-      Log.debug('Publish for broker ${broker.hashCode}');
-      _contexts[broker]?.publish(topic, data);
-    }
+  Stream<String>? subscribe(BrokersDto broker, String topic) {
+    Log.debug('Subscribed: $topic for broker ${broker.hashCode}');
+    return _contexts[broker]?.getMessageStream(topic);
   }
 }

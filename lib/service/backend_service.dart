@@ -1,33 +1,36 @@
 import 'dart:collection';
 import 'dart:convert';
 
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
-import 'package:ripe/service/base_pref_service.dart';
+import 'package:flutter_native_timezone_updated_gradle/flutter_native_timezone.dart';
+import 'package:ripe/constants.dart';
 import 'package:ripe/service/mixins/http_client_mixin.dart';
+import 'package:ripe/service/models/sensor.dart';
+import 'package:ripe/service/settings/base_pref_service.dart';
 import 'package:ripe/util/log.dart';
 import 'package:tuple/tuple.dart';
 
 import 'models/dto.dart';
 
 class BackendService extends BasePrefService with DartHttpClientMixin {
-  Future<SensorDto?> getSensorStatus(int id, String key) async {
+  Future<SensorDto> getSensorStatus(RegisteredSensor sensor) async {
     final currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
     try {
-      final resp = await doGet(baseUrl, '/api/sensor/$id', {
+      final resp = await doGet(baseUrl, '/api/sensor/${sensor.id}', {
         'X-TZ': currentTimeZone,
-        'X-KEY': key,
+        'X-KEY': sensor.key,
       });
-      final json = jsonDecode(resp) as Map<String, dynamic>;
+      final json =
+          jsonDecode(utf8.decode(resp.codeUnits)) as Map<String, dynamic>;
 
-      Log.debug('Fetched sensor status for $id');
+      Log.debug('Fetched sensor status for ${sensor.id}');
       return SensorDto.fromJson(json);
     } catch (e) {
       Log.error('FetchSensorData - $e');
-      return null;
+      rethrow;
     }
   }
 
-  Future<bool> sendAgentCmd({
+  Future<void> sendAgentCmd({
     required int id,
     required String key,
     required String domain,
@@ -45,10 +48,9 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
       );
 
       Log.debug('Send command to sensor $id, $payload');
-      return true;
     } catch (e) {
       Log.error('sendAgentCmd - $e');
-      return false;
+      rethrow;
     }
   }
 
@@ -108,18 +110,17 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
     }
   }
 
-  Future<Map<String, Tuple2<String, Map<String, dynamic>>>?> getAgentConfig({
-    required int id,
-    required String key,
-    required String domain,
-  }) async {
+  Future<Map<String, Tuple2<String, Map<String, dynamic>>>?> getAgentConfig(
+      RegisteredSensor sensor, String domain) async {
     final currentTimeZone = await FlutterNativeTimezone.getLocalTimezone();
     try {
-      final resp = await doGet(baseUrl,
-          '/api/agent/$id/${base64.encode(utf8.encode(domain))}/config', {
-        'X-TZ': currentTimeZone,
-        'X-KEY': key,
-      });
+      final resp = await doGet(
+          baseUrl,
+          '/api/agent/${sensor.id}/${base64.encode(utf8.encode(domain))}/config',
+          {
+            'X-TZ': currentTimeZone,
+            'X-KEY': sensor.key,
+          });
 
       final json = jsonDecode(resp) as Map<String, dynamic>;
       final Map<String, List<dynamic>> casted = json.cast();
@@ -129,7 +130,7 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
       final Map<String, Tuple2<String, Map<String, dynamic>>> sorted =
           SplayTreeMap.from(transformed, (a, b) => a.compareTo(b));
 
-      Log.debug('Fetched agent config $id $domain');
+      Log.debug('Fetched agent config ${sensor.id} $domain');
       return sorted;
     } catch (e) {
       Log.error('getAgentConfig - $e');
@@ -137,9 +138,8 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
     }
   }
 
-  Future<bool> setAgentConfig({
-    required int id,
-    required String key,
+  Future<void> setAgentConfig({
+    required RegisteredSensor sensor,
     required String domain,
     required Map<String, dynamic> settings,
   }) async {
@@ -147,20 +147,19 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
     try {
       await doPost(
         baseUrl,
-        '/api/agent/$id/${base64.encode(utf8.encode(domain))}/config',
+        '/api/agent/${sensor.id}/${base64.encode(utf8.encode(domain))}/config',
         {
           'Content-Type': 'application/json',
           'X-TZ': currentTimeZone,
-          'X-KEY': key,
+          'X-KEY': sensor.key,
         },
         jsonEncode(settings),
       );
 
-      Log.debug('Set agent config $id $domain');
-      return true;
+      Log.debug('Set agent config ${sensor.id} $domain');
     } catch (e) {
       Log.error('setAgentConfig - $e');
-      return false;
+      rethrow;
     }
   }
 
@@ -180,10 +179,10 @@ class BackendService extends BasePrefService with DartHttpClientMixin {
    */
 
   set baseUrl(String url) {
-    prefs.setString('BASE_URL_V1', url);
+    prefs.setString(BASE_URL_KEY, url);
   }
 
   String get baseUrl {
-    return prefs.getString('BASE_URL_V1') ?? 'https://ripe.knukro.com';
+    return prefs.getString(BASE_URL_KEY) ?? DEFAULT_BASE_URL;
   }
 }

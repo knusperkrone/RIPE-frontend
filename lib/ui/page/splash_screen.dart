@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ripe/service/backend_service.dart';
-import 'package:ripe/service/sensor_setting_service.dart';
-import 'package:ripe/ui/component/branded.dart';
-import 'package:ripe/ui/page/detail/sensor_detail_page.dart';
-import 'package:ripe/ui/page/sensor_overview_page.dart';
-import 'package:ripe/ui/page/sensor_register_page.dart';
+import 'package:ripe/service/background.dart';
+import 'package:ripe/service/sensor_service.dart';
+import 'package:ripe/ui/page/sensor/sensor_overview_page.dart';
 
 class SplashScreen extends StatefulWidget {
-  final ImageProvider logo;
+  final String initialPath;
 
-  const SplashScreen(this.logo);
+  const SplashScreen(this.initialPath);
 
   @override
   State createState() => new _SplashScreenState();
@@ -17,9 +16,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   final _backendService = new BackendService();
-  final _sensorService = SensorSettingService.getInstance();
-  late Future<void> _delayFut;
-  bool isDirty = false;
+  final _sensorService = SensorService.getInstance();
 
   /*
    * Constructor/Destructor
@@ -28,8 +25,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _delayFut = new Future.delayed(const Duration(milliseconds: 750), () {});
     Future.wait([
+      initBackgroundTasks(),
       _sensorService.init(),
       _backendService.init(),
     ]).then((_) => _onConnect());
@@ -40,71 +37,20 @@ class _SplashScreenState extends State<SplashScreen> {
    */
 
   Future<void> _onConnect() async {
-    final sensorsList = _sensorService.getSensors();
-    if (sensorsList.isEmpty) {
-      // No sensor - register!
-      await _delayFut;
-      Navigator.pushReplacement<void, void>(
-          context, MaterialPageRoute(builder: (_) => SensorRegisterPage()));
-    } else if (!isDirty && sensorsList.length == 1) {
-      final first = sensorsList.first;
-      final data = await BackendService().getSensorStatus(first.id, first.key);
-      if (data != null) {
-        await _delayFut;
-        return Navigator.pushReplacement<void, void>(context,
-            MaterialPageRoute(builder: (_) => SensorDetailPage(first, data)));
-      } else {
-        isDirty = true;
-        return _notifyFetchError();
-      }
+    if (widget.initialPath == '/') {
+      GoRouter.of(context).go(SensorOverviewPage.path);
     } else {
-      await _delayFut;
-      return Navigator.pushReplacement<void, void>(
-          context, MaterialPageRoute(builder: (_) => SensorOverviewPage()));
+      GoRouter.of(context).go(widget.initialPath);
     }
   }
 
-  void _notifyFetchError() {
-    isDirty = true;
-    final snackbar = RipeSnackbar(
-      context,
-      label: 'Sensor-Daten konnten nicht abgerufen werden',
-      duration: const Duration(days: 1),
-      action: SnackBarAction(
-        label: 'Erneut versuchen',
-        onPressed: () {
-          _onConnect();
-        },
-      ),
-    );
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(snackbar);
-  }
-
-/*
+  /*
    * Build
    */
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [theme.canvasColor, theme.colorScheme.secondary],
-          ),
-        ),
-        child: Center(
-          child: Image(
-            image: widget.logo,
-            height: 200.0,
-            width: 200.0,
-          ),
-        ),
-      ),
-    );
+    //final theme = Theme.of(context);
+    return Container();
   }
 }

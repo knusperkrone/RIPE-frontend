@@ -13,7 +13,8 @@ MqttClient createMqttClient(
   final client = MqttBrowserClient.withPort(wssServer, id, broker.port)
     ..connectionMessage = connMess
     ..logging(on: false)
-    ..doAutoReconnect(force: false)
+    //..autoReconnect = true
+    ..doAutoReconnect(force: true)
     ..keepAlivePeriod = 20;
 
 
