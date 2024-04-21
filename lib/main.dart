@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ripe/service/background.dart';
 import 'package:ripe/ui/page/sensor/sensor_notification_page.dart';
 
 import 'service/sensor_service.dart';
@@ -18,6 +17,15 @@ import 'ui/page/sensor/register/sensor_register_page.dart';
 import 'ui/page/sensor/sensor_log_page.dart';
 import 'ui/page/sensor/sensor_overview_page.dart';
 import 'ui/page/splash_screen.dart';
+
+String? _checkSensorExistsRouter(BuildContext context, GoRouterState state) {
+  final sensorId = state.pathParameters['id'] ?? '';
+  final sensor = SensorService.getInstance().getById(sensorId);
+  if (sensor == null) {
+    return SensorOverviewPage.path;
+  }
+  return null;
+}
 
 void main() {
   int navigationCount = 0;
@@ -52,9 +60,9 @@ void main() {
           builder: (context, state) => const Text('Login'),
         ),
         GoRoute(
-          path: SensorOverviewPage.path,
-          builder: (context, state) => SensorOverviewPage(),
-        ),
+            path: SensorOverviewPage.path,
+            redirect: _checkSensorExistsRouter,
+            builder: (context, state) => SensorOverviewPage()),
         GoRoute(
           path: SensorRegisterPage.path,
           builder: (context, state) => SensorRegisterPage(),
@@ -64,60 +72,44 @@ void main() {
             builder: (context, state) => RegisteredSensorConfigPage()),
         GoRoute(
             path: SensorDetailPage.path,
+            redirect: _checkSensorExistsRouter,
             builder: (context, state) {
               final sensorId = state.pathParameters['id'] ?? '';
-              final sensor = SensorService.getInstance().getById(sensorId);
-              if (sensor == null) {
-                GoRouter.of(context).go(SensorOverviewPage.path);
-                return Container();
-              }
+              final sensor = SensorService.getInstance().getById(sensorId)!;
               return SensorDetailPage(sensor);
             }),
         GoRoute(
             path: SensorNotificationPage.path,
+            redirect: _checkSensorExistsRouter,
             builder: (context, state) {
               final sensorId = state.pathParameters['id'] ?? '';
-              final sensor = SensorService.getInstance().getById(sensorId);
-              if (sensor == null) {
-                GoRouter.of(context).go(SensorOverviewPage.path);
-                return Container();
-              }
-              checkSensor(sensor);
+              final sensor = SensorService.getInstance().getById(sensorId)!;
               return SensorNotificationPage(sensor);
             }),
         GoRoute(
             path: AgentConfigPage.path,
+            redirect: _checkSensorExistsRouter,
             builder: (context, state) {
               final sensorId = state.pathParameters['id'] ?? '';
-              final sensor = SensorService.getInstance().getById(sensorId);
-              if (sensor == null) {
-                GoRouter.of(context).go(SensorOverviewPage.path);
-                return Container();
-              }
+              final sensor = SensorService.getInstance().getById(sensorId)!;
               final domain = state.pathParameters['domain'] ?? '';
               return AgentConfigPage(sensor, domain);
             }),
         GoRoute(
             path: SensorLogPage.path,
+            redirect: _checkSensorExistsRouter,
             builder: (context, state) {
               final sensorId = state.pathParameters['id'] ?? '';
-              final sensor = SensorService.getInstance().getById(sensorId);
-              if (sensor == null) {
-                GoRouter.of(context).go(SensorOverviewPage.path);
-                return Container();
-              }
+              final sensor = SensorService.getInstance().getById(sensorId)!;
               return SensorLogPage(sensor);
             }),
         GoRoute(
             path: SensorChartPage.path,
+            redirect: _checkSensorExistsRouter,
             builder: (context, state) {
               final sensorId = state.pathParameters['id'] ?? '';
               final selectedStr = state.uri.queryParameters['selected'] ?? '';
-              final sensor = SensorService.getInstance().getById(sensorId);
-              if (sensor == null) {
-                GoRouter.of(context).go(SensorOverviewPage.path);
-                return Container();
-              }
+              final sensor = SensorService.getInstance().getById(sensorId)!;
               return SensorChartPage(
                 sensor,
                 int.tryParse(selectedStr) ?? 0,
