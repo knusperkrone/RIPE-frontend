@@ -61,7 +61,15 @@ void main() {
         ),
         GoRoute(
             path: SensorOverviewPage.path,
-            redirect: _checkSensorExistsRouter,
+            redirect: (context, state) {
+              final sensors = SensorService.getInstance().getSensors();
+              if (sensors.isEmpty) {
+                return SensorRegisterPage.path;
+              } else if (sensors.length == 1 && navigationCount == 2) {
+                return SensorDetailPage.route(sensors.first);
+              }
+              return null;
+            },
             builder: (context, state) => SensorOverviewPage()),
         GoRoute(
           path: SensorRegisterPage.path,

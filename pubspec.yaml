@@ -27,6 +27,7 @@ dependencies:
     git:
       url: git@github.com:knusperkrone/mrx-flutter-charts.git
       ref: memory_leaks
+  mutex: ^3.1.0
   palette_generator: ^0.3.2+3
   path_provider: ^2.1.3
   scidart: ^0.0.2-dev.12

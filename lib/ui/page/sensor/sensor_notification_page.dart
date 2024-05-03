@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:intl/intl.dart';
 import 'package:ripe/service/background.dart';
 import 'package:ripe/service/models/sensor.dart';
 import 'package:ripe/service/sensor_service.dart';
@@ -129,13 +130,28 @@ class _SensorNotificationPageState extends State<SensorNotificationPage> {
               ),
               ListTile(
                 title: OutlinedButton(
-                    onPressed: () {
-                      final sensor = widget.sensor.copyWith(
-                        notificationConfig: Nullable(config),
-                      );
-                      checkSensor(sensor);
-                    },
-                    child: const Text('Benachrichtigungen Testen')),
+                  onPressed: () {
+                    final sensor = widget.sensor.copyWith(
+                      notificationConfig: Nullable(config),
+                    );
+                    checkSensor(sensor);
+                  },
+                  child: const Text('Benachrichtigungen Testen'),
+                ),
+                subtitle: FutureBuilder(
+                  future: getLastCheck(widget.sensor),
+                  builder: (
+                    context,
+                    AsyncSnapshot<DateTime?> snapshot,
+                  ) {
+                    if (snapshot.data != null) {
+                      final hr =
+                          DateFormat('dd.MM.yyyy HH:mm').format(snapshot.data!);
+                      return Text('Letzter check: $hr');
+                    }
+                    return const Text('Keine Benachrichtigung gesendet');
+                  },
+                ),
               )
             ]
           ],

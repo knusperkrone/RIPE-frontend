@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:mqtt_client/mqtt_client.dart';
+import 'package:mutex/mutex.dart';
 import 'package:ripe/service/mixins/mqtt_platform_adapter_stub.dart'
     if (dart.library.io) 'package:ripe/service/mixins/mqtt_platform_adapter_mobile.dart'
     if (dart.library.html) 'package:ripe/service/mixins/mqtt_platform_adapter_web.dart';
@@ -68,41 +69,49 @@ class _MqttContext {
 
 abstract class MqttClientService {
   static final Map<BrokersDto, _MqttContext> _contexts = {};
+  static final Mutex _mutex = new Mutex();
   static bool _isOfflineMode = false;
 
   @protected
   _MqttContext? connectToBroker(BrokersDto broker) {
-    _MqttContext? ctx = _contexts[broker];
-    if (ctx == null || !ctx.isConnected) {
+    _mutex.acquire();
+    try {
+      return _doConnectToBroker(broker);
+    } finally {
+      _mutex.release();
+    }
+  }
+
+  _MqttContext? _doConnectToBroker(BrokersDto broker) {
+    if (_contexts[broker] == null) {
       try {
         final client = _createMqttClient(broker);
-        if (client == null) {
-          return null;
-        }
-
-        ctx = new _MqttContext(client);
-        _contexts[broker] = ctx;
-        if (!_isOfflineMode) {
-          Future(() async {
-            Log.debug('MQTT Connecting ${client.server}:${client.port}');
-            try {
-              await client.connect();
-              Log.info('MQTT Connected ${client.server}:${client.port}');
-            } catch (e) {
-              Log.error('Failed connect() MQTT $e');
-            }
-          });
-        }
+        _contexts[broker] = _createMqttContext(client);
       } catch (e, stacktrace) {
         Log.error('Failed connecting MQTT $e $stacktrace');
-        return null;
       }
     }
+    return _contexts[broker];
+  }
 
+  static _MqttContext _createMqttContext(MqttClient client) {
+    final ctx = new _MqttContext(client);
+
+    if (!_isOfflineMode) {
+      Future(() async {
+        Log.debug('MQTT Connecting ${client.server}:${client.port}');
+        try {
+          await client.connect();
+          Log.info('MQTT Connected ${client.server}:${client.port}');
+        } catch (e) {
+          Log.error('Failed connect() MQTT $e');
+        }
+      });
+    }
     return ctx;
   }
 
-  static MqttClient? _createMqttClient(BrokersDto broker) {
+  static MqttClient _createMqttClient(BrokersDto broker) {
     final id = _generateUUID();
     MqttClient? client;
 
@@ -110,7 +119,7 @@ abstract class MqttClientService {
         .where((element) => getSupportedSchemes().contains(element.scheme))) {
       final MqttConnectMessage connMess = MqttConnectMessage()
           .withClientIdentifier(id)
-          .withWillQos(MqttQos.atLeastOnce)
+          .withWillQos(MqttQos.exactlyOnce)
           .authenticateAs(
             broker.credentials?.username,
             broker.credentials?.password,
@@ -120,7 +129,7 @@ abstract class MqttClientService {
       assert(client.autoReconnect == true);
     }
 
-    return client;
+    return client!;
   }
 
   static String _generateUUID() {
@@ -129,7 +138,7 @@ abstract class MqttClientService {
     return 'APP${DateTime.now().toIso8601String()}-${rand.nextInt(maxVal)}-${rand.nextInt(maxVal)}';
   }
 
-  /*
+/*
    * Class Methods
    */
 

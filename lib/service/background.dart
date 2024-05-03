@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:ripe/service/backend_service.dart';
 import 'package:ripe/service/models/sensor.dart';
 import 'package:ripe/service/sensor_service.dart';
 import 'package:ripe/util/log.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
 const _notificationId = 0x80;
@@ -21,7 +21,7 @@ void _showNotification(String msg) {
   const androidDetails = AndroidNotificationDetails(
     'Warnungen',
     'Warnungen',
-    channelDescription: 'Zeigt unregelmäßige Warnungen deiner Pflanzen an',
+    channelDescription: 'Zeige Mängel deiner Pflanzen an',
     importance: Importance.defaultImportance,
     priority: Priority.defaultPriority,
     ticker: 'ticker',
@@ -37,11 +37,26 @@ void _showNotification(String msg) {
   Log.debug('Displaying notification');
 }
 
-Future<void> checkSensor(RegisteredSensor registerSensor) async {
+Future<DateTime?> getLastCheck(RegisteredSensor sensor) async {
+  final sharedPrefs = await SharedPreferences.getInstance();
+  final lastCheck = sharedPrefs.getString('SENSOR_LAST_CHECK_${sensor.id}');
+  if (lastCheck == null) {
+    return null;
+  }
+  return DateTime.parse(lastCheck);
+}
+
+Future<void> setLastCheck(RegisteredSensor sensor, DateTime time) async {
+  final sharedPrefs = await SharedPreferences.getInstance();
+  sharedPrefs.setString(
+      'SENSOR_LAST_CHECK_${sensor.id}', time.toIso8601String());
+}
+
+Future<bool> checkSensor(RegisteredSensor registerSensor) async {
   Log.debug('Checking sensor ${registerSensor.name}');
   if (registerSensor.notificationConfig == null) {
     Log.info('No notification config for ${registerSensor.name}');
-    return;
+    return false;
   }
 
   final now = DateTime.now();
@@ -79,32 +94,37 @@ Future<void> checkSensor(RegisteredSensor registerSensor) async {
     _showNotification(
         'Fehler beim Abrufen der Daten für ${registerSensor.name}');
   }
+  setLastCheck(registerSensor, now);
+  return true;
 }
 
 @pragma('vm:entry-point')
 void _callbackDispatcher() {
+  Log.debug("Startup background task");
   Workmanager().executeTask((task, inputData) async {
     Log.debug('Running background task $task');
-    if (task == PERIODIC_SYNC_TASK) {
-      return Future.value(true);
+    // Check all sensors
+    try {
+      final sensorService = SensorService.getInstance();
+      await sensorService.init();
+
+      await Future.wait(sensorService.getSensors().map((e) => checkSensor(e)));
+    } catch (e) {
+      Log.error('Failed to run background task: $e');
+      return false;
     }
 
-    // Check all sensors
-    final sensorService = SensorService.getInstance();
-    await Future.wait(sensorService.getSensors().map((e) => checkSensor(e)));
-
-    return Future.value(true);
+    Log.info('Successfully ran background task $task');
+    return true;
   });
 }
 
 Future<void> initBackgroundTasks() async {
-  if (kIsWeb) {
-    return;
-  }
+  Log.debug("Setting up background tasks");
   Workmanager()
     ..initialize(
       _callbackDispatcher,
-      isInDebugMode: !kReleaseMode,
+      isInDebugMode: true,
     )
     ..registerPeriodicTask(
       PERIODIC_SYNC_TASK,
