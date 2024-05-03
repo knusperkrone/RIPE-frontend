@@ -100,7 +100,7 @@ Future<bool> checkSensor(RegisteredSensor registerSensor) async {
 
 @pragma('vm:entry-point')
 void _callbackDispatcher() {
-  Log.debug("Startup background task");
+  Log.debug('Startup background task');
   Workmanager().executeTask((task, inputData) async {
     Log.debug('Running background task $task');
     // Check all sensors
@@ -120,7 +120,7 @@ void _callbackDispatcher() {
 }
 
 Future<void> initBackgroundTasks() async {
-  Log.debug("Setting up background tasks");
+  Log.debug('Setting up background tasks');
   Workmanager()
     ..initialize(
       _callbackDispatcher,

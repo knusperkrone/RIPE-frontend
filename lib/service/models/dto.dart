@@ -209,7 +209,7 @@ class AgentStateDto {
   }
 }
 
-@JsonSerializable()
+@JsonSerializable(createToJson: false)
 class AgentRenderDto {
   final AgentDecoratorDto decorator;
   @JsonKey(fromJson: AgentStateDto.fromJson, toJson: AgentStateDto.toJson)

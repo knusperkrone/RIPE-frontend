@@ -28,12 +28,6 @@ Map<String, dynamic> _$SensorDataDtoToJson(SensorDataDto instance) =>
       'light': instance.light,
     };
 
-Map<String, dynamic> _$AgentDecoratorDtoToJson(AgentDecoratorDto instance) =>
-    <String, dynamic>{
-      'payload': instance.payload,
-      'hashCode': instance.hashCode,
-    };
-
 AgentRenderDto _$AgentRenderDtoFromJson(Map<String, dynamic> json) =>
     AgentRenderDto(
       decorator:
