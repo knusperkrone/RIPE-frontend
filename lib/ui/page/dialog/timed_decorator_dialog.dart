@@ -101,14 +101,14 @@ class _TimePaneDecoratorState extends State<TimePaneDecoratorDialog> {
                 OutlinedButton(
                   child: const Text('Ausschalten'),
                   style: ButtonStyle(
-                      foregroundColor: MaterialStateProperty.all(Colors.white),
-                      overlayColor: MaterialStateProperty.all(
+                      foregroundColor: WidgetStateProperty.all(Colors.white),
+                      overlayColor: WidgetStateProperty.all(
                         ERROR_COLOR
                             .withBlue(ERROR_COLOR.blue + 15)
                             .withGreen(ERROR_COLOR.green + 15)
                             .withRed(ERROR_COLOR.red + 15),
                       ),
-                      backgroundColor: MaterialStateProperty.all(ERROR_COLOR)),
+                      backgroundColor: WidgetStateProperty.all(ERROR_COLOR)),
                   onPressed: () => GoRouter.of(context)
                       .pop(TimePaneDecoratorDialogResult(false, forceSeconds)),
                 ),
@@ -116,9 +116,9 @@ class _TimePaneDecoratorState extends State<TimePaneDecoratorDialog> {
                 OutlinedButton(
                   child: const Text('Einschalten'),
                   style: ButtonStyle(
-                      foregroundColor: MaterialStateProperty.all(Colors.white),
+                      foregroundColor: WidgetStateProperty.all(Colors.white),
                       backgroundColor:
-                          MaterialStateProperty.all(PRIMARY_COLOR)),
+                          WidgetStateProperty.all(PRIMARY_COLOR)),
                   onPressed: () => GoRouter.of(context)
                       .pop(TimePaneDecoratorDialogResult(true, forceSeconds)),
                 ),

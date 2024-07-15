@@ -27,7 +27,7 @@ class SensorChartPage extends StatefulWidget {
 class _SensorChartPageState extends State<SensorChartPage> {
   final graphKey = new GlobalKey<SensorDataChartState>();
   final loadingKey = new GlobalKey<AnimatedLoadingSpinnerState>();
-  final data = <SensorDataDao>[];
+  final data = <SensorDaoData>[];
 
   late SensorDataService _historyService;
   late DateTime _from;
@@ -49,6 +49,14 @@ class _SensorChartPageState extends State<SensorChartPage> {
       axisPadding: 5,
       adapter: SensorDataGraphAdapter(
         getter: (data) => data.moisture ?? 0.0,
+        builder: (data, value) => data.copyWith(moisture: Value(value)),
+      ),
+    ),
+    SensorDataGraphConfig(
+      color: Colors.lightBlueAccent,
+      axisPadding: 5,
+      adapter: SensorDataGraphAdapter(
+        getter: (data) => data.humidity ?? 0.0,
         builder: (data, value) => data.copyWith(moisture: Value(value)),
       ),
     ),
@@ -98,12 +106,13 @@ class _SensorChartPageState extends State<SensorChartPage> {
       appBar: RipeAppBar(
         centerTitle: true,
         title: Container(
-          width: 320,
+          width: 340,
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               OutlinedButton(
                 style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(Colors.white30),
+                  backgroundColor: WidgetStatePropertyAll(Colors.white30),
                 ),
                 child: Text(
                   'Vom: ' + DateFormat('dd.MM').format(_from),
@@ -137,7 +146,7 @@ class _SensorChartPageState extends State<SensorChartPage> {
               ),
               OutlinedButton(
                 style: const ButtonStyle(
-                  backgroundColor: MaterialStatePropertyAll(Colors.white30),
+                  backgroundColor: WidgetStatePropertyAll(Colors.white30),
                 ),
                 child: Text(
                   'Bis: ' + DateFormat('dd.MM').format(_until),
@@ -199,6 +208,17 @@ class _SensorChartPageState extends State<SensorChartPage> {
               color: Colors.lightBlue,
             ),
             label: 'Feuchtigkeit',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.air_outlined,
+              color: Theme.of(context).iconTheme.color,
+            ),
+            activeIcon: const Icon(
+              Icons.pool_outlined,
+              color: Colors.lightBlue,
+            ),
+            label: 'Luft-Feuchtigkeit',
           ),
           BottomNavigationBarItem(
             icon: Icon(

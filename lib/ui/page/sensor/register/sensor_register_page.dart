@@ -210,9 +210,9 @@ class _SensorRegisterPageState extends State<SensorRegisterPage> {
                 ),
                 child: ElevatedButton(
                   style: ButtonStyle(
-                    foregroundColor: MaterialStateProperty.all(
+                    foregroundColor: WidgetStateProperty.all(
                         Theme.of(context).textTheme.labelLarge!.color),
-                    backgroundColor: MaterialStateProperty.all(PRIMARY_COLOR),
+                    backgroundColor: WidgetStateProperty.all(PRIMARY_COLOR),
                   ),
                   child: const Text('Bestätigen'),
                   onPressed: () => _onRegister(context),

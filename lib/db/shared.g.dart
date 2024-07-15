@@ -3,12 +3,12 @@
 part of 'shared.dart';
 
 // ignore_for_file: type=lint
-class $SensorDataTable extends SensorData
-    with TableInfo<$SensorDataTable, SensorDataDao> {
+class $SensorDaoTable extends SensorDao
+    with TableInfo<$SensorDaoTable, SensorDaoData> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $SensorDataTable(this.attachedDatabase, [this._alias]);
+  $SensorDaoTable(this.attachedDatabase, [this._alias]);
   static const VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int> id = GeneratedColumn<int>(
@@ -48,6 +48,12 @@ class $SensorDataTable extends SensorData
   late final GeneratedColumn<double> temperature = GeneratedColumn<double>(
       'temperature', aliasedName, true,
       type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _humidityMeta =
+      const VerificationMeta('humidity');
+  @override
+  late final GeneratedColumn<double> humidity = GeneratedColumn<double>(
+      'humidity', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
   static const VerificationMeta _carbonMeta = const VerificationMeta('carbon');
   @override
   late final GeneratedColumn<int> carbon = GeneratedColumn<int>(
@@ -72,6 +78,7 @@ class $SensorDataTable extends SensorData
         battery,
         moisture,
         temperature,
+        humidity,
         carbon,
         conductivity,
         light
@@ -80,9 +87,9 @@ class $SensorDataTable extends SensorData
   String get aliasedName => _alias ?? actualTableName;
   @override
   String get actualTableName => $name;
-  static const String $name = 'sensor_data';
+  static const String $name = 'sensor_dao';
   @override
-  VerificationContext validateIntegrity(Insertable<SensorDataDao> instance,
+  VerificationContext validateIntegrity(Insertable<SensorDaoData> instance,
       {bool isInserting = false}) {
     final context = VerificationContext();
     final data = instance.toColumns(true);
@@ -115,6 +122,10 @@ class $SensorDataTable extends SensorData
           temperature.isAcceptableOrUnknown(
               data['temperature']!, _temperatureMeta));
     }
+    if (data.containsKey('humidity')) {
+      context.handle(_humidityMeta,
+          humidity.isAcceptableOrUnknown(data['humidity']!, _humidityMeta));
+    }
     if (data.containsKey('carbon')) {
       context.handle(_carbonMeta,
           carbon.isAcceptableOrUnknown(data['carbon']!, _carbonMeta));
@@ -135,9 +146,9 @@ class $SensorDataTable extends SensorData
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  SensorDataDao map(Map<String, dynamic> data, {String? tablePrefix}) {
+  SensorDaoData map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return SensorDataDao(
+    return SensorDaoData(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       sensorId: attachedDatabase.typeMapping
@@ -150,6 +161,8 @@ class $SensorDataTable extends SensorData
           .read(DriftSqlType.double, data['${effectivePrefix}moisture']),
       temperature: attachedDatabase.typeMapping
           .read(DriftSqlType.double, data['${effectivePrefix}temperature']),
+      humidity: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}humidity']),
       carbon: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}carbon']),
       conductivity: attachedDatabase.typeMapping
@@ -160,28 +173,30 @@ class $SensorDataTable extends SensorData
   }
 
   @override
-  $SensorDataTable createAlias(String alias) {
-    return $SensorDataTable(attachedDatabase, alias);
+  $SensorDaoTable createAlias(String alias) {
+    return $SensorDaoTable(attachedDatabase, alias);
   }
 }
 
-class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
+class SensorDaoData extends DataClass implements Insertable<SensorDaoData> {
   final int id;
   final int sensorId;
   final DateTime timestamp;
   final double? battery;
   final double? moisture;
   final double? temperature;
+  final double? humidity;
   final int? carbon;
   final int? conductivity;
   final int? light;
-  const SensorDataDao(
+  const SensorDaoData(
       {required this.id,
       required this.sensorId,
       required this.timestamp,
       this.battery,
       this.moisture,
       this.temperature,
+      this.humidity,
       this.carbon,
       this.conductivity,
       this.light});
@@ -200,6 +215,9 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
     if (!nullToAbsent || temperature != null) {
       map['temperature'] = Variable<double>(temperature);
     }
+    if (!nullToAbsent || humidity != null) {
+      map['humidity'] = Variable<double>(humidity);
+    }
     if (!nullToAbsent || carbon != null) {
       map['carbon'] = Variable<int>(carbon);
     }
@@ -212,8 +230,8 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
     return map;
   }
 
-  SensorDataCompanion toCompanion(bool nullToAbsent) {
-    return SensorDataCompanion(
+  SensorDaoCompanion toCompanion(bool nullToAbsent) {
+    return SensorDaoCompanion(
       id: Value(id),
       sensorId: Value(sensorId),
       timestamp: Value(timestamp),
@@ -226,6 +244,9 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
       temperature: temperature == null && nullToAbsent
           ? const Value.absent()
           : Value(temperature),
+      humidity: humidity == null && nullToAbsent
+          ? const Value.absent()
+          : Value(humidity),
       carbon:
           carbon == null && nullToAbsent ? const Value.absent() : Value(carbon),
       conductivity: conductivity == null && nullToAbsent
@@ -236,16 +257,17 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
     );
   }
 
-  factory SensorDataDao.fromJson(Map<String, dynamic> json,
+  factory SensorDaoData.fromJson(Map<String, dynamic> json,
       {ValueSerializer? serializer}) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return SensorDataDao(
+    return SensorDaoData(
       id: serializer.fromJson<int>(json['id']),
       sensorId: serializer.fromJson<int>(json['sensorId']),
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
       battery: serializer.fromJson<double?>(json['battery']),
       moisture: serializer.fromJson<double?>(json['moisture']),
       temperature: serializer.fromJson<double?>(json['temperature']),
+      humidity: serializer.fromJson<double?>(json['humidity']),
       carbon: serializer.fromJson<int?>(json['carbon']),
       conductivity: serializer.fromJson<int?>(json['conductivity']),
       light: serializer.fromJson<int?>(json['light']),
@@ -261,36 +283,39 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
       'battery': serializer.toJson<double?>(battery),
       'moisture': serializer.toJson<double?>(moisture),
       'temperature': serializer.toJson<double?>(temperature),
+      'humidity': serializer.toJson<double?>(humidity),
       'carbon': serializer.toJson<int?>(carbon),
       'conductivity': serializer.toJson<int?>(conductivity),
       'light': serializer.toJson<int?>(light),
     };
   }
 
-  SensorDataDao copyWith(
+  SensorDaoData copyWith(
           {int? id,
           int? sensorId,
           DateTime? timestamp,
           Value<double?> battery = const Value.absent(),
           Value<double?> moisture = const Value.absent(),
           Value<double?> temperature = const Value.absent(),
+          Value<double?> humidity = const Value.absent(),
           Value<int?> carbon = const Value.absent(),
           Value<int?> conductivity = const Value.absent(),
           Value<int?> light = const Value.absent()}) =>
-      SensorDataDao(
+      SensorDaoData(
         id: id ?? this.id,
         sensorId: sensorId ?? this.sensorId,
         timestamp: timestamp ?? this.timestamp,
         battery: battery.present ? battery.value : this.battery,
         moisture: moisture.present ? moisture.value : this.moisture,
         temperature: temperature.present ? temperature.value : this.temperature,
+        humidity: humidity.present ? humidity.value : this.humidity,
         carbon: carbon.present ? carbon.value : this.carbon,
         conductivity:
             conductivity.present ? conductivity.value : this.conductivity,
         light: light.present ? light.value : this.light,
       );
-  SensorDataDao copyWithCompanion(SensorDataCompanion data) {
-    return SensorDataDao(
+  SensorDaoData copyWithCompanion(SensorDaoCompanion data) {
+    return SensorDaoData(
       id: data.id.present ? data.id.value : this.id,
       sensorId: data.sensorId.present ? data.sensorId.value : this.sensorId,
       timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
@@ -298,6 +323,7 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
       moisture: data.moisture.present ? data.moisture.value : this.moisture,
       temperature:
           data.temperature.present ? data.temperature.value : this.temperature,
+      humidity: data.humidity.present ? data.humidity.value : this.humidity,
       carbon: data.carbon.present ? data.carbon.value : this.carbon,
       conductivity: data.conductivity.present
           ? data.conductivity.value
@@ -308,13 +334,14 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
 
   @override
   String toString() {
-    return (StringBuffer('SensorDataData(')
+    return (StringBuffer('SensorDaoData(')
           ..write('id: $id, ')
           ..write('sensorId: $sensorId, ')
           ..write('timestamp: $timestamp, ')
           ..write('battery: $battery, ')
           ..write('moisture: $moisture, ')
           ..write('temperature: $temperature, ')
+          ..write('humidity: $humidity, ')
           ..write('carbon: $carbon, ')
           ..write('conductivity: $conductivity, ')
           ..write('light: $light')
@@ -324,62 +351,67 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
 
   @override
   int get hashCode => Object.hash(id, sensorId, timestamp, battery, moisture,
-      temperature, carbon, conductivity, light);
+      temperature, humidity, carbon, conductivity, light);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is SensorDataDao &&
+      (other is SensorDaoData &&
           other.id == this.id &&
           other.sensorId == this.sensorId &&
           other.timestamp == this.timestamp &&
           other.battery == this.battery &&
           other.moisture == this.moisture &&
           other.temperature == this.temperature &&
+          other.humidity == this.humidity &&
           other.carbon == this.carbon &&
           other.conductivity == this.conductivity &&
           other.light == this.light);
 }
 
-class SensorDataCompanion extends UpdateCompanion<SensorDataDao> {
+class SensorDaoCompanion extends UpdateCompanion<SensorDaoData> {
   final Value<int> id;
   final Value<int> sensorId;
   final Value<DateTime> timestamp;
   final Value<double?> battery;
   final Value<double?> moisture;
   final Value<double?> temperature;
+  final Value<double?> humidity;
   final Value<int?> carbon;
   final Value<int?> conductivity;
   final Value<int?> light;
-  const SensorDataCompanion({
+  const SensorDaoCompanion({
     this.id = const Value.absent(),
     this.sensorId = const Value.absent(),
     this.timestamp = const Value.absent(),
     this.battery = const Value.absent(),
     this.moisture = const Value.absent(),
     this.temperature = const Value.absent(),
+    this.humidity = const Value.absent(),
     this.carbon = const Value.absent(),
     this.conductivity = const Value.absent(),
     this.light = const Value.absent(),
   });
-  SensorDataCompanion.insert({
+  SensorDaoCompanion.insert({
     this.id = const Value.absent(),
     required int sensorId,
     required DateTime timestamp,
     this.battery = const Value.absent(),
     this.moisture = const Value.absent(),
     this.temperature = const Value.absent(),
+    this.humidity = const Value.absent(),
     this.carbon = const Value.absent(),
     this.conductivity = const Value.absent(),
     this.light = const Value.absent(),
   })  : sensorId = Value(sensorId),
         timestamp = Value(timestamp);
-  static Insertable<SensorDataDao> custom({
+  static Insertable<SensorDaoData> custom({
     Expression<int>? id,
     Expression<int>? sensorId,
     Expression<DateTime>? timestamp,
     Expression<double>? battery,
     Expression<double>? moisture,
     Expression<double>? temperature,
+    Expression<double>? humidity,
     Expression<int>? carbon,
     Expression<int>? conductivity,
     Expression<int>? light,
@@ -391,29 +423,32 @@ class SensorDataCompanion extends UpdateCompanion<SensorDataDao> {
       if (battery != null) 'battery': battery,
       if (moisture != null) 'moisture': moisture,
       if (temperature != null) 'temperature': temperature,
+      if (humidity != null) 'humidity': humidity,
       if (carbon != null) 'carbon': carbon,
       if (conductivity != null) 'conductivity': conductivity,
       if (light != null) 'light': light,
     });
   }
 
-  SensorDataCompanion copyWith(
+  SensorDaoCompanion copyWith(
       {Value<int>? id,
       Value<int>? sensorId,
       Value<DateTime>? timestamp,
       Value<double?>? battery,
       Value<double?>? moisture,
       Value<double?>? temperature,
+      Value<double?>? humidity,
       Value<int?>? carbon,
       Value<int?>? conductivity,
       Value<int?>? light}) {
-    return SensorDataCompanion(
+    return SensorDaoCompanion(
       id: id ?? this.id,
       sensorId: sensorId ?? this.sensorId,
       timestamp: timestamp ?? this.timestamp,
       battery: battery ?? this.battery,
       moisture: moisture ?? this.moisture,
       temperature: temperature ?? this.temperature,
+      humidity: humidity ?? this.humidity,
       carbon: carbon ?? this.carbon,
       conductivity: conductivity ?? this.conductivity,
       light: light ?? this.light,
@@ -441,6 +476,9 @@ class SensorDataCompanion extends UpdateCompanion<SensorDataDao> {
     if (temperature.present) {
       map['temperature'] = Variable<double>(temperature.value);
     }
+    if (humidity.present) {
+      map['humidity'] = Variable<double>(humidity.value);
+    }
     if (carbon.present) {
       map['carbon'] = Variable<int>(carbon.value);
     }
@@ -455,13 +493,14 @@ class SensorDataCompanion extends UpdateCompanion<SensorDataDao> {
 
   @override
   String toString() {
-    return (StringBuffer('SensorDataCompanion(')
+    return (StringBuffer('SensorDaoCompanion(')
           ..write('id: $id, ')
           ..write('sensorId: $sensorId, ')
           ..write('timestamp: $timestamp, ')
           ..write('battery: $battery, ')
           ..write('moisture: $moisture, ')
           ..write('temperature: $temperature, ')
+          ..write('humidity: $humidity, ')
           ..write('carbon: $carbon, ')
           ..write('conductivity: $conductivity, ')
           ..write('light: $light')
@@ -860,7 +899,7 @@ class FetchHistoriesCompanion extends UpdateCompanion<FetchHistory> {
 abstract class _$SharedDatabase extends GeneratedDatabase {
   _$SharedDatabase(QueryExecutor e) : super(e);
   $SharedDatabaseManager get managers => $SharedDatabaseManager(this);
-  late final $SensorDataTable sensorData = $SensorDataTable(this);
+  late final $SensorDaoTable sensorDao = $SensorDaoTable(this);
   late final $InitialSensorDataTable initialSensorData =
       $InitialSensorDataTable(this);
   late final $FetchHistoriesTable fetchHistories = $FetchHistoriesTable(this);
@@ -869,48 +908,50 @@ abstract class _$SharedDatabase extends GeneratedDatabase {
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
-      [sensorData, initialSensorData, fetchHistories];
+      [sensorDao, initialSensorData, fetchHistories];
 }
 
-typedef $$SensorDataTableCreateCompanionBuilder = SensorDataCompanion Function({
+typedef $$SensorDaoTableCreateCompanionBuilder = SensorDaoCompanion Function({
   Value<int> id,
   required int sensorId,
   required DateTime timestamp,
   Value<double?> battery,
   Value<double?> moisture,
   Value<double?> temperature,
+  Value<double?> humidity,
   Value<int?> carbon,
   Value<int?> conductivity,
   Value<int?> light,
 });
-typedef $$SensorDataTableUpdateCompanionBuilder = SensorDataCompanion Function({
+typedef $$SensorDaoTableUpdateCompanionBuilder = SensorDaoCompanion Function({
   Value<int> id,
   Value<int> sensorId,
   Value<DateTime> timestamp,
   Value<double?> battery,
   Value<double?> moisture,
   Value<double?> temperature,
+  Value<double?> humidity,
   Value<int?> carbon,
   Value<int?> conductivity,
   Value<int?> light,
 });
 
-class $$SensorDataTableTableManager extends RootTableManager<
+class $$SensorDaoTableTableManager extends RootTableManager<
     _$SharedDatabase,
-    $SensorDataTable,
-    SensorDataDao,
-    $$SensorDataTableFilterComposer,
-    $$SensorDataTableOrderingComposer,
-    $$SensorDataTableCreateCompanionBuilder,
-    $$SensorDataTableUpdateCompanionBuilder> {
-  $$SensorDataTableTableManager(_$SharedDatabase db, $SensorDataTable table)
+    $SensorDaoTable,
+    SensorDaoData,
+    $$SensorDaoTableFilterComposer,
+    $$SensorDaoTableOrderingComposer,
+    $$SensorDaoTableCreateCompanionBuilder,
+    $$SensorDaoTableUpdateCompanionBuilder> {
+  $$SensorDaoTableTableManager(_$SharedDatabase db, $SensorDaoTable table)
       : super(TableManagerState(
           db: db,
           table: table,
           filteringComposer:
-              $$SensorDataTableFilterComposer(ComposerState(db, table)),
+              $$SensorDaoTableFilterComposer(ComposerState(db, table)),
           orderingComposer:
-              $$SensorDataTableOrderingComposer(ComposerState(db, table)),
+              $$SensorDaoTableOrderingComposer(ComposerState(db, table)),
           updateCompanionCallback: ({
             Value<int> id = const Value.absent(),
             Value<int> sensorId = const Value.absent(),
@@ -918,17 +959,19 @@ class $$SensorDataTableTableManager extends RootTableManager<
             Value<double?> battery = const Value.absent(),
             Value<double?> moisture = const Value.absent(),
             Value<double?> temperature = const Value.absent(),
+            Value<double?> humidity = const Value.absent(),
             Value<int?> carbon = const Value.absent(),
             Value<int?> conductivity = const Value.absent(),
             Value<int?> light = const Value.absent(),
           }) =>
-              SensorDataCompanion(
+              SensorDaoCompanion(
             id: id,
             sensorId: sensorId,
             timestamp: timestamp,
             battery: battery,
             moisture: moisture,
             temperature: temperature,
+            humidity: humidity,
             carbon: carbon,
             conductivity: conductivity,
             light: light,
@@ -940,17 +983,19 @@ class $$SensorDataTableTableManager extends RootTableManager<
             Value<double?> battery = const Value.absent(),
             Value<double?> moisture = const Value.absent(),
             Value<double?> temperature = const Value.absent(),
+            Value<double?> humidity = const Value.absent(),
             Value<int?> carbon = const Value.absent(),
             Value<int?> conductivity = const Value.absent(),
             Value<int?> light = const Value.absent(),
           }) =>
-              SensorDataCompanion.insert(
+              SensorDaoCompanion.insert(
             id: id,
             sensorId: sensorId,
             timestamp: timestamp,
             battery: battery,
             moisture: moisture,
             temperature: temperature,
+            humidity: humidity,
             carbon: carbon,
             conductivity: conductivity,
             light: light,
@@ -958,9 +1003,9 @@ class $$SensorDataTableTableManager extends RootTableManager<
         ));
 }
 
-class $$SensorDataTableFilterComposer
-    extends FilterComposer<_$SharedDatabase, $SensorDataTable> {
-  $$SensorDataTableFilterComposer(super.$state);
+class $$SensorDaoTableFilterComposer
+    extends FilterComposer<_$SharedDatabase, $SensorDaoTable> {
+  $$SensorDaoTableFilterComposer(super.$state);
   ColumnFilters<int> get id => $state.composableBuilder(
       column: $state.table.id,
       builder: (column, joinBuilders) =>
@@ -991,6 +1036,11 @@ class $$SensorDataTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
+  ColumnFilters<double> get humidity => $state.composableBuilder(
+      column: $state.table.humidity,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
   ColumnFilters<int> get carbon => $state.composableBuilder(
       column: $state.table.carbon,
       builder: (column, joinBuilders) =>
@@ -1007,9 +1057,9 @@ class $$SensorDataTableFilterComposer
           ColumnFilters(column, joinBuilders: joinBuilders));
 }
 
-class $$SensorDataTableOrderingComposer
-    extends OrderingComposer<_$SharedDatabase, $SensorDataTable> {
-  $$SensorDataTableOrderingComposer(super.$state);
+class $$SensorDaoTableOrderingComposer
+    extends OrderingComposer<_$SharedDatabase, $SensorDaoTable> {
+  $$SensorDaoTableOrderingComposer(super.$state);
   ColumnOrderings<int> get id => $state.composableBuilder(
       column: $state.table.id,
       builder: (column, joinBuilders) =>
@@ -1037,6 +1087,11 @@ class $$SensorDataTableOrderingComposer
 
   ColumnOrderings<double> get temperature => $state.composableBuilder(
       column: $state.table.temperature,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<double> get humidity => $state.composableBuilder(
+      column: $state.table.humidity,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
@@ -1221,8 +1276,8 @@ class $$FetchHistoriesTableOrderingComposer
 class $SharedDatabaseManager {
   final _$SharedDatabase _db;
   $SharedDatabaseManager(this._db);
-  $$SensorDataTableTableManager get sensorData =>
-      $$SensorDataTableTableManager(_db, _db.sensorData);
+  $$SensorDaoTableTableManager get sensorDao =>
+      $$SensorDaoTableTableManager(_db, _db.sensorDao);
   $$InitialSensorDataTableTableManager get initialSensorData =>
       $$InitialSensorDataTableTableManager(_db, _db.initialSensorData);
   $$FetchHistoriesTableTableManager get fetchHistories =>

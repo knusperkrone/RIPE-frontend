@@ -45,13 +45,13 @@ ThemeData buildTheme(ThemeData theme) {
       titleSmall: textTheme.titleSmall!.copyWith(fontWeight: FontWeight.w400),
     ),
     switchTheme: theme.switchTheme.copyWith(
-      thumbColor: MaterialStateProperty.resolveWith((states) {
-        return (states.contains(MaterialState.selected))
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        return (states.contains(WidgetState.selected))
             ? buttonColorDark
             : buttonColorLight;
       }),
-      trackColor: MaterialStateProperty.resolveWith((states) {
-        return (states.contains(MaterialState.selected))
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        return (states.contains(WidgetState.selected))
             ? secondaryColor
             : Colors.white10;
       }),
@@ -81,14 +81,14 @@ ThemeData buildTheme(ThemeData theme) {
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: ButtonStyle(
-        foregroundColor: MaterialStateProperty.all(buttonColorDark),
-        overlayColor: MaterialStateProperty.all(buttonColorLight),
+        foregroundColor: WidgetStateProperty.all(buttonColorDark),
+        overlayColor: WidgetStateProperty.all(buttonColorLight),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: ButtonStyle(
-        foregroundColor: MaterialStateProperty.all(primaryColor),
-        overlayColor: MaterialStateProperty.all(secondaryColor),
+        foregroundColor: WidgetStateProperty.all(primaryColor),
+        overlayColor: WidgetStateProperty.all(secondaryColor),
       ),
     ),
   );

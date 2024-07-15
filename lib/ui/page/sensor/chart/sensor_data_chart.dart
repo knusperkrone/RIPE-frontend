@@ -7,8 +7,8 @@ import 'package:ripe/util/log.dart';
 import 'package:scidart/numdart.dart';
 import 'package:scidart/scidart.dart';
 
-typedef ValueGetter = double Function(SensorDataDao);
-typedef DataBuilder = SensorDataDao Function(SensorDataDao, double);
+typedef ValueGetter = double Function(SensorDaoData);
+typedef DataBuilder = SensorDaoData Function(SensorDaoData, double);
 
 class SensorDataGraphAdapter {
   final ValueGetter getter;
@@ -32,7 +32,7 @@ class SensorDataGraphConfig {
 class SensorDataChart extends StatefulWidget {
   final RegisteredSensor sensor;
   final SensorDataGraphConfig config;
-  final List<SensorDataDao>? data;
+  final List<SensorDaoData>? data;
 
   const SensorDataChart({
     Key? key,
@@ -46,11 +46,11 @@ class SensorDataChart extends StatefulWidget {
 }
 
 class SensorDataChartState extends State<SensorDataChart> {
-  List<SensorDataDao>? displayData;
+  List<SensorDaoData>? displayData;
 
   final labelFactorY = 10;
   late int labelFactorX;
-  late List<SensorDataDao> rawData;
+  late List<SensorDaoData> rawData;
   late double minY;
   late double maxY;
 
@@ -67,7 +67,7 @@ class SensorDataChartState extends State<SensorDataChart> {
     });
   }
 
-  void setRawData(List<SensorDataDao> data) {
+  void setRawData(List<SensorDaoData> data) {
     _lineConvolution = max(1, data.length ~/ 150);
     Log.debug('Convolution kernel is set to $_lineConvolution');
     _smoothDataAndPlot();
@@ -81,7 +81,7 @@ class SensorDataChartState extends State<SensorDataChart> {
     final kernel = Array(List.filled(span * 2 + 1, 1 / (span * 2 + 1)));
     final smoothedValues = convolution(values, kernel);
 
-    final kValues = <SensorDataDao>[];
+    final kValues = <SensorDaoData>[];
     final k = span + log(span).round() + 1;
     for (int i = span * 2; i < rawData.length; i += k) {
       kValues.add(adapter.builder(rawData[i], smoothedValues[i]));

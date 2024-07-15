@@ -235,9 +235,9 @@ class RegisteredSensorConfigPageState
                 ),
                 child: ElevatedButton(
                   style: ButtonStyle(
-                    foregroundColor: MaterialStateProperty.all(
+                    foregroundColor: WidgetStateProperty.all(
                         Theme.of(context).textTheme.labelLarge!.color),
-                    backgroundColor: MaterialStateProperty.all(PRIMARY_COLOR),
+                    backgroundColor: WidgetStateProperty.all(PRIMARY_COLOR),
                   ),
                   child: const Text('Sensor konfigurieren'),
                   onPressed: () => _onAdd(context),

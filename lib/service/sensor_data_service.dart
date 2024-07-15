@@ -7,7 +7,7 @@ import 'package:ripe/util/log.dart';
 import 'package:tuple/tuple.dart';
 
 const _CACHE_LIFETIME = Duration(minutes: 10);
-Tuple2<DateTime, List<SensorDataDao>>? _cache;
+Tuple2<DateTime, List<SensorDaoData>>? _cache;
 
 class SensorDataService {
   final _db = new DatabaseService();
@@ -17,7 +17,7 @@ class SensorDataService {
 
   SensorDataService(this.sensor);
 
-  Future<List<SensorDataDao>> getHistoryData(
+  Future<List<SensorDaoData>> getHistoryData(
     DateTime from,
     DateTime until,
   ) async {
@@ -67,7 +67,7 @@ class SensorDataService {
     }
   }
 
-  Future<List<SensorDataDao>> _getTodayData() async {
+  Future<List<SensorDaoData>> _getTodayData() async {
     if (_isCacheHealthy()) {
       Log.debug('Using cached history data');
       return _cache!.item2;

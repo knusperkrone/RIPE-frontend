@@ -14,9 +14,9 @@ class DatabaseService {
   static const int _BATCH_SIZE = 24;
   final SharedDatabase _db;
 
-  Future<List<SensorDataDao>> getData(
+  Future<List<SensorDaoData>> getData(
       int sensorId, DateTime from, DateTime until) async {
-    return (_db.select(_db.sensorData)
+    return (_db.select(_db.sensorDao)
           ..where((tbl) => tbl.sensorId.equals(sensorId))
           ..where((tbl) => tbl.timestamp.isBetweenValues(from, until))
           ..orderBy([
@@ -49,14 +49,15 @@ class DatabaseService {
         .get();
   }
 
-  Future<SensorDataDao> insertSingle(
+  Future<SensorDaoData> insertSingle(
       int sensorId, SensorDataDto element) async {
-    return _db.into(_db.sensorData).insertReturning(SensorDataCompanion.insert(
+    return _db.into(_db.sensorDao).insertReturning(SensorDaoCompanion.insert(
         sensorId: sensorId,
         timestamp: element.timestamp,
         battery: Value(element.battery),
         moisture: Value(element.moisture),
         temperature: Value(element.temperature),
+        humidity: Value(element.humidity),
         carbon: Value(element.carbon),
         conductivity: Value(element.conductivity),
         light: Value(element.light)));
@@ -75,12 +76,13 @@ class DatabaseService {
               element.timestamp.isAtSameMomentAs(until)));
 
       executor.scheduleTask(
-        () async => await _db.into(_db.sensorData).insert(
-            SensorDataCompanion.insert(
+        () async => await _db.into(_db.sensorDao).insert(
+            SensorDaoCompanion.insert(
                 sensorId: sensorId,
                 timestamp: element.timestamp,
                 battery: Value(element.battery),
                 moisture: Value(element.moisture),
+                humidity: Value(element.humidity),
                 temperature: Value(element.temperature),
                 carbon: Value(element.carbon),
                 conductivity: Value(element.conductivity),
@@ -94,9 +96,9 @@ class DatabaseService {
             FetchHistoriesCompanion.insert(sensorId: sensorId, day: day),
           );
     } catch (_) {
-      _db.delete(_db.sensorData).where((tbl) =>
+      _db.delete(_db.sensorDao).where((tbl) =>
           tbl.timestamp.isBiggerOrEqualValue(elements.first.timestamp));
-      _db.delete(_db.sensorData).where((tbl) =>
+      _db.delete(_db.sensorDao).where((tbl) =>
           tbl.timestamp.isSmallerOrEqualValue(elements.last.timestamp));
       _db.delete(_db.fetchHistories)
         ..where((tbl) => tbl.sensorId.equals(sensorId))
@@ -106,17 +108,20 @@ class DatabaseService {
     }
   }
 
-  SensorDataDao transformSensorData(int sensorId, SensorDataDto element) {
-    return SensorDataDao(
+  SensorDaoData transformSensorData(int sensorId, SensorDataDto element) {
+    return SensorDaoData(
       id: -1,
       sensorId: sensorId,
       timestamp: element.timestamp,
       battery: element.battery,
       moisture: element.moisture,
       temperature: element.temperature,
+      humidity: element.humidity,
       carbon: element.carbon,
       conductivity: element.conductivity,
       light: element.light,
     );
   }
+
+  SharedDatabase get db => _db;
 }

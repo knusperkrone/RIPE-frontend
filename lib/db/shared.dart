@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'database_service.dart';
 
 export 'base.dart'
     if (dart.library.ffi) 'native.dart'
@@ -6,7 +7,7 @@ export 'base.dart'
 
 part 'shared.g.dart';
 
-class SensorData extends Table {
+class SensorDao extends Table {
   IntColumn get id => integer().autoIncrement()();
 
   IntColumn get sensorId => integer()();
@@ -18,6 +19,8 @@ class SensorData extends Table {
   RealColumn get moisture => real().nullable()();
 
   RealColumn get temperature => real().nullable()();
+
+  RealColumn get humidity => real().nullable()();
 
   IntColumn get carbon => integer().nullable()();
 
@@ -45,7 +48,7 @@ class FetchHistories extends Table {
 }
 
 @DriftDatabase(tables: [
-  SensorData,
+  SensorDao,
   InitialSensorData,
   FetchHistories,
 ])
@@ -53,5 +56,18 @@ class SharedDatabase extends _$SharedDatabase {
   SharedDatabase(QueryExecutor e) : super(e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 10;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        beforeOpen: (m) async {},
+        onUpgrade: (m, from, to) async {
+          final _db = DatabaseService().db;
+
+          if (from < 1) {
+            customStatement("ALTER TABLE sensor_data RENAME TO sensor_dao;");
+            await m.addColumn(_db.sensorDao, _db.sensorDao.humidity);
+          }
+        },
+      );
 }
