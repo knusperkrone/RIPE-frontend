@@ -39,7 +39,7 @@ class _AddPhotoDialogState extends State<AddPhotoDialog> {
     if (picked != null) {
       final croppedFile = await _imageCropper.cropImage(
         sourcePath: picked.path,
-        aspectRatioPresets: [CropAspectRatioPreset.square],
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
       );
       if (croppedFile != null) {
         // Select file and preview gradient

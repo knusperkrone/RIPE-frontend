@@ -17,7 +17,6 @@ ThemeData buildTheme(ThemeData theme) {
       onPrimary: buttonColorDark,
       secondary: secondaryColor,
       onSecondary: buttonColorLight,
-      background: backgroundColor,
       error: errorColor,
       outline: Colors.white70,
     ),
