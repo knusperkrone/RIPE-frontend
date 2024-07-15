@@ -12,9 +12,10 @@ SensorDataDto _$SensorDataDtoFromJson(Map<String, dynamic> json) =>
       (json['battery'] as num?)?.toDouble(),
       (json['moisture'] as num?)?.toDouble(),
       (json['temperature'] as num?)?.toDouble(),
-      json['carbon'] as int?,
-      json['conductivity'] as int?,
-      json['light'] as int?,
+      (json['humidity'] as num?)?.toDouble(),
+      (json['carbon'] as num?)?.toInt(),
+      (json['conductivity'] as num?)?.toInt(),
+      (json['light'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$SensorDataDtoToJson(SensorDataDto instance) =>
@@ -23,6 +24,7 @@ Map<String, dynamic> _$SensorDataDtoToJson(SensorDataDto instance) =>
       'battery': instance.battery,
       'moisture': instance.moisture,
       'temperature': instance.temperature,
+      'humidity': instance.humidity,
       'carbon': instance.carbon,
       'conductivity': instance.conductivity,
       'light': instance.light,
@@ -74,7 +76,7 @@ BrokerConnectionDetailsDto _$BrokerConnectionDetailsDtoFromJson(
     BrokerConnectionDetailsDto(
       json['scheme'] as String,
       json['host'] as String,
-      json['port'] as int,
+      (json['port'] as num).toInt(),
       json['credentials'] == null
           ? null
           : BrokerCredentialsDto.fromJson(

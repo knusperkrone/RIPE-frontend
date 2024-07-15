@@ -19,10 +19,10 @@ Map<String, dynamic> _$RangeConfigToJson(RangeConfig instance) =>
 
 NotificationConfig _$NotificationConfigFromJson(Map<String, dynamic> json) =>
     NotificationConfig(
-      battery: (json['battery'] as num?)?.toDouble() ?? 0,
       temperature:
           RangeConfig.fromJson(json['temperature'] as Map<String, dynamic>),
       moisture: RangeConfig.fromJson(json['moisture'] as Map<String, dynamic>),
+      battery: (json['battery'] as num).toDouble(),
     );
 
 Map<String, dynamic> _$NotificationConfigToJson(NotificationConfig instance) =>
@@ -34,11 +34,11 @@ Map<String, dynamic> _$NotificationConfigToJson(NotificationConfig instance) =>
 
 RegisteredSensor _$RegisteredSensorFromJson(Map<String, dynamic> json) =>
     RegisteredSensor(
-      json['id'] as int,
+      (json['id'] as num).toInt(),
       json['key'] as String,
       json['name'] as String,
       json['thumbPath'] as String,
-      const ColorJsonConverter().fromJson(json['imageColor'] as int),
+      const ColorJsonConverter().fromJson((json['imageColor'] as num).toInt()),
       json['notificationConfig'] == null
           ? null
           : NotificationConfig.fromJson(

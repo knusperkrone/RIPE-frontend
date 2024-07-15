@@ -289,6 +289,23 @@ class SensorDataDao extends DataClass implements Insertable<SensorDataDao> {
             conductivity.present ? conductivity.value : this.conductivity,
         light: light.present ? light.value : this.light,
       );
+  SensorDataDao copyWithCompanion(SensorDataCompanion data) {
+    return SensorDataDao(
+      id: data.id.present ? data.id.value : this.id,
+      sensorId: data.sensorId.present ? data.sensorId.value : this.sensorId,
+      timestamp: data.timestamp.present ? data.timestamp.value : this.timestamp,
+      battery: data.battery.present ? data.battery.value : this.battery,
+      moisture: data.moisture.present ? data.moisture.value : this.moisture,
+      temperature:
+          data.temperature.present ? data.temperature.value : this.temperature,
+      carbon: data.carbon.present ? data.carbon.value : this.carbon,
+      conductivity: data.conductivity.present
+          ? data.conductivity.value
+          : this.conductivity,
+      light: data.light.present ? data.light.value : this.light,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('SensorDataData(')
@@ -560,6 +577,13 @@ class InitialSensorDataData extends DataClass
         sensorId: sensorId ?? this.sensorId,
         initial: initial ?? this.initial,
       );
+  InitialSensorDataData copyWithCompanion(InitialSensorDataCompanion data) {
+    return InitialSensorDataData(
+      sensorId: data.sensorId.present ? data.sensorId.value : this.sensorId,
+      initial: data.initial.present ? data.initial.value : this.initial,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('InitialSensorDataData(')
@@ -745,6 +769,13 @@ class FetchHistory extends DataClass implements Insertable<FetchHistory> {
         sensorId: sensorId ?? this.sensorId,
         day: day ?? this.day,
       );
+  FetchHistory copyWithCompanion(FetchHistoriesCompanion data) {
+    return FetchHistory(
+      sensorId: data.sensorId.present ? data.sensorId.value : this.sensorId,
+      day: data.day.present ? data.day.value : this.day,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('FetchHistory(')
@@ -828,6 +859,7 @@ class FetchHistoriesCompanion extends UpdateCompanion<FetchHistory> {
 
 abstract class _$SharedDatabase extends GeneratedDatabase {
   _$SharedDatabase(QueryExecutor e) : super(e);
+  $SharedDatabaseManager get managers => $SharedDatabaseManager(this);
   late final $SensorDataTable sensorData = $SensorDataTable(this);
   late final $InitialSensorDataTable initialSensorData =
       $InitialSensorDataTable(this);
@@ -838,4 +870,361 @@ abstract class _$SharedDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities =>
       [sensorData, initialSensorData, fetchHistories];
+}
+
+typedef $$SensorDataTableCreateCompanionBuilder = SensorDataCompanion Function({
+  Value<int> id,
+  required int sensorId,
+  required DateTime timestamp,
+  Value<double?> battery,
+  Value<double?> moisture,
+  Value<double?> temperature,
+  Value<int?> carbon,
+  Value<int?> conductivity,
+  Value<int?> light,
+});
+typedef $$SensorDataTableUpdateCompanionBuilder = SensorDataCompanion Function({
+  Value<int> id,
+  Value<int> sensorId,
+  Value<DateTime> timestamp,
+  Value<double?> battery,
+  Value<double?> moisture,
+  Value<double?> temperature,
+  Value<int?> carbon,
+  Value<int?> conductivity,
+  Value<int?> light,
+});
+
+class $$SensorDataTableTableManager extends RootTableManager<
+    _$SharedDatabase,
+    $SensorDataTable,
+    SensorDataDao,
+    $$SensorDataTableFilterComposer,
+    $$SensorDataTableOrderingComposer,
+    $$SensorDataTableCreateCompanionBuilder,
+    $$SensorDataTableUpdateCompanionBuilder> {
+  $$SensorDataTableTableManager(_$SharedDatabase db, $SensorDataTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$SensorDataTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$SensorDataTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> sensorId = const Value.absent(),
+            Value<DateTime> timestamp = const Value.absent(),
+            Value<double?> battery = const Value.absent(),
+            Value<double?> moisture = const Value.absent(),
+            Value<double?> temperature = const Value.absent(),
+            Value<int?> carbon = const Value.absent(),
+            Value<int?> conductivity = const Value.absent(),
+            Value<int?> light = const Value.absent(),
+          }) =>
+              SensorDataCompanion(
+            id: id,
+            sensorId: sensorId,
+            timestamp: timestamp,
+            battery: battery,
+            moisture: moisture,
+            temperature: temperature,
+            carbon: carbon,
+            conductivity: conductivity,
+            light: light,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int sensorId,
+            required DateTime timestamp,
+            Value<double?> battery = const Value.absent(),
+            Value<double?> moisture = const Value.absent(),
+            Value<double?> temperature = const Value.absent(),
+            Value<int?> carbon = const Value.absent(),
+            Value<int?> conductivity = const Value.absent(),
+            Value<int?> light = const Value.absent(),
+          }) =>
+              SensorDataCompanion.insert(
+            id: id,
+            sensorId: sensorId,
+            timestamp: timestamp,
+            battery: battery,
+            moisture: moisture,
+            temperature: temperature,
+            carbon: carbon,
+            conductivity: conductivity,
+            light: light,
+          ),
+        ));
+}
+
+class $$SensorDataTableFilterComposer
+    extends FilterComposer<_$SharedDatabase, $SensorDataTable> {
+  $$SensorDataTableFilterComposer(super.$state);
+  ColumnFilters<int> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get sensorId => $state.composableBuilder(
+      column: $state.table.sensorId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get timestamp => $state.composableBuilder(
+      column: $state.table.timestamp,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<double> get battery => $state.composableBuilder(
+      column: $state.table.battery,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<double> get moisture => $state.composableBuilder(
+      column: $state.table.moisture,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<double> get temperature => $state.composableBuilder(
+      column: $state.table.temperature,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get carbon => $state.composableBuilder(
+      column: $state.table.carbon,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get conductivity => $state.composableBuilder(
+      column: $state.table.conductivity,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<int> get light => $state.composableBuilder(
+      column: $state.table.light,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$SensorDataTableOrderingComposer
+    extends OrderingComposer<_$SharedDatabase, $SensorDataTable> {
+  $$SensorDataTableOrderingComposer(super.$state);
+  ColumnOrderings<int> get id => $state.composableBuilder(
+      column: $state.table.id,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get sensorId => $state.composableBuilder(
+      column: $state.table.sensorId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get timestamp => $state.composableBuilder(
+      column: $state.table.timestamp,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<double> get battery => $state.composableBuilder(
+      column: $state.table.battery,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<double> get moisture => $state.composableBuilder(
+      column: $state.table.moisture,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<double> get temperature => $state.composableBuilder(
+      column: $state.table.temperature,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get carbon => $state.composableBuilder(
+      column: $state.table.carbon,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get conductivity => $state.composableBuilder(
+      column: $state.table.conductivity,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get light => $state.composableBuilder(
+      column: $state.table.light,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+typedef $$InitialSensorDataTableCreateCompanionBuilder
+    = InitialSensorDataCompanion Function({
+  required int sensorId,
+  required DateTime initial,
+  Value<int> rowid,
+});
+typedef $$InitialSensorDataTableUpdateCompanionBuilder
+    = InitialSensorDataCompanion Function({
+  Value<int> sensorId,
+  Value<DateTime> initial,
+  Value<int> rowid,
+});
+
+class $$InitialSensorDataTableTableManager extends RootTableManager<
+    _$SharedDatabase,
+    $InitialSensorDataTable,
+    InitialSensorDataData,
+    $$InitialSensorDataTableFilterComposer,
+    $$InitialSensorDataTableOrderingComposer,
+    $$InitialSensorDataTableCreateCompanionBuilder,
+    $$InitialSensorDataTableUpdateCompanionBuilder> {
+  $$InitialSensorDataTableTableManager(
+      _$SharedDatabase db, $InitialSensorDataTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$InitialSensorDataTableFilterComposer(ComposerState(db, table)),
+          orderingComposer: $$InitialSensorDataTableOrderingComposer(
+              ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<int> sensorId = const Value.absent(),
+            Value<DateTime> initial = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              InitialSensorDataCompanion(
+            sensorId: sensorId,
+            initial: initial,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required int sensorId,
+            required DateTime initial,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              InitialSensorDataCompanion.insert(
+            sensorId: sensorId,
+            initial: initial,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$InitialSensorDataTableFilterComposer
+    extends FilterComposer<_$SharedDatabase, $InitialSensorDataTable> {
+  $$InitialSensorDataTableFilterComposer(super.$state);
+  ColumnFilters<int> get sensorId => $state.composableBuilder(
+      column: $state.table.sensorId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get initial => $state.composableBuilder(
+      column: $state.table.initial,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$InitialSensorDataTableOrderingComposer
+    extends OrderingComposer<_$SharedDatabase, $InitialSensorDataTable> {
+  $$InitialSensorDataTableOrderingComposer(super.$state);
+  ColumnOrderings<int> get sensorId => $state.composableBuilder(
+      column: $state.table.sensorId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get initial => $state.composableBuilder(
+      column: $state.table.initial,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+typedef $$FetchHistoriesTableCreateCompanionBuilder = FetchHistoriesCompanion
+    Function({
+  required int sensorId,
+  required DateTime day,
+  Value<int> rowid,
+});
+typedef $$FetchHistoriesTableUpdateCompanionBuilder = FetchHistoriesCompanion
+    Function({
+  Value<int> sensorId,
+  Value<DateTime> day,
+  Value<int> rowid,
+});
+
+class $$FetchHistoriesTableTableManager extends RootTableManager<
+    _$SharedDatabase,
+    $FetchHistoriesTable,
+    FetchHistory,
+    $$FetchHistoriesTableFilterComposer,
+    $$FetchHistoriesTableOrderingComposer,
+    $$FetchHistoriesTableCreateCompanionBuilder,
+    $$FetchHistoriesTableUpdateCompanionBuilder> {
+  $$FetchHistoriesTableTableManager(
+      _$SharedDatabase db, $FetchHistoriesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $$FetchHistoriesTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $$FetchHistoriesTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<int> sensorId = const Value.absent(),
+            Value<DateTime> day = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              FetchHistoriesCompanion(
+            sensorId: sensorId,
+            day: day,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required int sensorId,
+            required DateTime day,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              FetchHistoriesCompanion.insert(
+            sensorId: sensorId,
+            day: day,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $$FetchHistoriesTableFilterComposer
+    extends FilterComposer<_$SharedDatabase, $FetchHistoriesTable> {
+  $$FetchHistoriesTableFilterComposer(super.$state);
+  ColumnFilters<int> get sensorId => $state.composableBuilder(
+      column: $state.table.sensorId,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get day => $state.composableBuilder(
+      column: $state.table.day,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $$FetchHistoriesTableOrderingComposer
+    extends OrderingComposer<_$SharedDatabase, $FetchHistoriesTable> {
+  $$FetchHistoriesTableOrderingComposer(super.$state);
+  ColumnOrderings<int> get sensorId => $state.composableBuilder(
+      column: $state.table.sensorId,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get day => $state.composableBuilder(
+      column: $state.table.day,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+class $SharedDatabaseManager {
+  final _$SharedDatabase _db;
+  $SharedDatabaseManager(this._db);
+  $$SensorDataTableTableManager get sensorData =>
+      $$SensorDataTableTableManager(_db, _db.sensorData);
+  $$InitialSensorDataTableTableManager get initialSensorData =>
+      $$InitialSensorDataTableTableManager(_db, _db.initialSensorData);
+  $$FetchHistoriesTableTableManager get fetchHistories =>
+      $$FetchHistoriesTableTableManager(_db, _db.fetchHistories);
 }

@@ -20,6 +20,7 @@ class SensorDataDto {
   final double? battery;
   final double? moisture;
   final double? temperature;
+  final double? humidity;
   final int? carbon;
   final int? conductivity;
   final int? light;
@@ -29,6 +30,7 @@ class SensorDataDto {
     this.battery,
     this.moisture,
     this.temperature,
+    this.humidity,
     this.carbon,
     this.conductivity,
     this.light,
@@ -41,6 +43,7 @@ class SensorDataDto {
       {double? battery,
       double? moisture,
       double? temperature,
+      double? humidity,
       int? carbon,
       int? conductivity,
       int? light}) {
@@ -49,6 +52,7 @@ class SensorDataDto {
         battery ?? this.battery,
         moisture ?? this.moisture,
         temperature ?? this.temperature,
+        humidity ?? this.humidity,
         carbon ?? this.carbon,
         conductivity ?? this.conductivity,
         light ?? this.light);
@@ -108,7 +112,7 @@ class SensorDataDto {
   }
 }
 
-@JsonSerializable(createFactory: false)
+@JsonSerializable(createFactory: false, createToJson: false)
 class AgentDecoratorDto {
   final Map<String, dynamic> payload;
 
@@ -174,7 +178,7 @@ class AgentStateDto {
 
   static dynamic toJson(AgentStateDto self) {
     if (self._time == null) {
-    return self._state.name.toString();
+      return self._state.name.toString();
     }
     return {self._state.name.toString(): self._time?.toString()};
   }
@@ -209,7 +213,7 @@ class AgentStateDto {
   }
 }
 
-@JsonSerializable(createToJson: false)
+@JsonSerializable(createToJson: true)
 class AgentRenderDto {
   final AgentDecoratorDto decorator;
   @JsonKey(fromJson: AgentStateDto.fromJson, toJson: AgentStateDto.toJson)

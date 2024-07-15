@@ -131,6 +131,14 @@ class _SensorDataCardState extends State<SensorDataCard> {
             ),
             ..._buildTile(
               context: context,
+              icon: Icons.air,
+              unitName: 'Luft-Feuchtigkeit',
+              value: data.humidity,
+              unit: '%',
+              tabIndex: 1,
+            ),
+            ..._buildTile(
+              context: context,
               icon: Icons.power_settings_new,
               unitName: 'Leitbarkeit',
               value: data.conductivity,
